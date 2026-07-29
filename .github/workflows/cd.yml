@@ -73,6 +73,15 @@ jobs:
           echo "image=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
 
   deploy:
+    # Manual-dispatch only. This is an open-source repo with no live Azure
+    # credentials configured (no AZURE_CLIENT_ID / AZURE_TENANT_ID /
+    # AZURE_SUBSCRIPTION_ID repo variables) -- running this on every push to
+    # main would fail the Azure OIDC login step every single time with:
+    #   "Login failed with Error: Using auth-type: SERVICE_PRINCIPAL.
+    #    Not all values are present."
+    # See DEPLOYMENT.md -> "Why the deploy job doesn't run automatically"
+    # for the full explanation and the one-time setup needed to enable it.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     needs: build-and-push
     environment: production
