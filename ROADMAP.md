@@ -5,6 +5,36 @@ here can move, split, or drop depending on what a real wave run surfaces.
 If you want to pick one of these up, open an issue first — see
 [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
+## Open-source initiative
+
+This project is open source so the rule engine, the guardrail pack, and the
+GCC food-law knowledge base stay reviewable by anyone who wants to check
+them against the actual regulations — not just the maintainer. The goal
+over time is a small community of contributors around three things: keeping
+`gcc_food_law_json/` current as regulations change, extending the guardrail
+pack, and hardening the pipeline itself (the "Near term" and "Later /
+exploratory" items below).
+
+**Community feature contest — $1,000 in Azure AI compute.** To kick this
+off, the best community-submitted feature integration wins $1,000 worth of
+Azure AI credits, sponsored by the maintainer. "Best" means: solves a real
+gap on this roadmap (or a well-argued gap not yet listed), ships with
+tests, and doesn't compromise the standing constraints in `README.md` (no
+LLM-produced labels, no golden-set access from an agent environment, etc.).
+How to enter:
+
+1. Open an issue describing what you want to build and why, tagged
+   `contest`, before starting work — this avoids two people building the
+   same thing and lets the maintainer flag anything that conflicts with a
+   standing constraint early.
+2. Submit a PR referencing that issue, following [`CONTRIBUTING.md`](CONTRIBUTING.md).
+3. Winner is chosen by the maintainer once the submission window closes;
+   selection criteria and the closing date are posted on the pinned contest
+   issue in the Issues tab (open one if it doesn't exist yet).
+
+This is a starting point, not a permanent program — terms may be adjusted
+run to run based on what submissions actually look like.
+
 ## Now
 
 Recently shipped, still hardening:
