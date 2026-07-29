@@ -1,13 +1,21 @@
 # GCC cold-chain fine-tuning pipeline
 
 [![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
+[![CD - Azure Container Apps](https://github.com/<OWNER>/<REPO>/actions/workflows/cd.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/cd.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-3C3489)](LICENSE)
+[![Python 3.11 | 3.12](https://img.shields.io/badge/python-3.11%20%7C%203.12-0C447C)](requirements.txt)
+[![Docker](https://img.shields.io/badge/container-Dockerfile-085041)](Dockerfile)
+[![Deploy to Azure](https://img.shields.io/badge/Azure-Container%20Apps-0C447C)](https://portal.azure.com/#create/Microsoft.Template/uri=https%3A%2F%2Fraw.githubusercontent.com%2F<OWNER>%2F<REPO>%2Fmain%2Finfra%2Fmain.json)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-712B13)](CONTRIBUTING.md)
+
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri=https%3A%2F%2Fraw.githubusercontent.com%2F<OWNER>%2F<REPO>%2Fmain%2Finfra%2Fmain.json)
 
 > Replace `<OWNER>/<REPO>` above with this repo's actual GitHub path once
 > pushed — GitHub badges and the Deploy-to-Azure button both need a real,
 > public URL to resolve. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for full
 > Azure Container Apps CI/CD setup (OIDC login, required GitHub secrets,
-> one-time role assignments).
+> one-time role assignments), [`ROADMAP.md`](ROADMAP.md) for what's planned
+> next, and [`CONTRIBUTING.md`](CONTRIBUTING.md) to open a PR.
 
 An agentic data-generation and evaluation pipeline that builds a 5,304-record,
 English-language training corpus (8 waves of 663) for a student model that
@@ -57,6 +65,9 @@ Mongo: ledger, coverage_state ├─→ cold_chain/curriculum.py ─→ plan.jso
 | `infra/main.json` | ARM template provisioning an Azure Container Apps Job to run pipeline stages unattended — see [`DEPLOYMENT.md`](DEPLOYMENT.md) |
 | `.github/workflows/ci.yml` | pytest across Python 3.11/3.12 + a Docker build check on every push/PR |
 | `.github/workflows/cd.yml` | Builds and pushes the image to GHCR, then updates the Azure Container Apps Job on push to `main` |
+| [`ROADMAP.md`](ROADMAP.md) | What's shipped, what's planned next, and what's explicitly out of scope |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Dev setup, coding standards, and the review process for changes to `rules_engine.py` / `guardrails/` |
+| [`LICENSE`](LICENSE) | MIT |
 
 ### `cold_chain/`
 
