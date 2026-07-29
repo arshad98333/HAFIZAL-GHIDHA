@@ -1,0 +1,314 @@
+{
+  "meta": {
+    "guardrail_pack": "GCC Perishable & Cold-Storage Guardrails for AI Agents",
+    "file_role": "country_overlay",
+    "version": "1.0.0",
+    "compiled_on": "2026-07-28",
+    "country": "Kingdom of Saudi Arabia",
+    "country_arabic": "المملكة العربية السعودية",
+    "iso_3166_1_alpha_2": "SA",
+    "extends": "00_gcc_base_guardrails.json",
+    "precedence": "This overlay takes precedence over the base file on any conflict. Base rules GCC-EDGE-001..020 and GCC-NORM-001..005 remain in force unless explicitly overridden here.",
+    "primary_competent_authority": "Saudi Food and Drug Authority (SFDA)",
+    "legal_profile_reference": "../gcc_food_law_json/02_saudi_arabia_food_law.json",
+    "design_principle": {
+      "name": "Pareto (80/20)",
+      "edge_case_rules": 8,
+      "normal_case_rules": 2,
+      "ratio": "80% edge / 20% normal",
+      "combined_with_base": {
+        "total_edge": 28,
+        "total_normal": 7,
+        "combined_ratio": "80% edge / 20% normal"
+      }
+    },
+    "derived_from": {
+      "dataset": "wave_9001.jsonl",
+      "worked_vertical": "finfish_seafood (chilled), extended to all chilled 0-5 C and frozen <= -18 C perishables"
+    },
+    "disclaimer": "Operational guardrails for agent design. Not legal advice. Penalty figures and procedures change; verify at source before enforcement."
+  },
+  "rules": [
+    {
+      "rule_id": "SA-EDGE-001",
+      "class": "edge_case",
+      "category": "legal_gate_notification",
+      "severity": "blocking",
+      "title": "SFDA rapid warning system triggers on risk, not on confirmed harm",
+      "legal_basis": {
+        "instrument": "Food Law, Royal Decree No. M/1 (1436 AH); SFDA rapid warning system for direct or indirect risks to human health; SFDA powers to inspect, sample, close facilities, suspend production lines and withdraw food",
+        "authority": "Saudi Food and Drug Authority (SFDA)"
+      },
+      "trigger": {
+        "expression": "excursion_confirmed OR telemetry_defect_on_high_risk_product",
+        "signals": [
+          "product already released from the port",
+          "distributed to retail",
+          "SFDA-registered establishment involved"
+        ]
+      },
+      "agent_must": [
+        "Treat the rapid warning threshold as a potential risk to public health, not a proven one",
+        "Draft the notification and assemble the distribution list; escalate for human transmission",
+        "Recognise SFDA as the single competent authority across the whole food chain - there is no separate federal/local split as in the UAE"
+      ],
+      "agent_must_not": [
+        "Wait for laboratory confirmation before escalating",
+        "Notify a municipal authority instead of SFDA and treat that as discharge of the duty"
+      ],
+      "escalation": "Immediate human escalation; agent drafts, human transmits."
+    },
+    {
+      "rule_id": "SA-EDGE-002",
+      "class": "edge_case",
+      "category": "import_clearance",
+      "severity": "blocking",
+      "title": "FASEH release is a gate the agent cannot substitute for",
+      "legal_basis": {
+        "instrument": "Food Law Article 7 - imported food shall not be released prior to SFDA approval; SFDA Conditions and Requirements for Importing Food, Article 5 (SFDA procedures)",
+        "authority": "SFDA; ZATCA for customs release after SFDA clearance"
+      },
+      "trigger": {
+        "expression": "consignment is imported AND FASEH release status is not confirmed released",
+        "signals": [
+          "consignment at port",
+          "clearance pending",
+          "agent asked whether the load 'looks fine to move'"
+        ]
+      },
+      "agent_must": [
+        "State that no imported consignment may be released prior to SFDA approval, regardless of how good the telemetry looks",
+        "Report FASEH status as a distinct field from telemetry verdict",
+        "Treat an in-spec log as evidence supporting clearance, never as clearance"
+      ],
+      "agent_must_not": [
+        "Recommend gate-out on telemetry alone",
+        "Interpret ZATCA customs progress as SFDA food clearance",
+        "Advise moving a consignment held pending SFDA decision"
+      ],
+      "escalation": "Hard block on any release recommendation before confirmed SFDA release."
+    },
+    {
+      "rule_id": "SA-EDGE-003",
+      "class": "edge_case",
+      "category": "documentation_integrity",
+      "severity": "blocking",
+      "title": "Health certificate must match the physical consignment after a cold-chain event",
+      "legal_basis": {
+        "instrument": "SFDA import conditions Articles 3 and 5 - health certificates must follow the SFDA or GSO model and be issued by the competent authority of the exporting country; SFDA designs the standard certificate models and may audit the exporting country's competent authority under Article 8",
+        "authority": "SFDA"
+      },
+      "trigger": {
+        "expression": "consignment split, transferred, partially salvaged or re-consolidated following an excursion",
+        "signals": [
+          "part of the load moved to a substitute reefer",
+          "salvage repacking",
+          "consignment split across two clearance entries"
+        ]
+      },
+      "agent_must": [
+        "Flag that any split, transfer or repack breaks the one-certificate-to-one-consignment correspondence",
+        "Require certificate reconciliation before proposing any onward movement",
+        "Verify the certificate follows the current SFDA or GSO model, not an annexed model from an older edition of the import guide"
+      ],
+      "agent_must_not": [
+        "Assume a certificate covers a reconstituted or partially salvaged consignment",
+        "Reuse a certificate reference across a split",
+        "Rely on the certificate models annexed to an undated import guide as current"
+      ],
+      "escalation": "hold_for_qa pending SFDA position on the split."
+    },
+    {
+      "rule_id": "SA-EDGE-004",
+      "class": "edge_case",
+      "category": "halal_integrity",
+      "severity": "blocking",
+      "title": "Halal certification chain must survive the salvage decision",
+      "legal_basis": {
+        "instrument": "SFDA Halal Center recognition of Halal Certification Bodies; certificate of consignment for halal slaughter (meat, poultry, birds) and certificate of consignment for halal products; adopted GSO 2055-1",
+        "authority": "SFDA Halal Center"
+      },
+      "trigger": {
+        "expression": "salvage, transfer or co-storage following a cold-chain failure on a halal-relevant consignment",
+        "signals": [
+          "substitute reefer with unknown prior load",
+          "emergency cross-dock",
+          "co-storage during breakdown"
+        ]
+      },
+      "agent_must": [
+        "Confirm that the halal certificate was issued by a body recognised by the SFDA Halal Center - an unrecognised body's certificate has no standing regardless of its content",
+        "Treat halal segregation as a separate pass/fail dimension from temperature",
+        "Verify which of the three certificate types applies: consignment halal slaughter, consignment halal products, or establishment-level halal certificate"
+      ],
+      "agent_must_not": [
+        "Accept a halal certificate from a body not recognised by the SFDA Halal Center",
+        "Treat successful temperature recovery as curing a segregation break"
+      ],
+      "escalation": "reject the halal claim and escalate."
+    },
+    {
+      "rule_id": "SA-EDGE-005",
+      "class": "edge_case",
+      "category": "labelling_integrity",
+      "severity": "blocking",
+      "title": "No re-dating or relabelling; menu-level disclosure is also in scope",
+      "legal_basis": {
+        "instrument": "Adopted GSO 9 date marking - producer-applied indelible dates only, no stickers, one date per pack; SFDA menu labelling technical regulation in force from 1 July 2025",
+        "authority": "SFDA; Ministry of Municipalities and Housing for food service premises"
+      },
+      "trigger": {
+        "expression": "proposal to alter a date or label after an excursion, OR excursion affects product destined for a food service establishment subject to menu labelling"
+      },
+      "agent_must": [
+        "Refuse all date and label alteration, including shortening",
+        "Note that for food service destinations, an excursion affecting composition or portioning can also invalidate declared menu nutrition, caffeine or sodium information",
+        "Route any legitimate re-dating need to SFDA through a named human"
+      ],
+      "agent_must_not": [
+        "Propose a date sticker",
+        "Assume menu labelling obligations are unaffected by a product substitution made during salvage"
+      ],
+      "escalation": "Immediate."
+    },
+    {
+      "rule_id": "SA-EDGE-006",
+      "class": "edge_case",
+      "category": "penalty_exposure",
+      "severity": "blocking",
+      "title": "Penalty exposure is set by a schedule that changes - do not quote stale figures",
+      "legal_basis": {
+        "instrument": "Food Law (M/1) penalty chapter plus the joint SFDA / Ministry of Municipalities and Housing schedule of food law violations, updated in 2025. SFDA enforcement powers include facility closure, production line suspension and seizure.",
+        "authority": "SFDA with MOMAH"
+      },
+      "trigger": {
+        "expression": "agent is asked to state penalty exposure OR to auto-release against an unresolved excursion"
+      },
+      "agent_must": [
+        "State that penalty amounts are set in a periodically updated violations schedule and must be read from the current schedule",
+        "Escalate to a named human for any release against the agent's proposal",
+        "Report the enforcement powers (closure, line suspension, seizure) as the operative risk rather than quoting a figure"
+      ],
+      "agent_must_not": [
+        "Quote a specific fine figure from memory or from an undated document",
+        "Release autonomously"
+      ],
+      "escalation": "Named human authorisation, recorded."
+    },
+    {
+      "rule_id": "SA-EDGE-007",
+      "class": "edge_case",
+      "category": "authority_change",
+      "severity": "medium",
+      "title": "Cite the current SFDA statute, not the 2007 Act",
+      "legal_basis": {
+        "instrument": "A new Law of the Saudi Food and Drug Authority was enacted in 2025, superseding the Food and Drug Authority Act (Royal Decree M/6 of 1428 AH). The 2025 Law grants SFDA legal personality with financial and administrative independence, reporting to the President of the Council of Ministers, and consolidates regulatory, executive and monitoring mandates.",
+        "authority": "SFDA"
+      },
+      "trigger": {
+        "expression": "agent generates a legal citation for a Saudi cold-chain decision"
+      },
+      "agent_must": [
+        "Cite the Food Law (Royal Decree M/1, 1436 AH) as the substantive food statute and the 2025 SFDA Law as the authority statute",
+        "Flag that the exact royal decree number of the 2025 SFDA Law is unverified in the sibling profile and should be confirmed on laws.boe.gov.sa or in the Umm Al-Qura gazette",
+        "Check the SFDA regulations register for the current edition of any technical regulation cited"
+      ],
+      "agent_must_not": [
+        "Cite Royal Decree M/6 of 1428 AH as the current SFDA statute",
+        "Cite a technical regulation edition without checking the register"
+      ],
+      "escalation": "None; citation hygiene."
+    },
+    {
+      "rule_id": "SA-EDGE-008",
+      "class": "edge_case",
+      "category": "bilingual_input",
+      "severity": "high",
+      "title": "Arabic narrative parsing and bilingual certificate reconciliation",
+      "legal_basis": {
+        "instrument": "SFDA health certificate models are bilingual Arabic/English; adopted GSO 9 requires Arabic labelling",
+        "authority": "SFDA"
+      },
+      "trigger": {
+        "expression": "artifact language is ar_msa OR a bilingual certificate is in evidence",
+        "signals": [
+          "°م notation",
+          "hedge words أغلبها / حوالي / تقريبًا",
+          "Arabic and English certificate fields that do not correspond"
+        ]
+      },
+      "agent_must": [
+        "Apply base rules GCC-EDGE-008 and GCC-EDGE-011 to Arabic hedge words exactly as to English ones",
+        "Reconcile the Arabic and English fields of a bilingual certificate and report any divergence as a documentation defect",
+        "Quote both language versions verbatim where they diverge"
+      ],
+      "agent_must_not": [
+        "Read only the English half of a bilingual certificate",
+        "Round or reformat numbers during translation",
+        "Treat a divergence between the Arabic and English fields as a translation artefact rather than a defect"
+      ],
+      "escalation": "hold_for_qa on any certificate field divergence."
+    },
+    {
+      "rule_id": "SA-NORM-001",
+      "class": "normal_case",
+      "category": "routine_clearance",
+      "severity": "informational",
+      "title": "Normal Saudi clearance path",
+      "trigger": {
+        "expression": "base GCC-NORM-001 or GCC-NORM-002 satisfied AND FASEH released AND halal certification from an SFDA-recognised body AND health certificate on the current model"
+      },
+      "agent_must": [
+        "Report telemetry verdict, FASEH status, halal certificate body recognition and health certificate model as four separate confirmations",
+        "Cite Food Law Article 7 and the SFDA import conditions"
+      ],
+      "agent_must_not": [
+        "Collapse the four confirmations into a single 'cleared' statement"
+      ],
+      "escalation": "None."
+    },
+    {
+      "rule_id": "SA-NORM-002",
+      "class": "normal_case",
+      "category": "record_contract",
+      "severity": "medium",
+      "title": "Saudi record and citation contract",
+      "trigger": {
+        "expression": "any disposition emitted"
+      },
+      "agent_must": [
+        "Cite the specific article of the Food Law or the specific SFDA technical regulation relied on",
+        "Record the FASEH reference and the halal certificate reference in the traceability write-back",
+        "Retain the raw telemetry artifact unmodified"
+      ],
+      "agent_must_not": [
+        "Cite 'SFDA regulations' generically without an instrument reference"
+      ],
+      "escalation": "None."
+    }
+  ],
+  "rule_index": {
+    "blocking": [
+      "SA-EDGE-001",
+      "SA-EDGE-002",
+      "SA-EDGE-003",
+      "SA-EDGE-004",
+      "SA-EDGE-005",
+      "SA-EDGE-006"
+    ],
+    "edge_case": [
+      "SA-EDGE-001",
+      "SA-EDGE-002",
+      "SA-EDGE-003",
+      "SA-EDGE-004",
+      "SA-EDGE-005",
+      "SA-EDGE-006",
+      "SA-EDGE-007",
+      "SA-EDGE-008"
+    ],
+    "normal_case": [
+      "SA-NORM-001",
+      "SA-NORM-002"
+    ]
+  }
+}

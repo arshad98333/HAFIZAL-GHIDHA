@@ -1,0 +1,304 @@
+{
+  "meta": {
+    "guardrail_pack": "GCC Perishable & Cold-Storage Guardrails for AI Agents",
+    "file_role": "country_overlay",
+    "version": "1.0.0",
+    "compiled_on": "2026-07-28",
+    "country": "State of Qatar",
+    "country_arabic": "دولة قطر",
+    "iso_3166_1_alpha_2": "QA",
+    "extends": "00_gcc_base_guardrails.json",
+    "precedence": "This overlay takes precedence over the base file on any conflict. Base rules GCC-EDGE-001..020 and GCC-NORM-001..005 remain in force unless explicitly overridden here.",
+    "primary_competent_authority": "Ministry of Public Health - Food Safety Department",
+    "legal_profile_reference": "../gcc_food_law_json/03_qatar_food_law.json",
+    "design_principle": {
+      "name": "Pareto (80/20)",
+      "edge_case_rules": 8,
+      "normal_case_rules": 2,
+      "ratio": "80% edge / 20% normal",
+      "combined_with_base": {
+        "total_edge": 28,
+        "total_normal": 7,
+        "combined_ratio": "80% edge / 20% normal"
+      }
+    },
+    "derived_from": {
+      "dataset": "wave_9001.jsonl",
+      "worked_vertical": "finfish_seafood (chilled), extended to all chilled 0-5 C and frozen <= -18 C perishables"
+    },
+    "disclaimer": "Operational guardrails for agent design. Not legal advice. Penalty figures and procedures change; verify at source before enforcement."
+  },
+  "rules": [
+    {
+      "rule_id": "QA-EDGE-001",
+      "class": "edge_case",
+      "category": "legal_gate_notification",
+      "severity": "blocking",
+      "title": "Multi-agency notification - MOPH is not the only addressee",
+      "legal_basis": {
+        "instrument": "Law No. 8 of 1990 on the Regulation of Human Food Control, Article 7 (competent authorities and their respective jurisdictions), as amended by Law No. 4 of 2014",
+        "authority": "Ministry of Public Health Food Safety Department, with the Ministry of Municipality, MOCI, the Ministry of Environment and Climate Change, HMC and PHCC"
+      },
+      "trigger": {
+        "expression": "excursion_confirmed OR suspected foodborne risk",
+        "signals": [
+          "product in food service",
+          "product in retail",
+          "imported consignment at a port",
+          "suspected illness cluster"
+        ]
+      },
+      "agent_must": [
+        "Identify every authority with jurisdiction over the specific leg before proposing a notification path - Qatar operates a multi-agency model and Article 7 allocates jurisdiction",
+        "Route foodborne illness signals to MOPH and note the HMC/PHCC surveillance interface",
+        "Draft, escalate, and let a named human transmit"
+      ],
+      "agent_must_not": [
+        "Assume MOPH notification alone discharges every duty",
+        "Notify a single authority by default because it was correct on a previous consignment"
+      ],
+      "escalation": "Immediate human escalation with the jurisdiction map attached."
+    },
+    {
+      "rule_id": "QA-EDGE-002",
+      "class": "edge_case",
+      "category": "shelf_life",
+      "severity": "blocking",
+      "title": "QS 10050:2025 governs shelf life - do not apply pre-2025 assumptions",
+      "legal_basis": {
+        "instrument": "Ministerial Decision No. 102 of 2025 adopting Qatari Technical Regulation QS 10050:2025 on the Shelf Life of Food Products, developed by MOCI with MOPH, the Ministry of Municipality and QS; published December 2025",
+        "authority": "MOCI / QS, with MOPH"
+      },
+      "trigger": {
+        "expression": "shelf life, expiry or remaining-life question arises for a Qatari consignment"
+      },
+      "agent_must": [
+        "Apply QS 10050:2025 as the governing shelf-life instrument and cite it explicitly",
+        "Flag that any shelf-life logic derived from a pre-2025 code of practice or guidance document is superseded",
+        "Confirm transition and phase-in dates with MOCI or QS before applying it to in-transit stock",
+        "Report excursion-consumed shelf life separately from the printed date"
+      ],
+      "agent_must_not": [
+        "Apply shelf-life reasoning taken from the 2020 MOPH Food Safety Code of Practice without checking it against QS 10050:2025",
+        "Assume the GCC half-life-on-arrival convention without confirming the figure under QS 10050:2025"
+      ],
+      "escalation": "hold_for_qa where the applicable shelf-life rule cannot be confirmed."
+    },
+    {
+      "rule_id": "QA-EDGE-003",
+      "class": "edge_case",
+      "category": "penalty_exposure",
+      "severity": "blocking",
+      "title": "Penalty amounts are unverified - never state a figure",
+      "legal_basis": {
+        "instrument": "Law No. 8 of 1990, Chapter on Crimes and Penalties, Articles 19-23, as amended by Law No. 4 of 2014",
+        "authority": "MOPH; courts"
+      },
+      "trigger": {
+        "expression": "agent is asked to state Qatari penalty exposure"
+      },
+      "agent_must": [
+        "State that the specific fine and imprisonment ranges under Articles 19-23 as amended are not verified in the sibling country profile and must be read from Al Meezan",
+        "Describe the enforcement measures available (prohibition of handling, seizure, withdrawal, destruction, closure, fines, imprisonment) without quoting amounts",
+        "Escalate any release-against-proposal to a named human"
+      ],
+      "agent_must_not": [
+        "Invent, estimate or infer a Qatari fine figure",
+        "Transfer a UAE or Kuwaiti figure by analogy"
+      ],
+      "escalation": "Named human authorisation, recorded.",
+      "note": "This is a deliberate known-gap rule. The sibling Qatar profile marks penalty amounts as NOT STATED because Al Meezan is JavaScript-rendered and no machine-readable official text was retrievable."
+    },
+    {
+      "rule_id": "QA-EDGE-004",
+      "class": "edge_case",
+      "category": "labelling_integrity",
+      "severity": "blocking",
+      "title": "No re-dating; allergen menu disclosure survives substitution",
+      "legal_basis": {
+        "instrument": "GSO 9 date marking as adopted (producer-applied indelible dates, no stickers, one date per pack); MOPH Food Safety Code of Practice for Food Services requires menu items to declare the presence of GSO 9 allergens",
+        "authority": "MOPH; MOCI"
+      },
+      "trigger": {
+        "expression": "proposal to alter a date or label after an excursion, OR a salvage substitution changes the ingredient profile of a food service item"
+      },
+      "agent_must": [
+        "Refuse date and label alteration including shortening",
+        "Flag that a substitution made during salvage can invalidate the menu allergen declaration for a food service destination",
+        "Re-verify the allergen declaration whenever an ingredient is substituted"
+      ],
+      "agent_must_not": [
+        "Propose a date sticker",
+        "Assume the menu allergen declaration is unaffected by a substitution"
+      ],
+      "escalation": "Immediate."
+    },
+    {
+      "rule_id": "QA-EDGE-005",
+      "class": "edge_case",
+      "category": "halal_integrity",
+      "severity": "blocking",
+      "title": "Halal segregation during emergency transfer",
+      "legal_basis": {
+        "instrument": "Adopted GSO 2055-1; halal slaughter certificate required for meat and poultry, halal certificate for products with halal-relevant ingredients",
+        "authority": "MOPH with the Ministry of Municipality"
+      },
+      "trigger": {
+        "expression": "emergency transfer, co-storage or cross-dock on a halal-relevant consignment"
+      },
+      "agent_must": [
+        "Verify prior-load history and segregation of any substitute unit",
+        "Treat halal integrity as a separate pass/fail dimension",
+        "Record the halal certificate reference alongside the transfer decision"
+      ],
+      "agent_must_not": [
+        "Optimise only for temperature when selecting a substitute unit",
+        "Treat temperature recovery as curing a segregation break"
+      ],
+      "escalation": "reject the halal claim and escalate."
+    },
+    {
+      "rule_id": "QA-EDGE-006",
+      "class": "edge_case",
+      "category": "prerequisite_programmes",
+      "severity": "high",
+      "title": "Cold-chain failure at a food service destination reopens the prerequisite programme",
+      "legal_basis": {
+        "instrument": "MOPH Food Safety Code of Practice for Food Services (Rev. 0, October 2020), Part A prerequisite programmes - including ambient temperature, air quality and ventilation, and documents and records",
+        "authority": "MOPH Food Safety Department"
+      },
+      "trigger": {
+        "expression": "excursion occurs at or on delivery to a food service establishment",
+        "signals": [
+          "walk-in chiller failure",
+          "receiving dock delay in high ambient",
+          "documented ambient temperature control lapse"
+        ]
+      },
+      "agent_must": [
+        "Check whether the excursion indicates a prerequisite programme failure at the receiving establishment, not just a transport failure",
+        "Require the establishment's documents and records for the relevant prerequisite area",
+        "Recognise that MOPH inspection covers restaurants, hotels, supermarkets and food factories - the receiving site is in scope, not only the carrier"
+      ],
+      "agent_must_not": [
+        "Attribute a receiving-site failure to the carrier by default",
+        "Close a case on the transport leg when the excursion pattern points to the destination chiller"
+      ],
+      "escalation": "hold_for_qa and open a prerequisite programme review at the receiving site."
+    },
+    {
+      "rule_id": "QA-EDGE-007",
+      "class": "edge_case",
+      "category": "citation_hygiene",
+      "severity": "medium",
+      "title": "Authority names in older Qatari guidance are outdated",
+      "legal_basis": {
+        "instrument": "Institutional renaming since Law No. 4 of 2014",
+        "authority": "MOPH; Ministry of Municipality"
+      },
+      "trigger": {
+        "expression": "agent cites a Qatari authority or an older guidance document"
+      },
+      "agent_must": [
+        "Use Ministry of Public Health, not Supreme Council of Health",
+        "Use Ministry of Municipality, not Ministry of Municipality and Urban Planning",
+        "Note that several GSO editions cited in the 2020 code of practice are dated (GSO 21/1984, 323/1994, 969/1997, 1694/2005, 1909/2009, 1971/2009, 2309/2013) and verify current editions"
+      ],
+      "agent_must_not": [
+        "Reproduce superseded authority names from a source document without correction"
+      ],
+      "escalation": "None; citation hygiene."
+    },
+    {
+      "rule_id": "QA-EDGE-008",
+      "class": "edge_case",
+      "category": "bilingual_input",
+      "severity": "high",
+      "title": "Arabic operator narrative parsing",
+      "legal_basis": {
+        "instrument": "Adopted GSO 9 Arabic labelling requirement; bilingual operations",
+        "authority": "MOPH"
+      },
+      "trigger": {
+        "expression": "artifact language is ar_msa OR mixed",
+        "signals": [
+          "°م notation",
+          "أغلبها / حوالي / تقريبًا",
+          "Arabic-Indic digits",
+          "Hijri dates"
+        ]
+      },
+      "agent_must": [
+        "Parse °م as Celsius preserving exact values",
+        "Apply base rules GCC-EDGE-008 and GCC-EDGE-011 to Arabic hedge words",
+        "Convert any Hijri date to Gregorian and show both",
+        "Quote the Arabic verbatim in evidence"
+      ],
+      "agent_must_not": [
+        "Round during translation",
+        "Take the midpoint of an approximate range",
+        "Drop hedge words in translation"
+      ],
+      "escalation": "hold_for_qa where translation ambiguity changes the disposition."
+    },
+    {
+      "rule_id": "QA-NORM-001",
+      "class": "normal_case",
+      "category": "routine_clearance",
+      "severity": "informational",
+      "title": "Normal Qatari clearance path",
+      "trigger": {
+        "expression": "base GCC-NORM-001 or GCC-NORM-002 satisfied AND shelf life confirmed under QS 10050:2025 AND halal documentation complete"
+      },
+      "agent_must": [
+        "Confirm the MOPH health control gate and any Ministry of Municipality quarantine gate separately",
+        "Cite Law No. 8 of 1990 as amended by Law No. 4 of 2014, and QS 10050:2025 where shelf life is material"
+      ],
+      "agent_must_not": [
+        "Report clearance without naming which authority cleared which aspect"
+      ],
+      "escalation": "None."
+    },
+    {
+      "rule_id": "QA-NORM-002",
+      "class": "normal_case",
+      "category": "record_contract",
+      "severity": "medium",
+      "title": "Qatari record and citation contract",
+      "trigger": {
+        "expression": "any disposition emitted"
+      },
+      "agent_must": [
+        "Cite the specific article or technical regulation relied on",
+        "Record the inspection reference and retain the raw telemetry artifact unmodified"
+      ],
+      "agent_must_not": [
+        "Quote a penalty figure - see QA-EDGE-003"
+      ],
+      "escalation": "None."
+    }
+  ],
+  "rule_index": {
+    "blocking": [
+      "QA-EDGE-001",
+      "QA-EDGE-002",
+      "QA-EDGE-003",
+      "QA-EDGE-004",
+      "QA-EDGE-005"
+    ],
+    "edge_case": [
+      "QA-EDGE-001",
+      "QA-EDGE-002",
+      "QA-EDGE-003",
+      "QA-EDGE-004",
+      "QA-EDGE-005",
+      "QA-EDGE-006",
+      "QA-EDGE-007",
+      "QA-EDGE-008"
+    ],
+    "normal_case": [
+      "QA-NORM-001",
+      "QA-NORM-002"
+    ]
+  }
+}

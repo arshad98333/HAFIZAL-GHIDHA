@@ -1,0 +1,600 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "document_type": "country_food_law_and_food_safety_profile",
+    "country": "United Arab Emirates",
+    "country_arabic": "الإمارات العربية المتحدة",
+    "iso_3166_1_alpha_2": "AE",
+    "iso_3166_1_alpha_3": "ARE",
+    "region": "Gulf Cooperation Council (GCC)",
+    "compiled_on": "2026-07-28",
+    "data_current_as_of": "2026-07-28",
+    "language_of_record": "en",
+    "source_document_supplied_by_user": {
+      "filename": "Federal Law No. (10) _UAE.pdf",
+      "description": "Official English text of UAE Federal Law No. 10 of 2015 Concerning Food Safety (22 articles).",
+      "document_date": "2015-11-03",
+      "status": "used as base; all substantive content re-verified against current official and secondary sources"
+    },
+    "verification": {
+      "method": "Text extracted from the supplied PDF, then each legal instrument, authority name and requirement cross-checked against official gazettes/legal portals, the competent authority website, FAOLEX/ECOLEX, and current regulatory-intelligence reporting.",
+      "overall_confidence": "high",
+      "caveats": [
+        "Federal Law No. 10 of 2015 remains the primary federal food safety law and has NOT been repealed as of the compile date.",
+        "MOCCAE publicly announced a package of new food safety legislation (including a National System for Control and Inspection of Imported Food) targeted for early 2025; issuance had not been confirmed in the official gazette at the compile date. Treat as pending.",
+        "Emirate-level requirements (Abu Dhabi, Dubai, Sharjah, Ajman, RAK, Fujairah, UAQ) sit on top of the federal law and differ in detail; always check the relevant local authority."
+      ]
+    }
+  },
+  "competent_authorities": {
+    "primary_federal": {
+      "name": "Ministry of Climate Change and Environment",
+      "abbreviation": "MOCCAE",
+      "arabic_name": "وزارة التغيير المناخي والبيئة",
+      "role": "Federal competent authority for food safety under Federal Law No. 10/2015. Sets federal policy, technical regulations, food/fodder import controls, national food safety strategy, and coordinates the National Food Safety Committee.",
+      "website": "https://www.moccae.gov.ae"
+    },
+    "coordination_body": {
+      "name": "National Food Safety Committee",
+      "role": "Federal-local coordination on food safety policy, harmonising inspection regimes across the seven emirates."
+    },
+    "standards_body": {
+      "name": "Ministry of Industry and Advanced Technology - Standards and Metrology sector (formerly ESMA)",
+      "abbreviation": "MOIAT",
+      "role": "National standards, technical regulations, conformity assessment, Emirates Conformity Assessment Scheme (ECAS) and the national halal scheme (UAE.S GSO 2055 series).",
+      "website": "https://moiat.gov.ae",
+      "outdated_reference_note": "Federal Law No. 10/2015 cites Federal Law No. 28 of 2001 establishing the Emirates Authority for Standardization and Metrology (ESMA). ESMA was abolished in 2020 and its mandate transferred to MOIAT. Any reference to 'ESMA' in the 2015 text should now be read as MOIAT."
+    },
+    "local_authorities": [
+      {
+        "emirate": "Abu Dhabi",
+        "name": "Abu Dhabi Agriculture and Food Safety Authority",
+        "abbreviation": "ADAFSA",
+        "website": "https://www.adafsa.gov.ae",
+        "note": "Operates a Risk-Based inspection System (RBS) for food establishments; cited as a model for the planned national system."
+      },
+      {
+        "emirate": "Dubai",
+        "name": "Dubai Municipality - Food Safety Department",
+        "website": "https://www.dm.gov.ae",
+        "note": "Food label/product registration and establishment grading (Food Watch / FIRS platforms)."
+      },
+      {
+        "emirate": "Sharjah",
+        "name": "Sharjah City Municipality - Public Health Department",
+        "website": "https://portal.shjmun.gov.ae"
+      },
+      {
+        "emirate": "Ajman",
+        "name": "Ajman Municipality and Planning Department",
+        "note": "Operates the 'Raqeeb' smart inspection system."
+      },
+      {
+        "emirate": "Ras Al Khaimah",
+        "name": "RAK Municipality - Public Health Department"
+      },
+      {
+        "emirate": "Fujairah",
+        "name": "Fujairah Municipality"
+      },
+      {
+        "emirate": "Umm Al Quwain",
+        "name": "UAQ Municipality"
+      }
+    ],
+    "supporting_authorities": [
+      {
+        "name": "Federal Authority for Identity, Citizenship, Customs and Port Security (ICP) / local customs authorities",
+        "role": "Border clearance, cargo control."
+      },
+      {
+        "name": "Ministry of Economy and Tourism",
+        "role": "Consumer protection, commercial fraud."
+      },
+      {
+        "name": "Emirates Authority for Halal (national halal scheme under MOIAT)",
+        "role": "Recognition of halal certification bodies and halal national mark."
+      }
+    ]
+  },
+  "legal_framework": {
+    "primary_law": {
+      "citation": "Federal Law No. 10 of 2015 Concerning Food Safety",
+      "arabic_citation": "القانون الاتحادي رقم (10) لسنة 2015 في شأن سلامة الغذاء",
+      "issued": "2015-11-03",
+      "hijri_date": "21 Muharram 1437 AH (as printed in the official English text; note the official English PDF prints '1427 AH', which is a typographical error in the published translation)",
+      "entry_into_force": "Six months after issuance (Article 22) - i.e. from May 2016",
+      "status": "In force",
+      "structure": {
+        "articles": 22,
+        "chapters": "Not divided into chapters; 22 consecutive articles"
+      },
+      "article_map": [
+        {
+          "article": 1,
+          "subject": "Definitions"
+        },
+        {
+          "article": 2,
+          "subject": "Scope of application - all stages of the food and fodder chain"
+        },
+        {
+          "article": 3,
+          "subject": "General obligations of food business operators"
+        },
+        {
+          "article": 4,
+          "subject": "Requirements for food and fodder placed on the market"
+        },
+        {
+          "article": 5,
+          "subject": "Prohibited food / unfit food"
+        },
+        {
+          "article": 6,
+          "subject": "Food establishment obligations and self-control"
+        },
+        {
+          "article": 7,
+          "subject": "Traceability and record keeping"
+        },
+        {
+          "article": 8,
+          "subject": "Withdrawal and recall obligations"
+        },
+        {
+          "article": 9,
+          "subject": "Powers of the Ministry and competent authorities; inspection"
+        },
+        {
+          "article": 10,
+          "subject": "Import and export controls"
+        },
+        {
+          "article": 11,
+          "subject": "Sampling, analysis and custody of consignments"
+        },
+        {
+          "article": 12,
+          "subject": "Advertising and claims"
+        },
+        {
+          "article": 13,
+          "subject": "Information requests, prohibition of entry/trade in the public interest, confidentiality"
+        },
+        {
+          "article": 14,
+          "subject": "Criminal penalties"
+        },
+        {
+          "article": 15,
+          "subject": "Judicial seizure powers (officers designated by the Minister of Justice)"
+        },
+        {
+          "article": 16,
+          "subject": "Transition - 6 months to adjust status, extendable once by Cabinet"
+        },
+        {
+          "article": 17,
+          "subject": "Administrative measures, grievance and conciliation"
+        },
+        {
+          "article": 18,
+          "subject": "International and regional cooperation"
+        },
+        {
+          "article": 19,
+          "subject": "Territorial application - applies to the whole State including free zones"
+        },
+        {
+          "article": 20,
+          "subject": "Cabinet to issue Executive Regulations within 6 months"
+        },
+        {
+          "article": 21,
+          "subject": "Repeal of conflicting provisions; existing regulations remain until replaced"
+        },
+        {
+          "article": 22,
+          "subject": "Publication and entry into force"
+        }
+      ]
+    },
+    "executive_regulations": [
+      {
+        "citation": "Cabinet Resolution No. 26 of 2017 on the Executive Regulations of Federal Law No. 10 of 2015 Concerning Food Safety",
+        "status": "In force",
+        "content": "Detailed rules on food establishment obligations, registration/notification, hygiene, HACCP-based controls, import/export procedures, traceability, recall, inspection, grievance and conciliation procedures."
+      }
+    ],
+    "related_federal_legislation": [
+      {
+        "citation": "Federal Law No. 4 of 1979 on Combating Fraud and Adulteration in Commercial Transactions (as amended)",
+        "relevance": "Food adulteration and commercial fraud."
+      },
+      {
+        "citation": "Federal Law No. 5 of 1979 on Agricultural Quarantine (as amended)",
+        "relevance": "Plant health import controls."
+      },
+      {
+        "citation": "Federal Law No. 6 of 1979 on Veterinary Quarantine (as amended)",
+        "relevance": "Animal health import controls; GCC-unified in origin."
+      },
+      {
+        "citation": "Federal Law No. 41 of 1992 on Pesticides (as amended)",
+        "relevance": "Pesticide approval and residues."
+      },
+      {
+        "citation": "Federal Law No. 5 of 2009 on Organic Components and Products",
+        "relevance": "Organic food claims and certification."
+      },
+      {
+        "citation": "Federal Law No. 8 of 2013 on Prevention and Combating of Infectious and Epidemic Animal Diseases",
+        "relevance": "Animal disease controls affecting food of animal origin."
+      },
+      {
+        "citation": "Federal Law No. 15 of 2020 on Consumer Protection (and Cabinet Decision No. 66 of 2023 implementing regulations)",
+        "relevance": "Replaced Federal Law No. 24 of 2006 cited in the 2015 preamble. Governs pricing, misleading claims, recalls from a consumer-protection angle.",
+        "update_flag": "This SUPERSEDES the Federal Law No. 24 of 2006 reference in the preamble of Law 10/2015."
+      },
+      {
+        "citation": "Federal Decree-Law No. 31 of 2021 issuing the Crimes and Penalties Law (Penal Code)",
+        "relevance": "Replaced Federal Law No. 3 of 1987 cited in the 2015 preamble.",
+        "update_flag": "SUPERSEDES the Federal Law No. 3 of 1987 reference."
+      },
+      {
+        "citation": "Federal Decree-Law No. 32 of 2021 on Commercial Companies",
+        "relevance": "Replaced Federal Law No. 8 of 1984 cited in the preamble.",
+        "update_flag": "SUPERSEDES the Federal Law No. 8 of 1984 reference."
+      },
+      {
+        "citation": "Federal Decree-Law No. 38 of 2022 on Criminal Procedure",
+        "relevance": "Replaced Federal Law No. 35 of 1992 cited in the preamble.",
+        "update_flag": "SUPERSEDES the Federal Law No. 35 of 1992 reference."
+      },
+      {
+        "citation": "Federal Decree-Law No. 36 of 2021 on Trademarks",
+        "relevance": "Replaced Federal Law No. 37 of 1992 cited in the preamble.",
+        "update_flag": "SUPERSEDES the Federal Law No. 37 of 1992 reference."
+      }
+    ],
+    "pending_legislation": [
+      {
+        "item": "National System for Control and Inspection of Imported Food",
+        "status": "Announced as prepared / awaiting issuance",
+        "source_note": "MOCCAE statements 2024-2025."
+      },
+      {
+        "item": "National System for Control and Inspection of Food Traded in the UAE",
+        "status": "Under preparation"
+      },
+      {
+        "item": "Regulation on the circulation of novel/new food items",
+        "status": "Under preparation"
+      },
+      {
+        "item": "Unified national risk-based inspection regime (drawing on Abu Dhabi RBS and Ajman Raqeeb)",
+        "status": "Under preparation"
+      },
+      {
+        "item": "Expanded rules on e-commerce food activities",
+        "status": "Under preparation"
+      }
+    ]
+  },
+  "standards_framework": {
+    "regional_body": {
+      "name": "GCC Standardization Organization",
+      "abbreviation": "GSO",
+      "arabic_name": "هيئة التقييس لدول مجلس التعاون لدول الخليج العربية",
+      "role": "Regional standards body for the six GCC states plus Yemen. Issues GSO standards and GCC technical regulations which member states adopt as national standards, generally making them mandatory for food placed on the market.",
+      "website": "https://www.gso.org.sa",
+      "note": "Adoption is national: a GSO standard becomes legally binding in a member state only once that state's standards body/competent authority adopts it (as a national standard or via a national technical regulation)."
+    },
+    "national_prefix": "UAE.S (Emirates standards adopting GSO standards)",
+    "key_standards": [
+      {
+        "code": "GSO 9",
+        "title": "Labelling of prepackaged food stuffs",
+        "note": "Core GCC horizontal labelling standard. Requires Arabic labelling (other languages alongside Arabic), name of food, ingredient list, nutrition information, net contents, name/address of manufacturer/packer/importer, country of origin, date marking, storage and use instructions, and declaration of the 13 GCC allergen categories.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-1",
+        "title": "Expiration dates for food products - Part 1: Mandatory expiration periods",
+        "note": "Applies to perishable foods (milk/milk products, eggs, meat, poultry, fish, crustaceans, infant foods, ready-to-eat foods, fresh table eggs) chilled at 0-5 C.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-2",
+        "title": "Expiration dates for food products - Part 2: Voluntary expiration periods",
+        "note": "Frozen products held at <= -18 C, certain non-perishable chilled products (0-5 C) and ambient products stored in ventilated stores at <= 25 C. Products outside the standard require expiry periods agreed with the competent authority on a scientific basis.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2500",
+        "title": "Food additives permitted for use in foodstuffs",
+        "note": "Positive list. Only additives with a JECFA ADI (or otherwise assessed as safe) and a Codex INS number are eligible. Replaced/consolidated earlier GSO additive standards.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 995",
+        "title": "Permitted sweeteners in foodstuffs",
+        "note": "Sweeteners not permitted in infant and children's foods. Label warnings required for aspartame (phenylketonuria), sucralose (<=25 C), and laxative-effect warnings for polyols (sorbitol >40 g/day, mannitol >20 g/day, xylitol >40 g/day, lactitol, maltitol, erythritol).",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1694",
+        "title": "General principles of food hygiene",
+        "note": "GCC adoption of Codex CAC/RCP 1.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 21",
+        "title": "Hygienic regulations for food plants and their personnel",
+        "note": "1984 base standard; still cited by national codes of practice.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 323",
+        "title": "General requirements for transportation and storage of chilled and frozen foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 969",
+        "title": "Stores for frozen and chilled foodstuff - Part 2: General requirements",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1909",
+        "title": "Requirements for handling of ready-to-eat foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1971",
+        "title": "Hygienic conditions for school canteens and handled food",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2309",
+        "title": "General requirements for food shops and establishments",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-1",
+        "title": "Halal food - Part 1: General requirements",
+        "note": "2015 edition is the operative version. A draft revision GSO 2055-1:2026 was released for public consultation on 2026-02-17 (comment deadline 2026-04-18) tightening supply-chain, certification and labelling rules. Treat GSO 2055-1:2015 as in force and GSO 2055-1:2026 as pending until formally adopted.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-2",
+        "title": "Halal food - Part 2: General requirements for halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-3",
+        "title": "Halal food - Part 3: General requirements for accreditation bodies accrediting halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016",
+        "title": "Microbiological criteria for foodstuffs",
+        "note": "Horizontal microbiological limits; multi-part.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1863",
+        "title": "Maximum limits of pesticide residues in agricultural and food products",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016 / GSO 2481",
+        "title": "Contaminants and toxins in food and feed",
+        "note": "GSO 2481 mirrors Codex GSCTFF for heavy metals and mycotoxins. Verify latest edition in the GSO standards store before use.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2233",
+        "title": "Requirements of nutritional labelling",
+        "note": "Applied alongside GSO 9.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 839 / GSO 1863",
+        "title": "Food packaging - general requirements for food contact materials",
+        "note": "Food-contact material requirements are largely GSO-harmonised across the six states.",
+        "adopted_by_all_gcc": true
+      }
+    ],
+    "codex": {
+      "codex_alimentarius_member": true,
+      "note": "All six GCC states are Codex members; GSO standards are predominantly Codex-aligned, and national laws routinely allow Codex to be used where no GSO/national standard exists."
+    }
+  },
+  "food_business_requirements": {
+    "establishment_licensing": "Trade licence from the relevant economic department plus a food establishment permit from the local municipality/food authority of the emirate. Federal law requires all establishments in the food chain (including free zones) to comply.",
+    "food_safety_management_system": "HACCP-based system required for food establishments; Dubai and Abu Dhabi mandate documented HACCP or an equivalent certified FSMS for most categories.",
+    "person_in_charge": "Designated Person in Charge (PIC) / food safety supervisor with accredited training is required by Dubai Municipality and ADAFSA.",
+    "food_handler_requirements": "Occupational health card / food handler health certificate and basic food hygiene training; renewal periods set locally.",
+    "traceability": "One-step-back / one-step-forward records mandatory (Law 10/2015 Art. 7 and Cabinet Res. 26/2017).",
+    "recall": "Mandatory withdrawal/recall and notification to the competent authority (Art. 8)."
+  },
+  "product_registration_and_label_approval": {
+    "required": true,
+    "description": "Food product and label registration is required before marketing. At federal level MOCCAE operates the ZAD digital platform for food import/registration workflows; Dubai Municipality operates its own food label registration (FIRS/Food Watch) and Abu Dhabi via ADAFSA. First-time importers of a product generally need prior approval before the consignment arrives.",
+    "confidence": "medium-high",
+    "verify_at": [
+      "https://www.moccae.gov.ae",
+      "https://www.dm.gov.ae",
+      "https://www.adafsa.gov.ae"
+    ]
+  },
+  "labelling": {
+    "governing_standards": [
+      "GSO 9 (as UAE.S GSO 9)",
+      "GSO 2233 nutritional labelling",
+      "GSO 150-1/150-2 date marking"
+    ],
+    "language": "Arabic mandatory; English or another language may appear alongside Arabic and must be identical in content.",
+    "mandatory_particulars": [
+      "Product name",
+      "Full ingredient list in descending order",
+      "Additives by common name or E-number",
+      "Allergen declaration (13 GCC categories)",
+      "Net content",
+      "Name and address of manufacturer/packer/importer",
+      "Country of origin",
+      "Production date and expiry date",
+      "Storage conditions and instructions for use",
+      "Batch/lot identification",
+      "Nutrition declaration where applicable"
+    ],
+    "date_marking_rules": "Day-Month-Year for shelf life under 3 months; Month-Year permitted for shelf life over 3 months. Dates must be printed, embossed or stamped by the producer in indelible ink on the original pack. Stickers for production/expiry dates are not permitted, and only one production and one expiry date may appear.",
+    "animal_origin_disclosure": "Source of animal-derived ingredients (e.g. gelatin, lecithin, mono- and di-glycerides) must be declared.",
+    "prohibited": [
+      "Misleading descriptions or false claims (Law 10/2015 Art. 12 and Art. 14(3))",
+      "Health claims not permitted under the applicable technical regulation",
+      "Artificial sweeteners and non-permitted nutrients in infant/children's foods"
+    ]
+  },
+  "additives_contaminants_and_residues": {
+    "additives": "GSO 2500 positive list; sweeteners per GSO 995 with mandatory label warnings.",
+    "contaminants": "GSO/Codex-aligned maximum limits for heavy metals and mycotoxins.",
+    "pesticide_mrls": "GSO 1863 MRLs; Codex used as fallback.",
+    "microbiological": "GSO 1016 series criteria.",
+    "veterinary_drug_residues": "GSO/Codex MRLs enforced at import.",
+    "irradiation_and_gmo": "Irradiated foods and GM-containing foods must be declared on the label; check current MOIAT technical regulations for thresholds."
+  },
+  "halal_requirements": {
+    "mandatory_for": [
+      "Meat and poultry and their products",
+      "Products containing animal-derived ingredients (gelatin, enzymes, emulsifiers, rennet, etc.)"
+    ],
+    "standards": [
+      "UAE.S GSO 2055-1 (halal food general requirements)",
+      "UAE.S GSO 2055-2 (halal certification bodies)",
+      "UAE.S 2055-3"
+    ],
+    "scheme": "UAE National Halal Scheme / Emirates Halal Mark administered under MOIAT; halal certificates must be issued by a certification body accredited/recognised under the scheme.",
+    "pork_and_alcohol": "Trading food containing pork, pork derivatives, alcohol, or anything contrary to Sharia without a licence is a criminal offence (Art. 14(2)). Licensed pork/alcohol sections are permitted in designated outlets with segregation and clear labelling."
+  },
+  "import_clearance": {
+    "pre_import": [
+      "Importer must hold a valid trade licence with food import activity",
+      "Product/label registration and, for first-time products, prior MOCCAE or local-authority approval",
+      "Registration on the applicable federal/local digital platform"
+    ],
+    "documents": [
+      "Commercial invoice and packing list",
+      "Certificate of origin",
+      "Health/veterinary/phytosanitary certificate from the exporting country's competent authority where applicable",
+      "Halal slaughter certificate for meat and poultry; halal certificate for products with halal-relevant ingredients",
+      "Analysis certificates where required by risk category",
+      "Bill of lading / airway bill and customs declaration"
+    ],
+    "border_control": "Risk-based inspection at points of entry with documentary, identity and physical checks; sampling and laboratory analysis for higher-risk categories.",
+    "free_zones": "Law 10/2015 Art. 19 expressly extends the law to free zones.",
+    "shelf_life_on_arrival": "GCC practice requires a substantial proportion of shelf life remaining on arrival (commonly at least half for short-shelf-life goods; category-specific rules apply). Confirm the exact figure with the receiving authority for the specific product.",
+    "non_compliance": "Detention, re-export or destruction at importer's cost; administrative and criminal measures under Arts. 14 and 17."
+  },
+  "enforcement_and_penalties": {
+    "criminal_penalties_article_14": [
+      {
+        "offence": "Trading adulterated, harmful or spoiled food at any stage of the food chain",
+        "penalty": "Imprisonment not less than 3 months and/or fine of AED 100,000 to AED 2,000,000"
+      },
+      {
+        "offence": "Trading without licence any food containing pork meat/derivatives/products, alcoholic substances, or any material contrary to Islamic Sharia",
+        "penalty": "Imprisonment not less than 1 month and/or fine of AED 50,000 to AED 500,000"
+      },
+      {
+        "offence": "Trading, circulating or publishing a false description of food to mislead consumers",
+        "penalty": "Fine of AED 10,000 to AED 100,000"
+      },
+      {
+        "offence": "Disposing of food or fodder held under official custody",
+        "penalty": "Imprisonment 3 months to 2 years and/or fine of AED 100,000 to AED 300,000"
+      },
+      {
+        "offence": "Trading food or fodder contrary to technical regulations issued under the Law",
+        "penalty": "Fine of AED 10,000 to AED 100,000"
+      },
+      {
+        "offence": "Attempt to commit any offence under the Law",
+        "penalty": "Same penalty as the completed offence"
+      },
+      {
+        "offence": "Any other breach of the Law not specifically penalised",
+        "penalty": "Fine of not less than AED 10,000"
+      },
+      {
+        "offence": "Repeat offence",
+        "penalty": "Penalty is doubled in all cases"
+      }
+    ],
+    "administrative_measures_article_17": [
+      "Warning",
+      "Administrative closure for up to 3 months (may be lifted early once the breach is removed)",
+      "Final closure and request to withdraw the licence if the breach is not remedied"
+    ],
+    "grievance": "Establishment may challenge a temporary or permanent closure decision within 30 days of notification, per the Executive Regulations.",
+    "conciliation": "Settlement is available for the offences in Art. 14(2), (5) and (7) before referral to court, for up to AED 100,000 per offence; Cabinet sets the conciliation schedule.",
+    "prosecution_gate": "Criminal action for Art. 14(2), (5) and (7) offences requires a written request from the Ministry or the competent authority."
+  },
+  "recent_developments": [
+    {
+      "date": "2024-2025",
+      "item": "MOCCAE announced a package of new food safety legislation and a unified national control and inspection system, expected from early 2025.",
+      "status": "Issuance not confirmed in the official gazette at compile date"
+    },
+    {
+      "date": "2026-02-17",
+      "item": "GSO released draft GSO 2055-1:2026 revising halal food general requirements (consultation to 2026-04-18).",
+      "status": "Draft / pending adoption"
+    }
+  ],
+  "outdated_items_found_in_supplied_pdf": [
+    "ESMA (Federal Law 28/2001) cited in the preamble no longer exists; functions moved to MOIAT in 2020.",
+    "Ministry of Environment and Water (proposing minister) has been renamed the Ministry of Climate Change and Environment (MOCCAE).",
+    "Preamble references to the 1987 Penal Code, 1992 Criminal Procedure Law, 1992 Trademarks Law, 1984 Commercial Companies Law and 2006 Consumer Protection Law have all been superseded by 2020-2022 decree-laws.",
+    "The printed Hijri date '21 Muharram 1427 AH' in the English PDF does not correspond to 3 November 2015; the correct Hijri equivalent is 21 Muharram 1437 AH."
+  ],
+  "official_sources": [
+    {
+      "title": "Federal Law No. 10 of 2015 Concerning Food Safety (official English text)",
+      "url": "https://uaelegislation.gov.ae/en/legislations/1161"
+    },
+    {
+      "title": "Cabinet Resolution on the Executive Regulations of the Food Safety Law",
+      "url": "https://uaelegislation.gov.ae/en/legislations/1160"
+    },
+    {
+      "title": "MOCCAE - Food Safety knowledge portal",
+      "url": "https://www.moccae.gov.ae/en/knowledge/food-safety"
+    },
+    {
+      "title": "Federal Law No. 10 of 2015 (MOCCAE PDF)",
+      "url": "https://moccae.gov.ae/assets/download/3d703379/L10-15%20Eng.pdf.aspx"
+    },
+    {
+      "title": "UAE Government portal - food safety",
+      "url": "https://u.ae/en/information-and-services/health-and-fitness/food-safety-and-health-tips"
+    },
+    {
+      "title": "ECOLEX record for Federal Law No. 10 of 2015",
+      "url": "https://www.ecolex.org/details/legislation/federal-law-no10-of-2015-on-food-safety-lex-faoc166086/"
+    },
+    {
+      "title": "Gulf News - new UAE food safety laws expected by early 2025",
+      "url": "https://gulfnews.com/uae/environment/new-uae-food-safety-laws-expected-by-early-2025-says-environment-ministry-1.102513220"
+    }
+  ]
+}

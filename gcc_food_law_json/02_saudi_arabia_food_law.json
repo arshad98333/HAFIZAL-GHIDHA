@@ -1,0 +1,516 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "document_type": "country_food_law_and_food_safety_profile",
+    "country": "Kingdom of Saudi Arabia",
+    "country_arabic": "المملكة العربية السعودية",
+    "iso_3166_1_alpha_2": "SA",
+    "iso_3166_1_alpha_3": "SAU",
+    "region": "Gulf Cooperation Council (GCC)",
+    "compiled_on": "2026-07-28",
+    "data_current_as_of": "2026-07-28",
+    "language_of_record": "en",
+    "source_document_supplied_by_user": {
+      "filename": "SFDA_KSA.pdf",
+      "description": "SFDA 'Conditions & Requirements for Importing Food to the Kingdom of Saudi Arabia' - 8 articles across 3 chapters plus annexed bilingual health certificate models.",
+      "document_date": "undated in document; content consistent with the 2019-2022 SFDA import guide editions",
+      "status": "used as base; all substantive content re-verified against current official and secondary sources"
+    },
+    "verification": {
+      "method": "Text extracted from the supplied PDF, then each legal instrument, authority name and requirement cross-checked against official gazettes/legal portals, the competent authority website, FAOLEX/ECOLEX, and current regulatory-intelligence reporting.",
+      "overall_confidence": "high",
+      "caveats": [
+        "The supplied PDF is an SFDA import guide, not the Food Law itself. The Food Law (Royal Decree M/1 of 1436 AH / 2014) and the SFDA Law are the underlying statutes and were added from official sources.",
+        "A NEW SFDA Law was enacted in 2025, replacing/superseding the 2007 SFDA Act (Royal Decree M/6 of 1428 AH). Independent confirmation of the exact royal decree number/date of the 2025 SFDA Law was not obtained; verify on laws.boe.gov.sa or the Umm Al-Qura gazette before relying on the citation.",
+        "SFDA technical regulations are revised frequently by Board decisions; always check the SFDA regulations register for the current edition of any specific technical regulation."
+      ]
+    }
+  },
+  "competent_authorities": {
+    "primary": {
+      "name": "Saudi Food and Drug Authority",
+      "abbreviation": "SFDA",
+      "arabic_name": "الهيئة العامة للغذاء والدواء",
+      "role": "Sole national competent authority for food safety across the whole food chain: technical regulations and standards for food, import clearance, food establishment licensing conditions, laboratory analysis, market surveillance, recalls, rapid alert, halal recognition (Halal Center), and enforcement/penalties.",
+      "website": "https://www.sfda.gov.sa",
+      "legal_personality": "Independent body with financial and administrative autonomy, reporting to the President of the Council of Ministers (per the 2025 SFDA Law, Art. 2). Headquartered in Riyadh with authority to open regional branches.",
+      "key_systems": [
+        {
+          "name": "FASEH (نظام الفسح)",
+          "purpose": "Electronic import clearance/release system for consignments subject to SFDA control.",
+          "url": "https://faseh.sfda.gov.sa/"
+        },
+        {
+          "name": "Halal Center - SFDA",
+          "purpose": "Recognition of Halal Certification Bodies (HCBs) whose certificates are accepted for imports."
+        },
+        {
+          "name": "SFDA Reference Laboratory and branch laboratories",
+          "purpose": "Official analysis; private laboratories may be licensed by SFDA."
+        }
+      ]
+    },
+    "supporting_authorities": [
+      {
+        "name": "Ministry of Municipalities and Housing",
+        "abbreviation": "MOMAH",
+        "role": "Licensing and inspection of retail food outlets, restaurants and food handling premises at municipal level; jointly publishes the schedule of food law violations with SFDA."
+      },
+      {
+        "name": "Ministry of Environment, Water and Agriculture",
+        "abbreviation": "MEWA",
+        "role": "Primary production, veterinary and plant quarantine, animal and plant health certification for exports/imports."
+      },
+      {
+        "name": "Zakat, Tax and Customs Authority",
+        "abbreviation": "ZATCA",
+        "role": "Customs control and release of consignments after SFDA clearance."
+      },
+      {
+        "name": "Saudi Standards, Metrology and Quality Organization",
+        "abbreviation": "SASO",
+        "role": "General standards and the SABER conformity platform (non-food products; food standards sit with SFDA)."
+      },
+      {
+        "name": "Ministry of Health",
+        "abbreviation": "MOH",
+        "role": "Public health, foodborne disease surveillance, food handler health requirements."
+      }
+    ]
+  },
+  "legal_framework": {
+    "primary_law": {
+      "citation": "Food Law, issued by Royal Decree No. M/1 dated 1436 AH (approved by Council of Ministers Resolution No. 475; published 30 October 2014)",
+      "arabic_citation": "نظام الغذاء الصادر بالمرسوم الملكي رقم م/1",
+      "status": "In force",
+      "structure": {
+        "articles": 45,
+        "chapters": 12
+      },
+      "objective": "Ensure food safety and improve food quality across the whole food chain.",
+      "scope": "All stages of the food chain - primary production through to the consumer - including import, export, production, sale, resale and distribution.",
+      "entry_into_force": "180 days after publication in the Official Gazette",
+      "key_articles": [
+        {
+          "article": 4,
+          "subject": "Empowers SFDA to issue technical regulations and standards for food products."
+        },
+        {
+          "article": 7,
+          "subject": "Imported food may not be released prior to SFDA approval; SFDA is responsible for developing the regulatory bylaws controlling clearance of imported foodstuffs. (This is the legal basis of the supplied import-conditions document.)"
+        }
+      ],
+      "official_english_translation": "https://laws.boe.gov.sa/Files/Download/?attId=e2faa68e-d8c5-439d-82cf-adbb01248b17"
+    },
+    "implementing_regulations": [
+      {
+        "citation": "Food Law Implementing Regulations (Bylaws)",
+        "status": "In force",
+        "key_provision": "Article 3(4): countries exporting to Saudi Arabia must comply with the import conditions and requirements issued by SFDA."
+      }
+    ],
+    "authority_statute": {
+      "current": {
+        "citation": "Law of the Saudi Food and Drug Authority (2025)",
+        "status": "Enacted 2025; confirm decree number in the Official Gazette",
+        "confidence": "medium - the substance is well documented, the exact decree number was not independently verified",
+        "key_features": [
+          "Art. 2 - SFDA has legal personality with financial and administrative independence, reporting to the President of the Council of Ministers.",
+          "Art. 3 - Mandate covers food, drugs, medical devices, biologicals (vaccines/serums), cosmetics, health products, animal health products, bottled and non-bottled water, diagnostic and electronic medical equipment, and agricultural/public-health pesticides.",
+          "Art. 5 - Three functional domains: regulatory (standards and mandatory specifications), executive (testing, registration, import clearance, penalties, emergency response, licensing private labs), and monitoring (licensing oversight, GMP compliance, market/warehouse/restaurant inspection, traceability and authenticity).",
+          "Establishes a central reference laboratory at headquarters plus specialised branch laboratories.",
+          "SFDA to conduct and accredit training programmes for food and drug professionals."
+        ]
+      },
+      "superseded": {
+        "citation": "Food and Drug Authority Act, Royal Decree No. M/6 of 1428 AH (2007)",
+        "status": "Superseded by the 2025 SFDA Law",
+        "note": "Art. 6 of the 2007 Act had been amended by Council of Ministers Resolution No. 760 dated 01/11/1446 AH to add a Culinary Arts Authority representative to the Board."
+      }
+    },
+    "key_secondary_instruments": [
+      {
+        "citation": "SFDA 'Conditions and Requirements for Importing Food to the Kingdom of Saudi Arabia'",
+        "basis": "Food Law Art. 7 and Bylaws Art. 3(4)",
+        "status": "In force; the supplied PDF"
+      },
+      {
+        "citation": "Updated schedule of food law violations and penalties",
+        "issuer": "Ministry of Municipalities and Housing jointly with SFDA",
+        "status": "In force (2025 update)"
+      },
+      {
+        "citation": "SFDA technical regulation on mandatory menu labelling",
+        "effective": "2025-07-01",
+        "content": "Food establishments must display calories and detailed nutrition information on menus, place a 'saltshaker' symbol beside high-sodium meals, disclose caffeine content of beverages, and indicate the estimated physical activity time needed to burn the meal's calories."
+      },
+      {
+        "citation": "SFDA Board technical regulations register",
+        "url": "https://www.sfda.gov.sa/en/regulations",
+        "note": "Technical regulations are adopted by Board decision (e.g. decision 7/46 dated 26/12/1446 AH) and updated frequently."
+      }
+    ]
+  },
+  "standards_framework": {
+    "regional_body": {
+      "name": "GCC Standardization Organization",
+      "abbreviation": "GSO",
+      "arabic_name": "هيئة التقييس لدول مجلس التعاون لدول الخليج العربية",
+      "role": "Regional standards body for the six GCC states plus Yemen. Issues GSO standards and GCC technical regulations which member states adopt as national standards, generally making them mandatory for food placed on the market.",
+      "website": "https://www.gso.org.sa",
+      "note": "Adoption is national: a GSO standard becomes legally binding in a member state only once that state's standards body/competent authority adopts it (as a national standard or via a national technical regulation)."
+    },
+    "national_prefix": "SASO/SFDA adoptions of GSO standards; SFDA technical regulations (لوائح فنية) are the binding instrument for food.",
+    "key_standards": [
+      {
+        "code": "GSO 9",
+        "title": "Labelling of prepackaged food stuffs",
+        "note": "Core GCC horizontal labelling standard. Requires Arabic labelling (other languages alongside Arabic), name of food, ingredient list, nutrition information, net contents, name/address of manufacturer/packer/importer, country of origin, date marking, storage and use instructions, and declaration of the 13 GCC allergen categories.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-1",
+        "title": "Expiration dates for food products - Part 1: Mandatory expiration periods",
+        "note": "Applies to perishable foods (milk/milk products, eggs, meat, poultry, fish, crustaceans, infant foods, ready-to-eat foods, fresh table eggs) chilled at 0-5 C.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-2",
+        "title": "Expiration dates for food products - Part 2: Voluntary expiration periods",
+        "note": "Frozen products held at <= -18 C, certain non-perishable chilled products (0-5 C) and ambient products stored in ventilated stores at <= 25 C. Products outside the standard require expiry periods agreed with the competent authority on a scientific basis.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2500",
+        "title": "Food additives permitted for use in foodstuffs",
+        "note": "Positive list. Only additives with a JECFA ADI (or otherwise assessed as safe) and a Codex INS number are eligible. Replaced/consolidated earlier GSO additive standards.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 995",
+        "title": "Permitted sweeteners in foodstuffs",
+        "note": "Sweeteners not permitted in infant and children's foods. Label warnings required for aspartame (phenylketonuria), sucralose (<=25 C), and laxative-effect warnings for polyols (sorbitol >40 g/day, mannitol >20 g/day, xylitol >40 g/day, lactitol, maltitol, erythritol).",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1694",
+        "title": "General principles of food hygiene",
+        "note": "GCC adoption of Codex CAC/RCP 1.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 21",
+        "title": "Hygienic regulations for food plants and their personnel",
+        "note": "1984 base standard; still cited by national codes of practice.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 323",
+        "title": "General requirements for transportation and storage of chilled and frozen foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 969",
+        "title": "Stores for frozen and chilled foodstuff - Part 2: General requirements",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1909",
+        "title": "Requirements for handling of ready-to-eat foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1971",
+        "title": "Hygienic conditions for school canteens and handled food",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2309",
+        "title": "General requirements for food shops and establishments",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-1",
+        "title": "Halal food - Part 1: General requirements",
+        "note": "2015 edition is the operative version. A draft revision GSO 2055-1:2026 was released for public consultation on 2026-02-17 (comment deadline 2026-04-18) tightening supply-chain, certification and labelling rules. Treat GSO 2055-1:2015 as in force and GSO 2055-1:2026 as pending until formally adopted.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-2",
+        "title": "Halal food - Part 2: General requirements for halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-3",
+        "title": "Halal food - Part 3: General requirements for accreditation bodies accrediting halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016",
+        "title": "Microbiological criteria for foodstuffs",
+        "note": "Horizontal microbiological limits; multi-part.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1863",
+        "title": "Maximum limits of pesticide residues in agricultural and food products",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016 / GSO 2481",
+        "title": "Contaminants and toxins in food and feed",
+        "note": "GSO 2481 mirrors Codex GSCTFF for heavy metals and mycotoxins. Verify latest edition in the GSO standards store before use.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2233",
+        "title": "Requirements of nutritional labelling",
+        "note": "Applied alongside GSO 9.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 839 / GSO 1863",
+        "title": "Food packaging - general requirements for food contact materials",
+        "note": "Food-contact material requirements are largely GSO-harmonised across the six states.",
+        "adopted_by_all_gcc": true
+      }
+    ],
+    "codex": {
+      "codex_alimentarius_member": true,
+      "note": "All six GCC states are Codex members; GSO standards are predominantly Codex-aligned, and national laws routinely allow Codex to be used where no GSO/national standard exists."
+    },
+    "note": "Where SFDA has issued a technical regulation it prevails; otherwise the adopted GSO standard applies, with Codex as fallback."
+  },
+  "food_business_requirements": {
+    "establishment_licensing": "Municipal licence from MOMAH for retail/food service premises; SFDA licensing/registration conditions apply to food factories, water bottling plants and importers.",
+    "food_safety_management_system": "HACCP required for food manufacturing; SFDA verifies GMP/GHP and HACCP implementation, including in exporting countries (see import controls).",
+    "food_handler_requirements": "Health certificate and food safety training per municipal requirements.",
+    "traceability": "Required across the food chain; SFDA maintains digital databases and can trace and recall products.",
+    "recall_and_rapid_alert": "SFDA operates a rapid warning system for direct or indirect risks to human health, with powers to close facilities, suspend production lines, seize and withdraw products."
+  },
+  "product_registration": {
+    "required": "Yes for specified categories",
+    "description": "Food establishments and certain product categories (e.g. health/special-purpose foods, infant formula, food supplements, bottled water) must be registered/notified with SFDA. General foodstuffs are cleared consignment-by-consignment through FASEH against the applicable technical regulations rather than by product pre-registration.",
+    "confidence": "medium-high; confirm the current category list on sfda.gov.sa"
+  },
+  "labelling": {
+    "governing_standards": [
+      "Adopted GSO 9",
+      "GSO 2233 nutrition labelling",
+      "GSO 150-1/150-2",
+      "SFDA technical regulations for specific categories",
+      "SFDA menu-labelling regulation (from 2025-07-01)"
+    ],
+    "language": "Arabic mandatory; bilingual Arabic/English widely used. Information in another language must match the Arabic.",
+    "mandatory_particulars": [
+      "Product name",
+      "Ingredient list in descending order",
+      "Additives by name or E-number",
+      "Allergen declaration",
+      "Net content",
+      "Manufacturer/packer/importer name and address",
+      "Country of origin",
+      "Production and expiry dates",
+      "Storage conditions",
+      "Batch/lot code",
+      "Nutrition declaration"
+    ],
+    "date_marking_rules": "Day-Month-Year for shelf life under 3 months; Month-Year acceptable for shelf life over 3 months. Dates must be applied by the producer, indelibly; date stickers are not permitted.",
+    "special_regimes": [
+      "Menu labelling with calories, sodium 'saltshaker' symbol, caffeine content and burn-off time (mandatory from 1 July 2025)",
+      "Trans-fat restrictions",
+      "Salt and sugar reduction technical regulations for specified categories"
+    ]
+  },
+  "additives_contaminants_and_residues": {
+    "additives": "Adopted GSO 2500 positive list plus SFDA technical regulations; sweeteners per GSO 995 with mandatory warnings.",
+    "contaminants": "SFDA/GSO maximum limits for heavy metals, mycotoxins and process contaminants, Codex-aligned.",
+    "pesticide_mrls": "SFDA-adopted MRLs (GSO 1863 basis); SFDA maintains its own MRL database for enforcement.",
+    "microbiological": "GSO 1016 series and SFDA technical regulations.",
+    "prohibited": [
+      "Pork, pork derivatives and products",
+      "Alcohol and alcohol-containing food/beverages",
+      "Poppy seeds and certain narcotic-related botanicals",
+      "Foods containing non-permitted additives or above-limit contaminants"
+    ]
+  },
+  "halal_requirements": {
+    "mandatory": true,
+    "scheme": "SFDA Halal Center recognises Halal Certification Bodies (HCBs). Only certificates from recognised HCBs are accepted at import.",
+    "certificate_types": [
+      {
+        "name": "Certificate of consignment/shipment for halal slaughter",
+        "applies_to": "Consignments of meat, poultry and birds",
+        "content": "Verifies the animals were slaughtered in accordance with Saudi/GSO technical regulations; must be issued by an HCB recognised by the SFDA Halal Center."
+      },
+      {
+        "name": "Certificate of consignment/shipment for halal products",
+        "applies_to": "Products containing components requiring halal verification (e.g. gelatin, enzymes, emulsifiers)",
+        "content": "Confirms the ingredients comply with KSA halal standards and regulations."
+      },
+      {
+        "name": "Halal Certificate (establishment level)",
+        "applies_to": "Establishments",
+        "content": "Confirms the establishment holds halal certification from an HCB recognised by the SFDA Halal Center under KSA halal standards."
+      }
+    ],
+    "standards": [
+      "GSO 2055-1 (as adopted)",
+      "GSO 2055-2",
+      "GSO 2055-3",
+      "SFDA halal technical regulations"
+    ]
+  },
+  "import_clearance": {
+    "legal_basis": "Food Law Art. 7 and Bylaws Art. 3(4); operationalised by the SFDA import conditions document (Articles 1-8).",
+    "structure_of_supplied_document": [
+      {
+        "article": 1,
+        "subject": "Scope and purpose"
+      },
+      {
+        "article": 2,
+        "subject": "Definitions (including halal food, halal certificates, health certificates, food label)"
+      },
+      {
+        "article": 3,
+        "subject": "Food controls required in the exporting country"
+      },
+      {
+        "article": 4,
+        "subject": "General import requirements"
+      },
+      {
+        "article": 5,
+        "subject": "SFDA procedures"
+      },
+      {
+        "article": 6,
+        "subject": "Import requirements for foods of animal origin"
+      },
+      {
+        "article": 7,
+        "subject": "Import requirements for foods of plant origin and their products"
+      },
+      {
+        "article": 8,
+        "subject": "Auditing of competent authorities in exporting countries"
+      }
+    ],
+    "exporting_country_obligations": "Exporting countries must have a functioning official food control system and comply with SFDA import conditions. SFDA may audit the competent authority of the exporting country (Art. 8) and designs standard health certificate models (Art. 5, para 1.2).",
+    "documents": [
+      "Original health certificate (paper or electronic) issued by the competent authority of the exporting country, following the SFDA or GSO health certificate model",
+      "Certificate of consignment/shipment for halal slaughter (meat, poultry, birds)",
+      "Certificate of consignment/shipment for halal products (products with halal-relevant ingredients)",
+      "Commercial invoice, packing list, certificate of origin",
+      "Bill of lading / airway bill and customs declaration",
+      "Certificates of analysis where required by risk category"
+    ],
+    "health_certificate_models_annexed": [
+      "Red meat",
+      "Poultry meat",
+      "Products of aquatic origin",
+      "Honey and bee products",
+      "Processed fruits and vegetables",
+      "Table eggs and egg products",
+      "Milk and milk products",
+      "Assorted/mixed food products",
+      "Infant formula",
+      "Processed foods"
+    ],
+    "clearance_system": "FASEH electronic clearance; risk-based documentary, identity and physical checks with sampling and analysis.",
+    "non_compliance": "Detention, refusal of release, re-export or destruction; possible suspension of the establishment or exporting-country listing."
+  },
+  "enforcement_and_penalties": {
+    "powers": [
+      "Inspection of food facilities",
+      "Sampling and analysis",
+      "Orders to close facilities",
+      "Suspension of production lines",
+      "Seizure and withdrawal of food where there is a potential public health risk",
+      "Administrative fines",
+      "Referral for prosecution"
+    ],
+    "penalty_schedule": "Food Law (M/1) penalty chapter plus the SFDA/MOMAH joint schedule of food law violations, updated 2025. Amounts are set per violation category in the schedule rather than in the Law itself.",
+    "note": "Specific fine amounts change with each update to the violations schedule - verify the current schedule before quoting figures."
+  },
+  "recent_developments": [
+    {
+      "date": "2025",
+      "item": "New Law of the Saudi Food and Drug Authority enacted, granting SFDA legal personality, financial/administrative independence and reporting to the President of the Council of Ministers; consolidating regulatory, executive and monitoring mandates.",
+      "status": "In force; confirm decree number"
+    },
+    {
+      "date": "2025-07-01",
+      "item": "Mandatory menu labelling: calories, detailed nutrition information, 'saltshaker' high-sodium symbol, caffeine disclosure, and estimated burn-off time.",
+      "status": "In force"
+    },
+    {
+      "date": "2025",
+      "item": "MOMAH and SFDA launched an updated schedule of food law violations.",
+      "status": "In force"
+    },
+    {
+      "date": "1446 AH / 2025",
+      "item": "Council of Ministers Resolution No. 760 amended Art. 6 of the (then) SFDA Act to add a Culinary Arts Authority representative to the SFDA Board.",
+      "status": "Superseded by the new SFDA Law"
+    },
+    {
+      "date": "2026-02-17",
+      "item": "GSO draft GSO 2055-1:2026 halal food revision released for consultation (deadline 2026-04-18).",
+      "status": "Draft"
+    }
+  ],
+  "outdated_items_found_in_supplied_pdf": [
+    "The document is undated and reflects an earlier edition of the SFDA import conditions; SFDA has since revised import procedures and certificate models. Check the current edition on sfda.gov.sa.",
+    "References to the SFDA's statutory basis now need to be read against the 2025 SFDA Law rather than the 2007 Act (Royal Decree M/6).",
+    "The annexed health certificate models are subject to periodic revision; use the current models published by SFDA rather than the annexed versions.",
+    "The document does not reflect the 2025 menu-labelling regulation or the 2025 updated violations schedule."
+  ],
+  "official_sources": [
+    {
+      "title": "SFDA official website",
+      "url": "https://www.sfda.gov.sa/en"
+    },
+    {
+      "title": "SFDA laws and regulations register",
+      "url": "https://www.sfda.gov.sa/en/regulations"
+    },
+    {
+      "title": "Food Law - Royal Decree No. M/1 (official English translation, Bureau of Experts)",
+      "url": "https://laws.boe.gov.sa/Files/Download/?attId=e2faa68e-d8c5-439d-82cf-adbb01248b17"
+    },
+    {
+      "title": "FAOLEX - Royal Decree No. M/1 issuing the Food Law",
+      "url": "https://www.fao.org/faolex/results/details/en/c/LEX-FAOC185594/"
+    },
+    {
+      "title": "FAOLEX - Food and Drug Authority Act, Royal Decree M/6 of 2007",
+      "url": "https://www.fao.org/faolex/results/details/en/c/LEX-FAOC151276/"
+    },
+    {
+      "title": "FASEH import clearance system",
+      "url": "https://faseh.sfda.gov.sa/"
+    },
+    {
+      "title": "SFDA news - new food rules for transparency and consumer health",
+      "url": "https://www.sfda.gov.sa/en/news/3745904"
+    },
+    {
+      "title": "Analysis of the new SFDA Law (Hammad & Al-Mehdar)",
+      "url": "https://hmco.com.sa/the-new-sfda-law-a-transformational-regulatory-framework-for-food-drug-and-health-oversight-in-saudi-arabia/"
+    },
+    {
+      "title": "USDA FAS FAIRS Country Report - Saudi Arabia 2025",
+      "url": "https://apps.fas.usda.gov/newgainapi/api/Report/DownloadReportByFileName?fileName=FAIRS+Country+Report+Annual_Riyadh_Saudi+Arabia_SA2025-0013.pdf"
+    }
+  ]
+}

@@ -1,0 +1,540 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "document_type": "country_food_law_and_food_safety_profile",
+    "country": "Sultanate of Oman",
+    "country_arabic": "سلطنة عُمان",
+    "iso_3166_1_alpha_2": "OM",
+    "iso_3166_1_alpha_3": "OMN",
+    "region": "Gulf Cooperation Council (GCC)",
+    "compiled_on": "2026-07-28",
+    "data_current_as_of": "2026-07-28",
+    "language_of_record": "en",
+    "source_document_supplied_by_user": {
+      "filename": "D1.Session.1.6_OMAN.pdf",
+      "description": "Conference presentation 'Supporting Food Safety, Security and Food Innovation in the Sultanate of Oman' by Dr Hussein Samh Al Masroori, Director-General, Food Safety and Quality Centre, Ministry of Agriculture, Fisheries and Water Resources.",
+      "document_date": "presentation includes GFSI data to 2022; likely delivered 2023",
+      "status": "used as base; all substantive content re-verified against current official and secondary sources"
+    },
+    "verification": {
+      "method": "Text extracted from the supplied PDF, then each legal instrument, authority name and requirement cross-checked against official gazettes/legal portals, the competent authority website, FAOLEX/ECOLEX, and current regulatory-intelligence reporting.",
+      "overall_confidence": "high",
+      "caveats": [
+        "The supplied PDF is a strategy presentation, not a legal instrument. It contains almost no citable legal content, so the legal framework in this file was reconstructed entirely from official Omani legislation sources and a 2025 peer-reviewed review co-authored from within the Food Safety and Quality Centre.",
+        "CRITICAL CORRECTION to the presentation: it shows the Food Safety and Quality Centre under the Ministry of Regional Municipalities and Water Resources. That is outdated. Royal Decree No. 92/2020 transferred the Centre to the Ministry of Agriculture, Fisheries Wealth and Water Resources (MAFWR), which is now the national competent authority for food safety.",
+        "The 2025 review source is internally inconsistent on the Plant Quarantine Law, citing both 'RD 91/2000 amended to 47/2007' and 'RD 47/2004'. Both variants are recorded below and flagged for verification.",
+        "The 2025 amendment adding Article 30 bis to the Food Safety Regulations was reported without a decision number in accessible sources; the number is flagged as unverified."
+      ]
+    }
+  },
+  "competent_authorities": {
+    "primary": {
+      "name": "Food Safety and Quality Centre, Ministry of Agriculture, Fisheries Wealth and Water Resources",
+      "abbreviation": "FSQC / MAFWR",
+      "arabic_name": "مركز سلامة وجودة الغذاء - وزارة الثروة الزراعية والسمكية وموارد المياه",
+      "role": "National competent authority for food safety across the entire supply chain (farm to fork) and sole legislator for food safety. Enforces the Food Safety Law and its executive regulations; develops legislation, standards and specifications; conducts analytical testing of food, water and food-contact materials; licenses food establishments and food transport vehicles and vessels; supervises affiliated third-party laboratories; issues permits for food advertising, promotional campaigns and events; oversees imports and exports of food commodities.",
+      "established_by": "Royal Decree No. 24/2019 (as the Centre for Food Safety and Quality in the then Ministry of Regional Municipalities and Water Resources)",
+      "reallocated_by": "Royal Decree No. 92/2020",
+      "structure": "Five technical departments.",
+      "specialised_unit": {
+        "name": "Fish Quality Control Centre",
+        "abbreviation": "FQCC",
+        "established": "1998, originally under the Directorate General of Fisheries Research",
+        "reallocated_by": "Royal Decree No. 92/2020 (to FSQC)",
+        "role": "Primary seafood safety regulator and the competent authority representing Oman in global fisheries markets. Enforces quality and safety requirements on locally produced seafood and the integrity of imported and exported seafood under Ministerial Decree No. 12/2009. Has its own laboratories; inspects and approves seafood facilities, vessels and related activities. Works with the Directorate General of Fisheries Development and veterinary quarantine on health certificates.",
+        "market_access": "MAFWR holds arrangements with the European Commission, the Eurasian Economic Union, the United States and other markets."
+      }
+    },
+    "coordination_body": {
+      "name": "National Food Safety Committee",
+      "abbreviation": "NFSC",
+      "role": "Provides legal provisions on food safety and quality, proposes inspection, monitoring and corrective measures, harmonises technical regulations and standard specifications across authorities to align with international standards, and coordinates with regional and international committees."
+    },
+    "supporting_authorities": [
+      {
+        "name": "Ministry of Commerce, Industry and Investment Promotion",
+        "abbreviation": "MCIIP",
+        "role": "National standards and technical regulations (Directorate General for Standards and Metrology); commercial aspects."
+      },
+      {
+        "name": "Regional Municipalities (including Muscat, Sohar and Dhofar municipalities)",
+        "role": "Local licensing and inspection of food premises."
+      },
+      {
+        "name": "Ministry of Health",
+        "abbreviation": "MOH",
+        "role": "Public health, foodborne disease surveillance."
+      },
+      {
+        "name": "Ministry of Endowments and Religious Affairs",
+        "role": "Religious/halal aspects."
+      },
+      {
+        "name": "Consumer Protection Authority",
+        "abbreviation": "CPA",
+        "role": "Consumer protection and commercial fraud."
+      },
+      {
+        "name": "Oman Public Authority for Special Economic Zones and Free Zones",
+        "abbreviation": "OPAZ",
+        "role": "Food activities within special economic and free zones."
+      },
+      {
+        "name": "Veterinary Quarantine Department (DG Animal Wealth, MAFWR)",
+        "role": "Animal health controls at all sea, land and air entry points; Oman's representative to WOAH."
+      },
+      {
+        "name": "Plant Quarantine Department (MAFWR)",
+        "role": "Plant health controls; Oman's representative to the IPPC."
+      },
+      {
+        "name": "Royal Oman Police",
+        "abbreviation": "ROP",
+        "role": "Enforcement support; customs at entry points."
+      }
+    ],
+    "governance_model": {
+      "model": "Integrated multi-agency food control system with MAFWR as the national competent authority",
+      "transition": "Oman moved from a fragmented multi-agency system to an integrated system in 2020 via Royal Decree No. 92/2020. Before 2020 the primary authority was the Ministry of Regional Municipalities and Water Resources, alongside the Ministry of Agriculture and Fisheries Wealth, the Ministry of Commerce and Industry, the Ministry of Health, local municipalities, the Public Authority for Consumer Protection and the Royal Oman Police.",
+      "post_2020_gains": [
+        "Streamlined roles and responsibilities",
+        "Risk-based inspection",
+        "Digitised real-time monitoring",
+        "Rapid response and improved inter-agency communication",
+        "Alignment of food safety with plant and animal quarantine",
+        "Reduced duplication and better resource use"
+      ]
+    }
+  },
+  "legal_framework": {
+    "hierarchy": {
+      "primary_legislation": "Royal Decrees (RD), promulgated by the Sultan",
+      "secondary_legislation": "Executive regulations, regulations and Ministerial Decisions (MD), promulgated by ministers and government bodies under authority granted by Royal Decrees. Basic laws take precedence in case of conflict.",
+      "standards": "Technical regulations and standard specifications issued by MCIIP (national) and GSO (regional)."
+    },
+    "primary_law": {
+      "citation": "Food Safety Law, promulgated by Royal Decree No. 84/2008",
+      "arabic_citation": "قانون سلامة الغذاء الصادر بالمرسوم السلطاني رقم 84/2008",
+      "issued": "2008-07-05",
+      "status": "In force",
+      "content": "General provisions on the protection of public health, hygienic practices, promotion of foodstuffs, distribution and transportation of food products and related permits, storage, compliance with standard specifications, import and export of food products, permits for the release of food shipments, inspections, withdrawal of food products from the market, and fines and penalties.",
+      "note": "Originally granted the Ministry of Regional Municipalities and Water Resources the authority to establish and enforce food safety regulations; that authority now sits with MAFWR under RD 92/2020."
+    },
+    "executive_regulations": [
+      {
+        "citation": "Ministerial Decision No. 2/2010 issuing the Food Safety Regulation",
+        "status": "In force as amended",
+        "content": "Executive regulations of RD 84/2008. Article 30 governs food product licensing.",
+        "amendments": [
+          {
+            "citation": "Ministerial Decision of 2025 adding Article 30 bis (decision number not verified)",
+            "date": "2025-07 (reported)",
+            "text_of_new_provision": "The competent authority may, before issuing the licence stipulated in Article (30) of these regulations, verify the health and manufacturing practices of the food product and the HACCP system applied in the food facility and evaluate them in the country of export or the country of origin, and the importer or exporter, or both, shall bear all expenses incurred by the competent authority in this regard.",
+            "effect": "Introduces pre-licensing verification of food products, including on-site audits of foreign manufacturing facilities and their HACCP systems, at the importer's or exporter's cost.",
+            "entry_into_force": "The day following publication in the Official Gazette",
+            "confidence": "medium-high on substance; LOW on the decision number - verify in the Official Gazette"
+          }
+        ]
+      }
+    ],
+    "key_secondary_instruments": [
+      {
+        "citation": "Royal Decree No. 24/2019 establishing the Centre for Food Safety and Quality",
+        "date": "2019-03-13",
+        "effect": "Created the FSQC and transferred food safety and quality competences from other laws, royal decrees and regulations to the (then) Ministry of Regional Municipalities and Water Resources."
+      },
+      {
+        "citation": "Royal Decree No. 92/2020",
+        "effect": "Transferred all regulations, resources, rights, responsibilities and assets from the Public Authority for Stores and Food Reserve, the Water Resources sector, and the FSQC within MRMWR to the renamed Ministry of Agriculture, Fisheries Wealth and Water Resources (MAFWR). Established the integrated food control system with MAFWR as national competent authority for food safety.",
+        "significance": "The single most important structural change in Omani food law in the last two decades."
+      },
+      {
+        "citation": "Ministerial Decision No. 29/2016 - Food Control Regulation (amending Ministerial Decision No. 241/1999)",
+        "status": "In force"
+      },
+      {
+        "citation": "Ministerial Decision No. 69/2024 issuing the Regulation of Registering, Advertising and Promoting Food Products",
+        "effect": "Establishes a comprehensive database for tracking food products as part of a broader food traceability system, and governs food product registration, advertising and promotion.",
+        "status": "In force"
+      },
+      {
+        "citation": "Ministerial Decree No. 12/2009",
+        "effect": "Seafood safety and quality requirements enforced by the Fish Quality Control Centre for locally produced, imported and exported seafood."
+      },
+      {
+        "citation": "Royal Decree No. 43/2025 promulgating the Public Health Law",
+        "relevance": "New general public health framework; check for interfaces with food hygiene and foodborne disease reporting.",
+        "confidence": "existence verified; food-specific interactions not fully mapped"
+      }
+    ],
+    "related_laws": [
+      {
+        "citation": "Veterinary Quarantine Law, Royal Decree No. 45/2004",
+        "executive_regulations": "Ministerial Decision No. 107/2008",
+        "note": "A GCC-unified law, aligned with WOAH recommendations and Codex. Covers all sea, land and air entry points."
+      },
+      {
+        "citation": "Plant Quarantine Law, Royal Decree No. 91/2000 (amended by Royal Decree No. 47/2007)",
+        "executive_regulations": "Ministerial Decision No. 32/2006",
+        "note": "A GCC-unified framework compliant with the IPPC.",
+        "verification_flag": "The 2025 FSQC-affiliated review cites this both as 'RD 91/2000 amended to 47/2007' and, elsewhere, as 'RD 47/2004'. Verify the operative citation in the Official Gazette / mjla.gov.om before relying on it."
+      },
+      {
+        "citation": "Pesticide Law, Royal Decree No. 64/2006",
+        "executive_regulations": "Ministerial Decision No. 41/2012"
+      }
+    ]
+  },
+  "standards_framework": {
+    "regional_body": {
+      "name": "GCC Standardization Organization",
+      "abbreviation": "GSO",
+      "arabic_name": "هيئة التقييس لدول مجلس التعاون لدول الخليج العربية",
+      "role": "Regional standards body for the six GCC states plus Yemen. Issues GSO standards and GCC technical regulations which member states adopt as national standards, generally making them mandatory for food placed on the market.",
+      "website": "https://www.gso.org.sa",
+      "note": "Adoption is national: a GSO standard becomes legally binding in a member state only once that state's standards body/competent authority adopts it (as a national standard or via a national technical regulation)."
+    },
+    "national_prefix": "OS (Omani standards) issued/adopted by MCIIP Directorate General for Standards and Metrology",
+    "key_standards": [
+      {
+        "code": "GSO 9",
+        "title": "Labelling of prepackaged food stuffs",
+        "note": "Core GCC horizontal labelling standard. Requires Arabic labelling (other languages alongside Arabic), name of food, ingredient list, nutrition information, net contents, name/address of manufacturer/packer/importer, country of origin, date marking, storage and use instructions, and declaration of the 13 GCC allergen categories.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-1",
+        "title": "Expiration dates for food products - Part 1: Mandatory expiration periods",
+        "note": "Applies to perishable foods (milk/milk products, eggs, meat, poultry, fish, crustaceans, infant foods, ready-to-eat foods, fresh table eggs) chilled at 0-5 C.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-2",
+        "title": "Expiration dates for food products - Part 2: Voluntary expiration periods",
+        "note": "Frozen products held at <= -18 C, certain non-perishable chilled products (0-5 C) and ambient products stored in ventilated stores at <= 25 C. Products outside the standard require expiry periods agreed with the competent authority on a scientific basis.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2500",
+        "title": "Food additives permitted for use in foodstuffs",
+        "note": "Positive list. Only additives with a JECFA ADI (or otherwise assessed as safe) and a Codex INS number are eligible. Replaced/consolidated earlier GSO additive standards.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 995",
+        "title": "Permitted sweeteners in foodstuffs",
+        "note": "Sweeteners not permitted in infant and children's foods. Label warnings required for aspartame (phenylketonuria), sucralose (<=25 C), and laxative-effect warnings for polyols (sorbitol >40 g/day, mannitol >20 g/day, xylitol >40 g/day, lactitol, maltitol, erythritol).",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1694",
+        "title": "General principles of food hygiene",
+        "note": "GCC adoption of Codex CAC/RCP 1.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 21",
+        "title": "Hygienic regulations for food plants and their personnel",
+        "note": "1984 base standard; still cited by national codes of practice.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 323",
+        "title": "General requirements for transportation and storage of chilled and frozen foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 969",
+        "title": "Stores for frozen and chilled foodstuff - Part 2: General requirements",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1909",
+        "title": "Requirements for handling of ready-to-eat foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1971",
+        "title": "Hygienic conditions for school canteens and handled food",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2309",
+        "title": "General requirements for food shops and establishments",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-1",
+        "title": "Halal food - Part 1: General requirements",
+        "note": "2015 edition is the operative version. A draft revision GSO 2055-1:2026 was released for public consultation on 2026-02-17 (comment deadline 2026-04-18) tightening supply-chain, certification and labelling rules. Treat GSO 2055-1:2015 as in force and GSO 2055-1:2026 as pending until formally adopted.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-2",
+        "title": "Halal food - Part 2: General requirements for halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-3",
+        "title": "Halal food - Part 3: General requirements for accreditation bodies accrediting halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016",
+        "title": "Microbiological criteria for foodstuffs",
+        "note": "Horizontal microbiological limits; multi-part.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1863",
+        "title": "Maximum limits of pesticide residues in agricultural and food products",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016 / GSO 2481",
+        "title": "Contaminants and toxins in food and feed",
+        "note": "GSO 2481 mirrors Codex GSCTFF for heavy metals and mycotoxins. Verify latest edition in the GSO standards store before use.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2233",
+        "title": "Requirements of nutritional labelling",
+        "note": "Applied alongside GSO 9.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 839 / GSO 1863",
+        "title": "Food packaging - general requirements for food contact materials",
+        "note": "Food-contact material requirements are largely GSO-harmonised across the six states.",
+        "adopted_by_all_gcc": true
+      }
+    ],
+    "codex": {
+      "codex_alimentarius_member": true,
+      "note": "All six GCC states are Codex members; GSO standards are predominantly Codex-aligned, and national laws routinely allow Codex to be used where no GSO/national standard exists."
+    },
+    "note": "FSQC develops and updates legislation, regulations, standards and specifications in line with internationally recognised criteria; the NFSC harmonises technical regulations across authorities."
+  },
+  "food_business_requirements": {
+    "establishment_licensing": "FSQC issues licences to compliant food establishments and to food transport vehicles and vessels. Municipal licences also apply at the local level.",
+    "food_safety_management_system": "HACCP is central - the 2025 Article 30 bis amendment allows FSQC to evaluate the HACCP system of a foreign food facility before licensing a product.",
+    "advertising_and_promotion": "Permits for food-related advertising, promotional campaigns and events are verified and issued by FSQC (see MD 69/2024).",
+    "traceability": "Ministerial Decision No. 69/2024 establishes a comprehensive food product tracking database. A Food Management and Tracking Programme was in development at the time of the 2025 review.",
+    "laboratories": "FSQC operates official laboratories and supervises affiliated third-party laboratories, validating their analytical tests and results.",
+    "inspection": "Risk-based inspection with digitised real-time monitoring and a rapid response system, post-2020."
+  },
+  "product_registration": {
+    "required": true,
+    "description": "Food products must be registered/licensed before circulation, under Article 30 of the Food Safety Regulation (MD 2/2010) and the Regulation of Registering, Advertising and Promoting Food Products (MD 69/2024). Since the 2025 Article 30 bis amendment, FSQC may, before issuing the licence, verify and evaluate the product's hygiene and manufacturing practices and the facility's HACCP system in the country of export or origin, with all costs borne by the importer and/or exporter.",
+    "confidence": "high on the mechanism; verify the current online workflow and fee schedule with FSQC"
+  },
+  "labelling": {
+    "governing_standards": [
+      "Adopted GSO 9",
+      "GSO 2233",
+      "GSO 150-1/150-2",
+      "OS national adoptions"
+    ],
+    "language": "Arabic mandatory; other languages alongside Arabic.",
+    "mandatory_particulars": [
+      "Product name",
+      "Ingredient list in descending order",
+      "Additives by common name or E-number",
+      "Allergen declaration (13 GCC categories)",
+      "Net content",
+      "Manufacturer/packer/importer name and address",
+      "Country of origin",
+      "Production and expiry dates",
+      "Storage conditions and instructions for use",
+      "Batch/lot identification",
+      "Nutrition declaration where applicable"
+    ],
+    "date_marking_rules": "Day-Month-Year for shelf life under 3 months; Month-Year permitted for shelf life over 3 months; producer-applied indelible dates only.",
+    "prohibited": [
+      "Misleading descriptions and unauthorised claims",
+      "Non-permitted additives"
+    ]
+  },
+  "additives_contaminants_and_residues": {
+    "additives": "Adopted GSO 2500 positive list; GSO 995 for sweeteners with mandatory warnings.",
+    "contaminants": "GSO/Codex-aligned maximum limits.",
+    "pesticide_mrls": "Pesticide Law RD 64/2006 and MD 41/2012 plus GSO 1863 MRLs.",
+    "microbiological": "GSO 1016 series.",
+    "veterinary_residues": "Controlled under the Veterinary Quarantine Law framework and GSO/Codex MRLs.",
+    "food_contact_materials": "FSQC conducts analytical tests on food-contact materials as well as food and water."
+  },
+  "halal_requirements": {
+    "mandatory_for": [
+      "Meat and poultry and their products",
+      "Products containing animal-derived ingredients"
+    ],
+    "standards": [
+      "Adopted GSO 2055-1",
+      "GSO 2055-2",
+      "GSO 2055-3"
+    ],
+    "certification": "Halal slaughter certificate from an approved Islamic body in the exporting country plus health certification; Ministry of Endowments and Religious Affairs is involved on religious aspects."
+  },
+  "import_clearance": {
+    "authority": "FSQC (with veterinary and plant quarantine departments of MAFWR) at all sea, land and air entry points; Royal Oman Police / customs for cargo control.",
+    "pre_import": "Product licence/registration required (MD 2/2010 Art. 30 and MD 69/2024); since 2025, possible pre-licensing verification and foreign facility audit under Article 30 bis at the importer's/exporter's cost.",
+    "documents": [
+      "Health certificate from the exporting country's competent authority",
+      "Veterinary health certificate / phytosanitary certificate as applicable",
+      "Halal slaughter certificate for meat and poultry; halal certificate where applicable",
+      "Certificate of origin, commercial invoice and packing list",
+      "Bill of lading / airway bill and customs declaration",
+      "Certificates of analysis for risk categories"
+    ],
+    "release_permits": "Permits for the release of food shipments are issued under RD 84/2008 and MD 2/2010.",
+    "border_control": "Risk-based documentary, identity and physical checks with sampling and laboratory analysis; quarantine facilities serve all governorates.",
+    "non_compliance": "Detention, withdrawal from the market, re-export or destruction, plus fines and penalties under RD 84/2008 and MD 2/2010.",
+    "recent_tightening": "Reported tightening of food safety measures for imported products, consistent with the Article 30 bis pre-licensing verification power."
+  },
+  "export_controls": {
+    "seafood": "FQCC acts as the competent authority for seafood exports, inspects and approves facilities and vessels, and issues/supports health certificates. Oman holds market-access arrangements with the EU, the Eurasian Economic Union, the United States and other markets.",
+    "other_foods": "FSQC oversees exports of food commodities and issues export health certification in coordination with veterinary and plant quarantine."
+  },
+  "enforcement_and_penalties": {
+    "legal_basis": "Food Safety Law RD 84/2008 (fines and penalties provisions) and the Food Safety Regulation MD 2/2010; Food Control Regulation MD 29/2016.",
+    "measures": [
+      "Inspection and sampling",
+      "Withdrawal of food products from the market",
+      "Detention, re-export and destruction of consignments",
+      "Suspension or withdrawal of establishment/vehicle licences",
+      "Fines",
+      "Referral for prosecution"
+    ],
+    "amounts": "NOT STATED - specific fine bands under RD 84/2008 and MD 2/2010 were not verifiable from an accessible official text at compile date. Verify on mjla.gov.om or the Official Gazette before quoting figures."
+  },
+  "strategy_and_policy_context": {
+    "source": "The supplied FSQC presentation",
+    "national_frameworks": [
+      "Oman Vision 2040 - the national reference for economic and social planning (2021-2040) and the source of national sector strategies and five-year development plans",
+      "National Food Security Strategy - three main axes: developing local food production, assessing food demand, and securing imports (noted as under major revision at the time of the presentation)"
+    ],
+    "eleven_support_pillars": [
+      "National strategies and policies",
+      "Regulatory frameworks - monitoring, testing, inspections and certifications; sustainable and financially sustainable practices",
+      "Enhancing agricultural productivity - modern farming techniques, support for farmers",
+      "Natural resources management - desalination and wastewater treatment, efficient irrigation",
+      "Technological and research innovation - agricultural research, smart agriculture, digital platforms for food management and traceability",
+      "Support for startups and entrepreneurs - incubators, accelerators, competitions and challenges",
+      "Food supply chain management - cold storage, logistics and distribution",
+      "Sustainable practices - organic farming, environmental conservation",
+      "Partnership - enabling the private sector",
+      "International cooperation - trade agreements, global partnerships",
+      "Education and awareness - public campaigns, training and capacity building"
+    ],
+    "performance_indicators_as_presented": {
+      "gfsi_score": {
+        "2013": 58.5,
+        "2022": 71.2,
+        "note": "Global Food Security Index score as shown in the presentation"
+      },
+      "food_safety_score": {
+        "2013": 61.5,
+        "2022": 73.2
+      },
+      "global_ranking": {
+        "2013": 62,
+        "2014": 60,
+        "2015": 58,
+        "2016": 55,
+        "2017": 52,
+        "2018": 48,
+        "2019": 47,
+        "2020": 45,
+        "2021": 40,
+        "2022": 35
+      },
+      "regional_position": "4th within the MENA region",
+      "caveat": "These figures are as presented in the supplied PDF and stop at 2022. The Economist Impact Global Food Security Index has not been published on the same basis in every subsequent year - do not extrapolate."
+    },
+    "capacity_building": [
+      "Annual national Food Safety Week (first held 2010) with public awareness campaigns, training workshops and scientific conferences",
+      "Strategic Research Project Programme funded by the Ministry of Higher Education, Research and Innovation, aligned to Oman Vision 2040",
+      "FSQC research funding from the Agricultural and Fisheries Development Fund"
+    ]
+  },
+  "recent_developments": [
+    {
+      "date": "2020",
+      "item": "Royal Decree No. 92/2020 - transition from a multi-agency to an integrated food control system; FSQC moved to MAFWR, which became the national competent authority for food safety.",
+      "status": "In force"
+    },
+    {
+      "date": "2024",
+      "item": "Ministerial Decision No. 69/2024 - Regulation of Registering, Advertising and Promoting Food Products, establishing a comprehensive food product tracking database.",
+      "status": "In force"
+    },
+    {
+      "date": "2025-07",
+      "item": "Article 30 bis added to the Food Safety Regulation (MD 2/2010), empowering pre-licensing verification of food products and evaluation of foreign facilities' hygiene, manufacturing practices and HACCP systems at the importer's/exporter's expense.",
+      "status": "In force from the day after gazette publication; decision number to verify"
+    },
+    {
+      "date": "2025",
+      "item": "Royal Decree No. 43/2025 promulgating the Public Health Law.",
+      "status": "In force; food-specific interactions to be mapped"
+    },
+    {
+      "date": "2026-02-17",
+      "item": "GSO draft GSO 2055-1:2026 halal food revision released for consultation (deadline 2026-04-18).",
+      "status": "Draft"
+    }
+  ],
+  "outdated_items_found_in_supplied_pdf": [
+    "OUTDATED: the presentation places the Food Safety and Quality Centre under the Ministry of Regional Municipalities and Water Resources. Royal Decree No. 92/2020 moved it to the Ministry of Agriculture, Fisheries Wealth and Water Resources (MAFWR), which is now the national competent authority.",
+    "The organisational chart showing MRMWR alongside 'Ministry of Agriculture, Fisheries Wealth and Water Resources' with DG Animal Wealth and DG Agricultural Development reflects the transitional structure, not the current one.",
+    "The National Food Security Strategy is described in the presentation as 'under major revision' - obtain the current version.",
+    "GFSI / food safety score and ranking data stop at 2022 and should not be quoted as current.",
+    "The presentation contains no legal citations at all; it must not be used as a source for Oman's food law. Use RD 84/2008, MD 2/2010 (as amended 2025), RD 24/2019, RD 92/2020, MD 29/2016 and MD 69/2024."
+  ],
+  "official_sources": [
+    {
+      "title": "Royal Decree 24/2019 establishing the Centre for Food Safety and Quality (Ministry of Justice and Legal Affairs)",
+      "url": "https://mjla.gov.om/eng/legislation/decrees/details.aspx?Id=554&type=L"
+    },
+    {
+      "title": "Royal Decree 24/2019 (Decree.om)",
+      "url": "https://decree.om/2019/rd20190024/"
+    },
+    {
+      "title": "Royal Decree 43/2025 issuing the Public Health Law (Decree.om)",
+      "url": "https://decree.om/2025/rd20250043/"
+    },
+    {
+      "title": "Ministerial Decision 69/2024 Regulation of Registering, Advertising and Promoting Food Products",
+      "url": "https://www.lawrtal.com/en/legislation/19166"
+    },
+    {
+      "title": "FAOLEX country profile - Oman",
+      "url": "https://www.fao.org/faolex/country-profiles/general-profile/en/?iso3=OMN"
+    },
+    {
+      "title": "Transitioning from a Multi-Agency to an Integrated Food Control System: A Case Study from the Sultanate of Oman (Foods, 2025, 14(15):2618) - co-authored from the FSQC",
+      "url": "https://www.mdpi.com/2304-8158/14/15/2618"
+    },
+    {
+      "title": "Reporting on the 2025 ministerial decision adding Article 30 bis",
+      "url": "https://www.thearabianstories.com/2025/07/20/oman-boosts-food-safety-regulations-with-new-ministerial-decision/"
+    },
+    {
+      "title": "Zawya - Oman ministry tightens food safety measures for imported products",
+      "url": "https://www.zawya.com/en/economy/gcc/oman-ministry-tightens-food-safety-measures-for-imported-products-kec0le3f"
+    },
+    {
+      "title": "Trade.gov - Oman labeling and marking requirements",
+      "url": "https://www.trade.gov/country-commercial-guides/oman-labeling-and-marking-requirements"
+    }
+  ]
+}

@@ -1,0 +1,338 @@
+{
+  "meta": {
+    "guardrail_pack": "GCC Perishable & Cold-Storage Guardrails for AI Agents",
+    "file_role": "country_overlay",
+    "version": "1.0.0",
+    "compiled_on": "2026-07-28",
+    "country": "United Arab Emirates",
+    "country_arabic": "الإمارات العربية المتحدة",
+    "iso_3166_1_alpha_2": "AE",
+    "extends": "00_gcc_base_guardrails.json",
+    "precedence": "This overlay takes precedence over the base file on any conflict. Base rules GCC-EDGE-001..020 and GCC-NORM-001..005 remain in force unless explicitly overridden here.",
+    "primary_competent_authority": "Ministry of Climate Change and Environment (MOCCAE) with the emirate-level food authority",
+    "legal_profile_reference": "../gcc_food_law_json/01_uae_food_law.json",
+    "design_principle": {
+      "name": "Pareto (80/20)",
+      "edge_case_rules": 8,
+      "normal_case_rules": 2,
+      "ratio": "80% edge / 20% normal",
+      "combined_with_base": {
+        "total_edge": 28,
+        "total_normal": 7,
+        "combined_ratio": "80% edge / 20% normal"
+      }
+    },
+    "derived_from": {
+      "dataset": "wave_9001.jsonl",
+      "worked_vertical": "finfish_seafood (chilled), extended to all chilled 0-5 C and frozen <= -18 C perishables"
+    },
+    "disclaimer": "Operational guardrails for agent design. Not legal advice. Penalty figures and procedures change; verify at source before enforcement."
+  },
+  "rules": [
+    {
+      "rule_id": "AE-EDGE-001",
+      "class": "edge_case",
+      "category": "legal_gate_notification",
+      "severity": "blocking",
+      "title": "Withdrawal and recall duty triggers on excursion, not on confirmed harm",
+      "legal_basis": {
+        "instrument": "Federal Law No. 10 of 2015, Article 8 (withdrawal and recall) and Article 9 (powers of the Ministry and competent authorities)",
+        "authority": "MOCCAE plus the emirate-level authority (ADAFSA, Dubai Municipality Food Safety Department, Sharjah, Ajman, RAK, Fujairah, UAQ)"
+      },
+      "trigger": {
+        "expression": "excursion_confirmed AND consignment_has_left_the_controlled_facility",
+        "signals": [
+          "product already dispatched to retail or food service",
+          "partial consignment released before the log was reviewed",
+          "cross-docked at a third-party facility"
+        ]
+      },
+      "agent_must": [
+        "Treat the withdrawal/recall obligation as triggered by reasonable grounds to believe the food is unsafe, not by a confirmed positive test result",
+        "Identify the correct emirate-level authority as well as MOCCAE - the federal law and the local regime both apply",
+        "Produce the downstream distribution list from the traceability record before proposing any market action",
+        "Escalate to a named human within the operator's recall procedure timeframe"
+      ],
+      "agent_must_not": [
+        "Wait for laboratory confirmation before notifying, where the excursion alone gives reasonable grounds",
+        "Notify only the federal authority and treat the emirate authority as optional",
+        "Propose a 'quiet' downstream swap in place of a notified withdrawal"
+      ],
+      "escalation": "Immediate human escalation. The agent may draft the notification but must not transmit it autonomously.",
+      "worked_example": {
+        "scenario": "wave_9001 compressor_fail profile: chilled seafood ramping to 9.92 C and still rising at end of a truncated log, already gate-out from the DC.",
+        "correct_behaviour": "Draft withdrawal notification, assemble downstream consignee list, escalate to the recall owner, notify MOCCAE and the relevant emirate authority. Do not send autonomously."
+      }
+    },
+    {
+      "rule_id": "AE-EDGE-002",
+      "class": "edge_case",
+      "category": "jurisdiction",
+      "severity": "high",
+      "title": "Free zones and multi-emirate legs are in scope, and the local authority changes mid-journey",
+      "legal_basis": {
+        "instrument": "Federal Law No. 10 of 2015, Article 19 - the Law applies to the territory of the State including the free zones",
+        "authority": "MOCCAE plus the emirate authority at each leg"
+      },
+      "trigger": {
+        "expression": "consignment_route crosses emirate boundaries OR includes a free zone facility",
+        "signals": [
+          "Jebel Ali or KIZAD storage leg",
+          "Dubai to Abu Dhabi transfer",
+          "free zone bonded cold store",
+          "re-export staged through a free zone"
+        ]
+      },
+      "agent_must": [
+        "Apply the federal law to free zone legs without exception",
+        "Identify which emirate authority governs each leg and note that inspection regimes differ (Abu Dhabi RBS, Ajman Raqeeb, Dubai Food Watch)",
+        "Record which authority's requirements were applied at each point in the chain",
+        "Flag that a national unified inspection system is announced but not confirmed as gazetted - do not assume harmonisation"
+      ],
+      "agent_must_not": [
+        "Treat a free zone leg as outside the food safety regime",
+        "Assume one emirate's acceptance criteria transfer to another",
+        "Assume the announced national control and inspection system is already in force"
+      ],
+      "escalation": "hold_for_qa where the governing local authority for the excursion leg cannot be established."
+    },
+    {
+      "rule_id": "AE-EDGE-003",
+      "class": "edge_case",
+      "category": "shelf_life",
+      "severity": "blocking",
+      "title": "Excursion-consumed shelf life against the remaining-shelf-life-on-arrival rule",
+      "legal_basis": {
+        "instrument": "GSO 150-1 (mandatory expiration periods for chilled perishables at 0-5 C) as adopted; UAE remaining-shelf-life-on-arrival practice",
+        "authority": "MOCCAE / emirate authority"
+      },
+      "trigger": {
+        "expression": "excursion_present AND product_class == chilled_mandatory AND remaining_shelf_life_at_arrival <= required_fraction",
+        "default_required_fraction": "commonly at least half; confirm the exact figure with the receiving authority for the specific product"
+      },
+      "agent_must": [
+        "Treat an excursion as having consumed shelf life even where the printed expiry date is unchanged",
+        "Report remaining shelf life both as printed and as adjusted for the excursion, clearly separated",
+        "Confirm the applicable remaining-shelf-life fraction with the receiving authority rather than assuming half"
+      ],
+      "agent_must_not": [
+        "Rely on the printed expiry date as evidence of remaining quality after an excursion",
+        "Assume the half-life rule applies uniformly to every product category"
+      ],
+      "escalation": "hold_for_qa. reject where the adjusted remaining shelf life falls below the authority's threshold."
+    },
+    {
+      "rule_id": "AE-EDGE-004",
+      "class": "edge_case",
+      "category": "labelling_integrity",
+      "severity": "blocking",
+      "title": "No re-dating, no date stickers, no relabelling after an excursion",
+      "legal_basis": {
+        "instrument": "GSO 9 date marking rules as adopted - dates must be applied by the producer in indelible ink; date stickers are not permitted; only one production and one expiry date per pack. Federal Law No. 10 of 2015 Article 14(3) penalises false description of food.",
+        "authority": "MOCCAE / emirate authority"
+      },
+      "trigger": {
+        "expression": "any proposal to alter, cover, reprint or re-issue a date or label following a cold-chain event",
+        "signals": [
+          "shorten the expiry to reflect lost shelf life",
+          "apply a sticker over the original date",
+          "re-grade frozen to chilled and re-date",
+          "re-issue the label at a repacking site"
+        ]
+      },
+      "agent_must": [
+        "Refuse every date or label alteration proposal, including proposals that shorten shelf life",
+        "State that shortening a date is still an alteration and still prohibited",
+        "Route any genuine re-dating need to the competent authority through a named human"
+      ],
+      "agent_must_not": [
+        "Propose a sticker as a remediation for lost shelf life",
+        "Propose re-grading thawed frozen product to chilled with a new date",
+        "Treat a shortened date as a conservative and therefore acceptable change"
+      ],
+      "escalation": "Immediate. Under Article 14(3), circulating or publishing a false description of food to mislead the consumer carries a fine of AED 10,000 to AED 100,000."
+    },
+    {
+      "rule_id": "AE-EDGE-005",
+      "class": "edge_case",
+      "category": "halal_integrity",
+      "severity": "blocking",
+      "title": "Halal integrity breaks during emergency cold-chain transfer",
+      "legal_basis": {
+        "instrument": "UAE.S GSO 2055-1 halal food requirements; Federal Law No. 10 of 2015 Article 14(2) - trading without licence any food containing pork meat, derivatives or products, alcoholic substances, or any material contrary to Islamic Sharia carries imprisonment of not less than one month and/or a fine of AED 50,000 to AED 500,000",
+        "authority": "MOIAT national halal scheme; MOCCAE"
+      },
+      "trigger": {
+        "expression": "emergency transfer OR co-storage OR cross-dock following an equipment failure",
+        "signals": [
+          "transfer to the nearest available reefer regardless of prior cargo",
+          "co-storage with non-halal product during a breakdown",
+          "loss of segregation during salvage",
+          "unknown prior load history of the substitute unit"
+        ]
+      },
+      "agent_must": [
+        "Verify segregation and prior-load history of any substitute cold unit before recommending transfer",
+        "Treat halal integrity as a separate pass/fail dimension from temperature compliance",
+        "Record the halal certificate reference and the recognised certification body alongside the transfer decision"
+      ],
+      "agent_must_not": [
+        "Optimise purely for temperature recovery when choosing a substitute unit",
+        "Assume a reefer is halal-clean because it is food-grade",
+        "Treat a temperature-successful salvage as an overall pass when halal segregation was broken"
+      ],
+      "escalation": "reject the halal claim and escalate. Temperature recovery does not cure a segregation break."
+    },
+    {
+      "rule_id": "AE-EDGE-006",
+      "class": "edge_case",
+      "category": "registration_gate",
+      "severity": "high",
+      "title": "Registration and prior-approval status is a separate gate from temperature",
+      "legal_basis": {
+        "instrument": "Cabinet Resolution No. 26 of 2017 (Executive Regulations); MOCCAE ZAD platform registration; emirate-level label registration (Dubai Municipality, ADAFSA). First-time importers generally require prior approval before arrival.",
+        "authority": "MOCCAE and the emirate authority"
+      },
+      "trigger": {
+        "expression": "consignment arrives with a cold-chain question AND registration or prior-approval status is unknown",
+        "signals": [
+          "first-time product",
+          "label registration lapsed",
+          "product registered in one emirate but not the destination emirate"
+        ]
+      },
+      "agent_must": [
+        "Evaluate registration status separately and report it separately from telemetry",
+        "State clearly when it can evaluate temperature but cannot evaluate registration",
+        "Recognise that a temperature-compliant consignment can still be lawfully rejected on registration grounds - this is a concrete instance of base rule GCC-EDGE-017"
+      ],
+      "agent_must_not": [
+        "Present an accept based only on telemetry as clearance to release",
+        "Infer registration status from the fact that previous consignments cleared"
+      ],
+      "escalation": "hold_for_qa pending registration confirmation."
+    },
+    {
+      "rule_id": "AE-EDGE-007",
+      "class": "edge_case",
+      "category": "penalty_exposure",
+      "severity": "blocking",
+      "title": "Penalty exposure from an autonomous release",
+      "legal_basis": {
+        "instrument": "Federal Law No. 10 of 2015 Article 14(1) - trading adulterated, harmful or spoiled food at any stage of the food chain carries imprisonment of not less than three months and/or a fine of AED 100,000 to AED 2,000,000; Article 14(8) doubles penalties on repetition; Article 17 provides for warning, administrative closure up to three months, and final closure with licence withdrawal",
+        "authority": "MOCCAE / emirate authority; judicial seizure officers designated under Article 15"
+      },
+      "trigger": {
+        "expression": "agent is asked to auto-release a consignment with an unresolved excursion or defective telemetry"
+      },
+      "agent_must": [
+        "State the penalty exposure explicitly in the escalation to the human decision maker",
+        "Record that the disposition was a human decision, with the human named, whenever release proceeds against the agent's proposal",
+        "Note that Article 4 disposal of food held under official custody carries imprisonment of three months to two years and a fine of AED 100,000 to AED 300,000 - relevant if a detained reefer is moved"
+      ],
+      "agent_must_not": [
+        "Release autonomously under any excursion or telemetry-defect condition",
+        "Present the penalty range as a negotiating input rather than a constraint"
+      ],
+      "escalation": "Named human authorisation required, recorded in the traceability write-back."
+    },
+    {
+      "rule_id": "AE-EDGE-008",
+      "class": "edge_case",
+      "category": "bilingual_input",
+      "severity": "high",
+      "title": "Arabic operator narrative must be parsed to the same standard as the CSV",
+      "legal_basis": {
+        "instrument": "GSO 9 as adopted requires Arabic labelling; operational communication in the UAE is routinely bilingual",
+        "authority": "MOCCAE / emirate authority"
+      },
+      "trigger": {
+        "expression": "artifact language is ar_msa OR mixed Arabic-English",
+        "signals": [
+          "temperatures written as °م",
+          "Arabic-Indic digits",
+          "hedge words: أغلبها (most of them), حوالي (approximately), تقريبًا (roughly)",
+          "RTL rendering of ranges"
+        ]
+      },
+      "agent_must": [
+        "Parse °م as degrees Celsius and preserve the exact numeric values",
+        "Treat أغلبها and حوالي exactly as base rule GCC-EDGE-008 and GCC-EDGE-011 require - as signals that outliers exist and that the upper bound of any range must be used",
+        "Quote the Arabic source text verbatim in evidence_quotes alongside the translation",
+        "Convert Arabic-Indic digits without altering precision"
+      ],
+      "agent_must_not": [
+        "Round or reformat numbers during translation",
+        "Drop a hedge word in translation and thereby present an approximate range as exact",
+        "Translate a range to its midpoint"
+      ],
+      "escalation": "hold_for_qa where translation ambiguity would change the disposition.",
+      "worked_example": {
+        "source": "قراءات شحنة الأسماك المبردة كانت أغلبها بين 0.8 و3.2°م ... مع ملاحظة ارتفاعين واضحين إلى 17.32 و14.35°م",
+        "correct_parse": "max = 17.32 C, second excursion = 14.35 C, baseline 0.8-3.2 C, 'أغلبها' flags that the baseline description excludes the peaks. Do not report max as 3.2 C."
+      }
+    },
+    {
+      "rule_id": "AE-NORM-001",
+      "class": "normal_case",
+      "category": "routine_clearance",
+      "severity": "informational",
+      "title": "Normal UAE clearance path",
+      "trigger": {
+        "expression": "base GCC-NORM-001 or GCC-NORM-002 satisfied AND registration current AND halal documentation complete"
+      },
+      "agent_must": [
+        "Confirm the federal gate (MOCCAE / ZAD) and the destination emirate gate separately",
+        "Record the emirate authority whose criteria were applied",
+        "Cite Federal Law No. 10 of 2015 and Cabinet Resolution No. 26 of 2017 in legal_citations"
+      ],
+      "agent_must_not": [
+        "Report a single combined clearance without naming which authority cleared what"
+      ],
+      "escalation": "None."
+    },
+    {
+      "rule_id": "AE-NORM-002",
+      "class": "normal_case",
+      "category": "record_contract",
+      "severity": "medium",
+      "title": "UAE record and citation contract",
+      "trigger": {
+        "expression": "any disposition emitted"
+      },
+      "agent_must": [
+        "Cite the specific article relied on, not the law generally",
+        "Record traceability one step back and one step forward per Article 7",
+        "Retain the raw telemetry artifact unmodified"
+      ],
+      "agent_must_not": [
+        "Cite ESMA - it was abolished in 2020 and its functions sit with MOIAT",
+        "Cite the superseded 2006 Consumer Protection Law, 1987 Penal Code, 1992 Criminal Procedure Law, 1992 Trademarks Law or 1984 Commercial Companies Law referenced in the 2015 preamble"
+      ],
+      "escalation": "None."
+    }
+  ],
+  "rule_index": {
+    "blocking": [
+      "AE-EDGE-001",
+      "AE-EDGE-003",
+      "AE-EDGE-004",
+      "AE-EDGE-005",
+      "AE-EDGE-007"
+    ],
+    "edge_case": [
+      "AE-EDGE-001",
+      "AE-EDGE-002",
+      "AE-EDGE-003",
+      "AE-EDGE-004",
+      "AE-EDGE-005",
+      "AE-EDGE-006",
+      "AE-EDGE-007",
+      "AE-EDGE-008"
+    ],
+    "normal_case": [
+      "AE-NORM-001",
+      "AE-NORM-002"
+    ]
+  }
+}

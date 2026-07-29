@@ -1,0 +1,302 @@
+{
+  "meta": {
+    "guardrail_pack": "GCC Perishable & Cold-Storage Guardrails for AI Agents",
+    "file_role": "country_overlay",
+    "version": "1.0.0",
+    "compiled_on": "2026-07-28",
+    "country": "Kingdom of Bahrain",
+    "country_arabic": "مملكة البحرين",
+    "iso_3166_1_alpha_2": "BH",
+    "extends": "00_gcc_base_guardrails.json",
+    "precedence": "This overlay takes precedence over the base file on any conflict. Base rules GCC-EDGE-001..020 and GCC-NORM-001..005 remain in force unless explicitly overridden here.",
+    "primary_competent_authority": "Ministry of Health - Public Health Directorate - Food Control Section",
+    "legal_profile_reference": "../gcc_food_law_json/06_bahrain_food_law.json",
+    "design_principle": {
+      "name": "Pareto (80/20)",
+      "edge_case_rules": 8,
+      "normal_case_rules": 2,
+      "ratio": "80% edge / 20% normal",
+      "combined_with_base": {
+        "total_edge": 28,
+        "total_normal": 7,
+        "combined_ratio": "80% edge / 20% normal"
+      }
+    },
+    "derived_from": {
+      "dataset": "wave_9001.jsonl",
+      "worked_vertical": "finfish_seafood (chilled), extended to all chilled 0-5 C and frozen <= -18 C perishables"
+    },
+    "disclaimer": "Operational guardrails for agent design. Not legal advice. Penalty figures and procedures change; verify at source before enforcement."
+  },
+  "rules": [
+    {
+      "rule_id": "BH-EDGE-001",
+      "class": "edge_case",
+      "category": "rejection_pathway",
+      "severity": "blocking",
+      "title": "Rejected consignments follow a prescribed two-branch procedure with certificates",
+      "legal_basis": {
+        "instrument": "Public Health Law No. 34 of 2018 is the basis for handling rejected food shipments. The importer must choose re-export to the country of origin or destruction under Food Control supervision. Re-export requires a request letter to the health office at the port of entry with a copy of the customs re-export declaration and a copy of the rejection notice, contact from a food control specialist before re-export, and a prescribed form to obtain the official re-export certificate. Destruction requires a request letter to the health office, coordination of the destruction date with food control specialists, Askar landfill waste management procedures, and a prescribed form to obtain the official destruction certificate.",
+        "authority": "MOH Public Health Directorate, Food Control Section"
+      },
+      "trigger": {
+        "expression": "disposition == reject on a Bahraini imported consignment"
+      },
+      "agent_must": [
+        "Present both branches (re-export and destruction) with their full document lists rather than recommending one",
+        "State that the choice is the importer's, made under Food Control supervision",
+        "Ensure the official certificate is obtained in either branch - the case is not closed without it",
+        "Note that destruction proceeds under Food Control supervision and via Askar landfill waste management procedures"
+      ],
+      "agent_must_not": [
+        "Recommend disposal without the prescribed request letter and certificate",
+        "Treat physical removal of the goods as closure of the case",
+        "Propose onward sale to a third market in place of the prescribed pathway"
+      ],
+      "escalation": "Named human owner for the branch decision; agent prepares documentation."
+    },
+    {
+      "rule_id": "BH-EDGE-002",
+      "class": "edge_case",
+      "category": "jurisdiction",
+      "severity": "high",
+      "title": "Three ports of entry, three different exposure profiles",
+      "legal_basis": {
+        "instrument": "The Imported Food Safety Group inspects all food received through three ports of entry - seaport, air cargo and the King Fahd Causeway - with public health specialists distributed across them, applying risk-based systems",
+        "authority": "MOH Public Health Directorate, Food Control Section"
+      },
+      "trigger": {
+        "expression": "Bahraini imported consignment with a cold-chain question",
+        "signals": [
+          "causeway land crossing in summer ambient",
+          "air cargo tarmac dwell",
+          "seaport yard dwell"
+        ]
+      },
+      "agent_must": [
+        "Identify the port of entry and factor its specific dwell risk into the analysis - causeway crossings in GCC summer ambient carry a materially different exposure profile from air cargo",
+        "Combine with base rule GCC-EDGE-014: ambient is a modifier, and the causeway leg is where it bites hardest",
+        "Direct correspondence to the health office at the relevant port, not a generic address"
+      ],
+      "agent_must_not": [
+        "Treat all three ports as equivalent",
+        "Apply an air-cargo dwell assumption to a causeway crossing"
+      ],
+      "escalation": "None on its own; sharpens other rules."
+    },
+    {
+      "rule_id": "BH-EDGE-003",
+      "class": "edge_case",
+      "category": "licensing_gate",
+      "severity": "blocking",
+      "title": "Licence suspension is available at any time and the licence expires annually",
+      "legal_basis": {
+        "instrument": "MOH Food Safety Guideline FCS/3: the food premises licence is valid for one year from issuance; the Food Control Section may suspend a licence at any time in the event of violations of approved food safety legislation; operating without a licence is a violation subject to penalties under the Public Health Law; no changes to the approved sketch and plans, and no addition of new production lines or devices, without formal Food Control Section approval",
+        "authority": "MOH Public Health Directorate, Food Control Section"
+      },
+      "trigger": {
+        "expression": "cold-chain remediation involves adding, relocating or modifying refrigeration equipment at a licensed premises, OR the premises licence is within 60 days of expiry"
+      },
+      "agent_must": [
+        "Flag that installing or relocating a chiller, freezer or cold room at a licensed premises is a change to the approved plans and requires formal Food Control Section approval BEFORE installation",
+        "Check licence validity as a precondition of any remediation plan",
+        "State that a violation can trigger suspension at any time, not only at renewal"
+      ],
+      "agent_must_not": [
+        "Propose emergency refrigeration installation at a licensed premises without flagging the approval requirement",
+        "Assume equipment changes are covered by the existing licence"
+      ],
+      "escalation": "hold_for_qa on the remediation plan pending Food Control Section approval."
+    },
+    {
+      "rule_id": "BH-EDGE-004",
+      "class": "edge_case",
+      "category": "shelf_life",
+      "severity": "blocking",
+      "title": "The GSO 150 mandatory/voluntary split determines how much latitude exists",
+      "legal_basis": {
+        "instrument": "As set out in the Bahrain Food Importers Guide: GSO 150-1 mandatory expiration periods cover perishable foods containing milk or milk products, eggs, meat, chicken, fish or crustaceans, or ingredients supporting microbial growth, held chilled at 0-5 C, plus children's food and foods requiring a specific preservation temperature such as fresh table eggs, fresh food and ready-to-eat foods. GSO 150-2 voluntary periods cover frozen products at not exceeding -18 C, certain non-perishable chilled products at 0-5 C, and products held at not greater than 25 C in ventilated stores. Products outside the standard require expiry periods agreed with the authority on a scientific basis. The expiry period for processed or repackaged products made from limited-shelf-life materials without thermal processing may not exceed the remaining expiry of the source materials.",
+        "authority": "MOH Food Control Section; MOIC Standards and Metrology Directorate"
+      },
+      "trigger": {
+        "expression": "shelf-life or salvage-repack question arises on a Bahraini consignment"
+      },
+      "agent_must": [
+        "Determine first whether the product sits in the GSO 150-1 mandatory class - if it does, there is no voluntary latitude",
+        "Apply the source-material constraint to any salvage repack: repacked product cannot outlive the remaining expiry of its source materials",
+        "Escalate to the authority for any product outside the standard, since its expiry must be agreed scientifically"
+      ],
+      "agent_must_not": [
+        "Apply voluntary-regime reasoning to a mandatory-class product",
+        "Assign a fresh shelf life to a salvage repack"
+      ],
+      "escalation": "hold_for_qa where the class cannot be determined."
+    },
+    {
+      "rule_id": "BH-EDGE-005",
+      "class": "edge_case",
+      "category": "labelling_integrity",
+      "severity": "blocking",
+      "title": "Bahrain's date-marking rules are stated with unusual specificity - honour them exactly",
+      "legal_basis": {
+        "instrument": "As set out in the Bahrain Food Importers Guide against GSO 9: dates must be engraved or in relief, printed, or stamped with irremovable ink directly on all packages or on their original label by the producer only. Adding stickers for production and expiry dates is not permissible. There must be no more than one production date and one expiry date on the same package, and neither may be subject to deletion, change or deceit. Day-Month-Year for durability under three months; Month-Year for over three months, calculated to the end of the recorded month. American date format is not acceptable and can lead to rejection.",
+        "authority": "MOH Food Control Section"
+      },
+      "trigger": {
+        "expression": "any proposal to alter, cover, add or re-issue a date following a cold-chain event, OR a date-format question arises"
+      },
+      "agent_must": [
+        "Refuse every sticker-based remediation explicitly - Bahrain's guidance names this prohibition directly",
+        "Refuse date shortening as an alteration",
+        "Flag MM/DD/YYYY formatting as a rejection risk in its own right, independent of the cold-chain question"
+      ],
+      "agent_must_not": [
+        "Propose a corrective date sticker",
+        "Treat a shortened date as a conservative and therefore permissible change",
+        "Overlook an American-format date because the temperatures were fine"
+      ],
+      "escalation": "Immediate."
+    },
+    {
+      "rule_id": "BH-EDGE-006",
+      "class": "edge_case",
+      "category": "product_specific_prohibition",
+      "severity": "blocking",
+      "title": "Named product prohibitions apply regardless of cold-chain performance",
+      "legal_basis": {
+        "instrument": "Ministerial Resolution No. 89 of 2022 prohibits the import and trading of gelatin candy for children containing konjac (E425) or any of its alternative names (Klakumanan, Konyako, Konjonak, tarot powder, yam flour, or any other name). Artificial sweeteners and added nutrients are not allowed in any baby food. Food items accompanied by children's toys must bear the Gulf Conformity mark per Ministerial Resolution No. 1 of 2014.",
+        "authority": "MOH Food Control Section; MOIC"
+      },
+      "trigger": {
+        "expression": "consignment contains confectionery, baby food, or food accompanied by a toy"
+      },
+      "agent_must": [
+        "Screen for the named prohibitions independently of the temperature verdict",
+        "Check konjac under all its listed alternative names, not only E425",
+        "Treat a prohibition hit as an absolute bar - a perfect cold chain does not cure it"
+      ],
+      "agent_must_not": [
+        "Clear a consignment on telemetry when a named prohibition applies",
+        "Search only for the E-number"
+      ],
+      "escalation": "reject; this is a concrete instance of base rule GCC-EDGE-017."
+    },
+    {
+      "rule_id": "BH-EDGE-007",
+      "class": "edge_case",
+      "category": "penalty_exposure",
+      "severity": "blocking",
+      "title": "Penalty amounts are unverified - never state a figure",
+      "legal_basis": {
+        "instrument": "Public Health Law No. 34 of 2018. The MOH guideline refers only to 'the penalties under the act of Public Health Law' without amounts.",
+        "authority": "MOH Public Health Directorate"
+      },
+      "trigger": {
+        "expression": "agent is asked to state Bahraini penalty exposure"
+      },
+      "agent_must": [
+        "State that the penalty provisions of Law No. 34 of 2018 are not verified in the sibling country profile and must be read from the law itself",
+        "Describe the available measures (licence refusal, licence suspension at any time, prohibition of unauthorised activities, rejection, re-export, destruction, legal action) without quoting amounts",
+        "Flag the separate open question of whether Legislative Decree No. 3 of 1985 on the control of imported foodstuffs remains in force in whole or part after Law No. 34 of 2018"
+      ],
+      "agent_must_not": [
+        "Invent or estimate a Bahraini fine figure",
+        "Cite Legislative Decree 3/1985 as unambiguously current"
+      ],
+      "escalation": "Named human authorisation, recorded."
+    },
+    {
+      "rule_id": "BH-EDGE-008",
+      "class": "edge_case",
+      "category": "bilingual_input",
+      "severity": "high",
+      "title": "Arabic parsing, plus the narrow Arabic-label exemptions",
+      "legal_basis": {
+        "instrument": "Labelling and adjoining explanatory statements must be in Arabic, with any other language alongside and identical in content. Small consignments of 20 cartons or fewer and ethnic food products may be exempted from Arabic label requirements subject to prior authorisation. Personal-use imports may be labelled in Arabic or English, with an approved translation office sticker if another language is used.",
+        "authority": "MOH Food Control Section"
+      },
+      "trigger": {
+        "expression": "artifact language is ar_msa OR an Arabic-label exemption is claimed",
+        "signals": [
+          "°م notation",
+          "أغلبها / حوالي / تقريبًا",
+          "claim of small-consignment or ethnic-food exemption",
+          "personal-use import"
+        ]
+      },
+      "agent_must": [
+        "Parse °م as Celsius preserving exact values and apply base rules GCC-EDGE-008 and GCC-EDGE-011 to Arabic hedge words",
+        "Verify that any Arabic-label exemption claim is supported by prior authorisation - the exemption is conditional, not automatic",
+        "Note that the translation-office sticker allowance applies only to personal-use imports and is not a general relabelling route"
+      ],
+      "agent_must_not": [
+        "Accept an exemption claim without evidence of prior authorisation",
+        "Extend the personal-use sticker allowance to commercial consignments",
+        "Round or take midpoints during translation"
+      ],
+      "escalation": "hold_for_qa on an unsupported exemption claim."
+    },
+    {
+      "rule_id": "BH-NORM-001",
+      "class": "normal_case",
+      "category": "routine_clearance",
+      "severity": "informational",
+      "title": "Normal Bahraini clearance path",
+      "trigger": {
+        "expression": "base GCC-NORM-001 or GCC-NORM-002 satisfied AND CR and health surveillance certificate current AND special-food registration in place where applicable AND label compliant"
+      },
+      "agent_must": [
+        "Confirm the two-part licensing chain separately: MOIC commercial registration via Sijilat, and the Public Health Directorate certificate to practise commercial activities under health surveillance",
+        "Note whether the product is regular food (no prior registration, but must meet Gulf specifications) or a special food (baby food, energy drinks, athletes' food) requiring prior registration",
+        "Cite Public Health Law No. 34 of 2018 and the applicable GSO standards"
+      ],
+      "agent_must_not": [
+        "Assume a single licence covers both the commercial and the health surveillance requirement"
+      ],
+      "escalation": "None."
+    },
+    {
+      "rule_id": "BH-NORM-002",
+      "class": "normal_case",
+      "category": "record_contract",
+      "severity": "medium",
+      "title": "Bahraini record and citation contract",
+      "trigger": {
+        "expression": "any disposition emitted"
+      },
+      "agent_must": [
+        "Cite Public Health Law No. 34 of 2018 as the statutory basis and the specific GSO standard for the technical requirement",
+        "Reference the 2024 edition of the Food Importers Guide for import procedure, not older editions",
+        "Retain the raw telemetry artifact unmodified"
+      ],
+      "agent_must_not": [
+        "Cite a 'Bahrain National Food Safety Authority' - no such body exists; the authority is the Food Control Section of the Public Health Directorate, Ministry of Health"
+      ],
+      "escalation": "None."
+    }
+  ],
+  "rule_index": {
+    "blocking": [
+      "BH-EDGE-001",
+      "BH-EDGE-003",
+      "BH-EDGE-004",
+      "BH-EDGE-005",
+      "BH-EDGE-006",
+      "BH-EDGE-007"
+    ],
+    "edge_case": [
+      "BH-EDGE-001",
+      "BH-EDGE-002",
+      "BH-EDGE-003",
+      "BH-EDGE-004",
+      "BH-EDGE-005",
+      "BH-EDGE-006",
+      "BH-EDGE-007",
+      "BH-EDGE-008"
+    ],
+    "normal_case": [
+      "BH-NORM-001",
+      "BH-NORM-002"
+    ]
+  }
+}

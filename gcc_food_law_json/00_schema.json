@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/gcc-food-law-country-profile-1.0.0.json",
+  "title": "GCC Country Food Law and Food Safety Profile",
+  "description": "Shared schema for the six GCC country food-law JSON files (UAE, Saudi Arabia, Qatar, Kuwait, Oman, Bahrain). Version 1.0.0.",
+  "type": "object",
+  "required": [
+    "meta",
+    "competent_authorities",
+    "legal_framework",
+    "standards_framework",
+    "food_business_requirements",
+    "labelling",
+    "additives_contaminants_and_residues",
+    "halal_requirements",
+    "import_clearance",
+    "enforcement_and_penalties",
+    "recent_developments",
+    "outdated_items_found_in_supplied_pdf",
+    "official_sources"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["schema_version", "document_type", "country", "iso_3166_1_alpha_2", "iso_3166_1_alpha_3", "compiled_on", "data_current_as_of", "source_document_supplied_by_user", "verification"],
+      "properties": {
+        "schema_version": {"type": "string", "const": "1.0.0"},
+        "document_type": {"type": "string", "const": "country_food_law_and_food_safety_profile"},
+        "country": {"type": "string"},
+        "country_arabic": {"type": "string"},
+        "iso_3166_1_alpha_2": {"type": "string", "pattern": "^[A-Z]{2}$"},
+        "iso_3166_1_alpha_3": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "region": {"type": "string"},
+        "compiled_on": {"type": "string", "format": "date"},
+        "data_current_as_of": {"type": "string", "format": "date"},
+        "language_of_record": {"type": "string"},
+        "source_document_supplied_by_user": {
+          "type": "object",
+          "required": ["filename", "description", "status"],
+          "properties": {
+            "filename": {"type": "string"},
+            "description": {"type": "string"},
+            "document_date": {"type": "string"},
+            "status": {"type": "string"}
+          }
+        },
+        "verification": {
+          "type": "object",
+          "required": ["method", "overall_confidence", "caveats"],
+          "properties": {
+            "method": {"type": "string"},
+            "overall_confidence": {"type": "string", "enum": ["high", "medium-high", "medium", "medium-low", "low"]},
+            "caveats": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "competent_authorities": {
+      "type": "object",
+      "description": "Primary competent authority plus coordination bodies, standards body, sub-national authorities and supporting authorities. Key names vary by country; 'primary' or 'primary_federal' is always present.",
+      "properties": {
+        "primary": {"$ref": "#/$defs/authority"},
+        "primary_federal": {"$ref": "#/$defs/authority"},
+        "coordination_body": {"$ref": "#/$defs/authority"},
+        "standards_body": {"$ref": "#/$defs/authority"},
+        "local_authorities": {"type": "array", "items": {"$ref": "#/$defs/authority"}},
+        "supporting_authorities": {"type": "array", "items": {"$ref": "#/$defs/authority"}},
+        "governance_model": {"oneOf": [{"type": "string"}, {"type": "object"}]},
+        "multi_agency_note": {"type": "string"}
+      }
+    },
+    "legal_framework": {
+      "type": "object",
+      "description": "Primary statute, implementing/executive regulations, amendments, key secondary instruments, related laws and pending legislation.",
+      "properties": {
+        "hierarchy": {"type": "object"},
+        "primary_law": {
+          "type": "object",
+          "required": ["citation", "status"],
+          "properties": {
+            "citation": {"type": "string"},
+            "arabic_citation": {"type": "string"},
+            "issued": {"type": "string"},
+            "status": {"type": "string"},
+            "structure": {"type": "object"},
+            "scope": {"type": "string"},
+            "article_map": {"type": "array", "items": {"type": "object", "properties": {"article": {"type": ["integer", "string"]}, "subject": {"type": "string"}}}}
+          }
+        },
+        "executive_regulations": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "implementing_regulations": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "amendments": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "authority_statute": {"type": "object"},
+        "key_secondary_instruments": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "supporting_instruments": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "related_laws": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "related_federal_legislation": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "other_legislation": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "key_guidance_documents": {"type": "array", "items": {"$ref": "#/$defs/instrument"}},
+        "operative_regulation": {"type": "object"},
+        "pending_legislation": {"type": "array", "items": {"type": "object", "properties": {"item": {"type": "string"}, "status": {"type": "string"}}}},
+        "gso_standards_cited_in_the_code": {"type": "array", "items": {"$ref": "#/$defs/standard"}}
+      }
+    },
+    "standards_framework": {
+      "type": "object",
+      "required": ["regional_body", "key_standards"],
+      "properties": {
+        "regional_body": {"type": "object"},
+        "national_prefix": {"type": "string"},
+        "key_standards": {"type": "array", "items": {"$ref": "#/$defs/standard"}},
+        "national_technical_regulations": {"type": "array", "items": {"$ref": "#/$defs/standard"}},
+        "codex": {"type": "object"},
+        "note": {"type": "string"}
+      }
+    },
+    "food_business_requirements": {
+      "type": "object",
+      "description": "Licensing, FSMS/HACCP, personnel, training, traceability, recall and premises requirements. Property names vary by country because national regimes differ."
+    },
+    "product_registration": {"type": "object"},
+    "product_registration_and_label_approval": {"type": "object"},
+    "labelling": {
+      "type": "object",
+      "required": ["governing_standards"],
+      "properties": {
+        "governing_standards": {"type": "array", "items": {"type": "string"}},
+        "language": {"type": "string"},
+        "language_rule": {"type": "string"},
+        "mandatory_particulars": {"type": "array", "items": {"type": "string"}},
+        "mandatory_particulars_gso_9": {"type": "array", "items": {"type": "string"}},
+        "date_marking_rules": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+        "allergen_list_13_categories": {"type": "array", "items": {"type": "string"}},
+        "prohibited": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "additives_contaminants_and_residues": {
+      "type": "object",
+      "description": "Additive positive list, sweeteners, contaminants, pesticide MRLs, microbiological criteria, veterinary residues and prohibited substances."
+    },
+    "halal_requirements": {
+      "type": "object",
+      "properties": {
+        "mandatory": {"type": "boolean"},
+        "mandatory_for": {"type": "array", "items": {"type": "string"}},
+        "standards": {"type": "array", "items": {"type": "string"}},
+        "scheme": {"type": "string"},
+        "certification": {"type": "string"},
+        "certificate_types": {"type": "array", "items": {"type": "object"}},
+        "certificates": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "import_clearance": {
+      "type": "object",
+      "description": "Pre-import steps, required documents, border controls, ports of entry, detention/rejection handling and shelf-life-on-arrival rules.",
+      "properties": {
+        "documents": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "export_controls": {"type": "object"},
+    "enforcement_and_penalties": {
+      "type": "object",
+      "description": "Criminal and administrative penalties, powers, and where amounts are not verifiable this is stated explicitly rather than estimated.",
+      "properties": {
+        "amounts": {"type": "string"},
+        "measures": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "strategy_and_policy_context": {"type": "object"},
+    "recent_developments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["date", "item", "status"],
+        "properties": {
+          "date": {"type": "string"},
+          "item": {"type": "string"},
+          "status": {"type": "string"}
+        }
+      }
+    },
+    "outdated_items_found_in_supplied_pdf": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Every item in the user's supplied PDF that is superseded, renamed, mis-dated or otherwise no longer reliable."
+    },
+    "official_sources": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["title", "url"],
+        "properties": {
+          "title": {"type": "string"},
+          "url": {"type": "string", "format": "uri"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "authority": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "abbreviation": {"type": "string"},
+        "arabic_name": {"type": "string"},
+        "role": {"type": "string"},
+        "website": {"type": "string"},
+        "emirate": {"type": "string"},
+        "note": {"type": "string"}
+      }
+    },
+    "instrument": {
+      "type": "object",
+      "required": ["citation"],
+      "properties": {
+        "citation": {"type": "string"},
+        "arabic_citation": {"type": "string"},
+        "issued": {"type": "string"},
+        "date": {"type": "string"},
+        "status": {"type": "string"},
+        "content": {"type": "string"},
+        "effect": {"type": "string"},
+        "relevance": {"type": "string"},
+        "update_flag": {"type": "string"},
+        "verification_flag": {"type": "string"},
+        "url": {"type": "string"}
+      }
+    },
+    "standard": {
+      "type": "object",
+      "required": ["code", "title"],
+      "properties": {
+        "code": {"type": "string"},
+        "title": {"type": "string"},
+        "note": {"type": "string"},
+        "adopted_by_all_gcc": {"type": "boolean"},
+        "adopted_by": {"type": "string"}
+      }
+    }
+  }
+}

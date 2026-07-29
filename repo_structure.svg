@@ -1,0 +1,38 @@
+<svg viewBox="0 0 640 520" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Repository structure, short form</title>
+<desc>Condensed repository folder tree with file counts instead of full file listings.</desc>
+
+<rect x="0" y="0" width="640" height="520" fill="#ffffff"/>
+
+<text x="320" y="42" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#111827">Repository Structure</text>
+<text x="320" y="64" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">Source only</text>
+
+<rect x="40" y="90" width="560" height="392" rx="12" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+
+<g font-family="Consolas, Menlo, monospace" font-size="14.5" fill="#111827">
+<text x="66" y="126" font-weight="700">cold-chain-gcc-agentic-ai/</text>
+
+<text x="66" y="158">├── README.md</text>
+<text x="66" y="184">├── requirements.txt</text>
+
+<text x="66" y="222" fill="#4f46e5" font-weight="700">├── cold_chain/</text>
+<text x="330" y="222" font-family="Arial, sans-serif" font-size="11.5" fill="#6b7280">12 modules, pipeline core</text>
+
+<text x="66" y="256" fill="#dc2626" font-weight="700">├── guardrails/</text>
+<text x="330" y="256" font-family="Arial, sans-serif" font-size="11.5" fill="#6b7280">7 files, rules for 6 countries</text>
+
+<text x="66" y="290" fill="#d97706" font-weight="700">├── gcc_food_law_json/</text>
+<text x="330" y="290" font-family="Arial, sans-serif" font-size="11.5" fill="#6b7280">8 files, source law</text>
+
+<text x="66" y="324" fill="#0d9488" font-weight="700">├── scripts/</text>
+<text x="330" y="324" font-family="Arial, sans-serif" font-size="11.5" fill="#6b7280">7 tools, run and audit</text>
+
+<text x="66" y="358" fill="#16a34a" font-weight="700">└── tests/</text>
+<text x="330" y="358" font-family="Arial, sans-serif" font-size="11.5" fill="#6b7280">10 files, offline suite</text>
+</g>
+
+<line x1="66" y1="396" x2="574" y2="396" stroke="#e5e7eb" stroke-width="1"/>
+<text x="320" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" fill="#6b7280">Local secrets, virtual environment, and generated run output</text>
+<text x="320" y="448" text-anchor="middle" font-family="Arial, sans-serif" font-size="11.5" fill="#6b7280">are not part of the source tree</text>
+
+</svg>

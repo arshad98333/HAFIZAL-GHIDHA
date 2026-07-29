@@ -1,0 +1,480 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "document_type": "country_food_law_and_food_safety_profile",
+    "country": "State of Qatar",
+    "country_arabic": "دولة قطر",
+    "iso_3166_1_alpha_2": "QA",
+    "iso_3166_1_alpha_3": "QAT",
+    "region": "Gulf Cooperation Council (GCC)",
+    "compiled_on": "2026-07-28",
+    "data_current_as_of": "2026-07-28",
+    "language_of_record": "en",
+    "source_document_supplied_by_user": {
+      "filename": "1662838504863_QATAR.pdf",
+      "description": "MOPH 'Food Safety Code of Practice for Food Services' - Food service establishment guidelines, Document Revision No. 0.",
+      "document_date": "2020-10",
+      "status": "used as base; all substantive content re-verified against current official and secondary sources"
+    },
+    "verification": {
+      "method": "Text extracted from the supplied PDF, then each legal instrument, authority name and requirement cross-checked against official gazettes/legal portals, the competent authority website, FAOLEX/ECOLEX, and current regulatory-intelligence reporting.",
+      "overall_confidence": "high",
+      "caveats": [
+        "The supplied PDF is a food-service code of practice, not the primary law. The statutory framework (Law No. 8 of 1990 as amended by Law No. 4 of 2014) was added from official sources.",
+        "Specific fine and imprisonment amounts under Law 8/1990 Arts. 19-23 as amended by Law 4/2014 could not be retrieved from a machine-readable official source (Al Meezan is JavaScript-rendered). Amounts are deliberately omitted rather than guessed - verify on almeezan.qa.",
+        "The code of practice is 'Revision No. 0' dated October 2020 and cites several 1980s-2010s GSO editions that have since been revised."
+      ]
+    }
+  },
+  "competent_authorities": {
+    "primary": {
+      "name": "Ministry of Public Health - Food Safety Department",
+      "abbreviation": "MOPH FSD",
+      "arabic_name": "وزارة الصحة العامة - إدارة سلامة الأغذية",
+      "role": "Implements national health policy on food safety; exercises the powers vested in MOPH under Law No. 8 of 1990; conducts food control and inspection of food handling premises and food traders; prohibits handling of food not meeting specifications and requirements; issues the food safety codes of practice.",
+      "website": "https://www.moph.gov.qa",
+      "food_safety_portal": "https://emsfsa.moph.gov.qa/en/Pages/AboutUs.aspx",
+      "activity_indicator": "3,221 inspections of restaurants, hotels, supermarkets and food factories in H1 2024."
+    },
+    "supporting_authorities": [
+      {
+        "name": "Ministry of Municipality",
+        "role": "Municipal licensing and inspection of food premises, slaughterhouses, markets; veterinary and agricultural affairs."
+      },
+      {
+        "name": "Ministry of Commerce and Industry",
+        "abbreviation": "MOCI",
+        "role": "Consumer protection, commercial fraud, and issuance of Qatari technical regulations (e.g. Ministerial Decision No. 102 of 2025 on shelf life)."
+      },
+      {
+        "name": "Qatar General Organization for Standards and Metrology (QS)",
+        "role": "Development and adoption of Qatari standards and technical regulations (QS series), adoption of GSO standards.",
+        "note": "Operates under MOCI."
+      },
+      {
+        "name": "Ministry of Environment and Climate Change",
+        "role": "Environmental aspects, agricultural quarantine, pesticide control."
+      },
+      {
+        "name": "General Authority of Customs",
+        "role": "Border clearance."
+      },
+      {
+        "name": "Hamad Medical Corporation and Primary Health Care Corporation",
+        "role": "Foodborne illness diagnosis, surveillance and reporting."
+      }
+    ],
+    "multi_agency_note": "Qatar operates a multi-agency food control model. Oversight is shared between MOPH, Ministry of Municipality, Ministry of Environment and Climate Change, MOCI, HMC and PHCC."
+  },
+  "legal_framework": {
+    "primary_law": {
+      "citation": "Law No. 8 of 1990 on the Regulation of Human Food Control",
+      "arabic_citation": "قانون رقم 8 لسنة 1990 بتنظيم مراقبة الأغذية الآدمية",
+      "status": "In force (as amended)",
+      "structure": {
+        "articles": 33,
+        "chapters": "Includes a chapter on Crimes and Penalties at Articles 19-23; final provisions at Articles 24-33"
+      },
+      "scope": "Defines quality standards for food intended for human consumption and regulates the trade, packaging and transport of both imported and locally produced food.",
+      "core_prohibitions": [
+        "Circulating food that violates the applicable standards",
+        "Circulating damaged or spoiled food that could harm human health",
+        "Adulteration or alteration of food",
+        "Use of food contaminated with radioactive materials, pesticides, toxic substances, or associated with infectious disease"
+      ],
+      "competent_authority_article": "Article 7 designates the competent authorities implementing the Law and their respective jurisdictions.",
+      "official_text": "https://www.almeezan.qa/LawView.aspx?opt=&LawID=2648&language=en"
+    },
+    "amendments": [
+      {
+        "citation": "Law No. 4 of 2014 Amending Certain Provisions of Law No. 8 of 1990 on the Regulation of Human Food Control",
+        "published": "2014-03-25",
+        "articles": 3,
+        "effect": "Amended provisions of Law 8/1990 including the allocation of competences; associated resolutions conferred authority on the Ministry of Municipality and Urban Planning (as then named), the Supreme Council of Health (now MOPH) and the Qatar General Authority for Standardization.",
+        "official_text": "https://almeezan.qa/LawView.aspx?LawID=6200&language=en&opt="
+      }
+    ],
+    "key_secondary_instruments": [
+      {
+        "citation": "MOPH Food Safety Code of Practice for Food Services (Revision No. 0, October 2020)",
+        "status": "In force as guidance/requirement for food service establishments",
+        "legal_basis": "Law No. 8 of 1990",
+        "structure": [
+          {
+            "section": "1-5",
+            "subject": "Purpose, scope, definitions, related documents (law and GSO list), responsibility"
+          },
+          {
+            "section": "Part A (6)",
+            "subject": "Prerequisite programmes - building exterior and construction, building interior (floors/walls/ceilings, doors/windows, lighting, ambient temperature, air quality and ventilation, water quality, drainage and sewage, building services, staff facilities), pest management"
+          },
+          {
+            "section": "Part B (7)",
+            "subject": "Operational controls - including food additives (referencing GSO permitted-additive standards such as GSO 19 for edible oils and fats)"
+          },
+          {
+            "section": "Part C (8)",
+            "subject": "Management systems - including complaint management"
+          },
+          {
+            "section": "Allergens",
+            "subject": "Menu items must disclose the presence of allergens listed in GSO 9"
+          }
+        ]
+      },
+      {
+        "citation": "Ministerial Decision No. 102 of 2025 adopting the Qatari Technical Regulation on the Shelf Life of Food Products, QS 10050:2025",
+        "issuer": "Minister of Commerce and Industry, developed with MOPH, Ministry of Municipality and QS",
+        "published": "December 2025",
+        "significance": "Described by MOCI as a qualitative shift in Qatar's food safety system; sets national shelf-life determination and declaration requirements for food products.",
+        "status": "In force / phasing in - confirm transition dates with MOCI/QS"
+      },
+      {
+        "citation": "MOPH food safety training and certification requirement (Prometric-delivered food safety examinations for food handlers/PICs)",
+        "status": "In force",
+        "url": "https://www.prometric.com/exams/mhqfs/"
+      }
+    ],
+    "gso_standards_cited_in_the_code": [
+      {
+        "code": "GSO 21/1984",
+        "title": "Hygienic regulations for food plants and their personnel"
+      },
+      {
+        "code": "GSO 323/1994",
+        "title": "General requirements for transportation and storage of chilled and frozen foods"
+      },
+      {
+        "code": "GSO 969/1997",
+        "title": "Stores for frozen and chilled foodstuff - Part 2: general requirements"
+      },
+      {
+        "code": "GSO 1694/2005",
+        "title": "General principles of food hygiene"
+      },
+      {
+        "code": "GSO 1909/2009",
+        "title": "Requirements for handling of ready-to-eat foods"
+      },
+      {
+        "code": "GSO 1971/2009",
+        "title": "Hygienic conditions for school canteens and handled food"
+      },
+      {
+        "code": "GSO 2309/2013",
+        "title": "General requirements for food shops and establishments"
+      },
+      {
+        "code": "GSO 9",
+        "title": "Labelling of prepackaged foodstuffs (cited for allergen list)"
+      },
+      {
+        "code": "GSO 19",
+        "title": "Permitted food additives in edible oils and fats"
+      }
+    ]
+  },
+  "standards_framework": {
+    "regional_body": {
+      "name": "GCC Standardization Organization",
+      "abbreviation": "GSO",
+      "arabic_name": "هيئة التقييس لدول مجلس التعاون لدول الخليج العربية",
+      "role": "Regional standards body for the six GCC states plus Yemen. Issues GSO standards and GCC technical regulations which member states adopt as national standards, generally making them mandatory for food placed on the market.",
+      "website": "https://www.gso.org.sa",
+      "note": "Adoption is national: a GSO standard becomes legally binding in a member state only once that state's standards body/competent authority adopts it (as a national standard or via a national technical regulation)."
+    },
+    "national_prefix": "QS (Qatari standards and technical regulations issued by QS under MOCI)",
+    "key_standards": [
+      {
+        "code": "GSO 9",
+        "title": "Labelling of prepackaged food stuffs",
+        "note": "Core GCC horizontal labelling standard. Requires Arabic labelling (other languages alongside Arabic), name of food, ingredient list, nutrition information, net contents, name/address of manufacturer/packer/importer, country of origin, date marking, storage and use instructions, and declaration of the 13 GCC allergen categories.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-1",
+        "title": "Expiration dates for food products - Part 1: Mandatory expiration periods",
+        "note": "Applies to perishable foods (milk/milk products, eggs, meat, poultry, fish, crustaceans, infant foods, ready-to-eat foods, fresh table eggs) chilled at 0-5 C.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-2",
+        "title": "Expiration dates for food products - Part 2: Voluntary expiration periods",
+        "note": "Frozen products held at <= -18 C, certain non-perishable chilled products (0-5 C) and ambient products stored in ventilated stores at <= 25 C. Products outside the standard require expiry periods agreed with the competent authority on a scientific basis.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2500",
+        "title": "Food additives permitted for use in foodstuffs",
+        "note": "Positive list. Only additives with a JECFA ADI (or otherwise assessed as safe) and a Codex INS number are eligible. Replaced/consolidated earlier GSO additive standards.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 995",
+        "title": "Permitted sweeteners in foodstuffs",
+        "note": "Sweeteners not permitted in infant and children's foods. Label warnings required for aspartame (phenylketonuria), sucralose (<=25 C), and laxative-effect warnings for polyols (sorbitol >40 g/day, mannitol >20 g/day, xylitol >40 g/day, lactitol, maltitol, erythritol).",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1694",
+        "title": "General principles of food hygiene",
+        "note": "GCC adoption of Codex CAC/RCP 1.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 21",
+        "title": "Hygienic regulations for food plants and their personnel",
+        "note": "1984 base standard; still cited by national codes of practice.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 323",
+        "title": "General requirements for transportation and storage of chilled and frozen foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 969",
+        "title": "Stores for frozen and chilled foodstuff - Part 2: General requirements",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1909",
+        "title": "Requirements for handling of ready-to-eat foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1971",
+        "title": "Hygienic conditions for school canteens and handled food",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2309",
+        "title": "General requirements for food shops and establishments",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-1",
+        "title": "Halal food - Part 1: General requirements",
+        "note": "2015 edition is the operative version. A draft revision GSO 2055-1:2026 was released for public consultation on 2026-02-17 (comment deadline 2026-04-18) tightening supply-chain, certification and labelling rules. Treat GSO 2055-1:2015 as in force and GSO 2055-1:2026 as pending until formally adopted.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-2",
+        "title": "Halal food - Part 2: General requirements for halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-3",
+        "title": "Halal food - Part 3: General requirements for accreditation bodies accrediting halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016",
+        "title": "Microbiological criteria for foodstuffs",
+        "note": "Horizontal microbiological limits; multi-part.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1863",
+        "title": "Maximum limits of pesticide residues in agricultural and food products",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016 / GSO 2481",
+        "title": "Contaminants and toxins in food and feed",
+        "note": "GSO 2481 mirrors Codex GSCTFF for heavy metals and mycotoxins. Verify latest edition in the GSO standards store before use.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2233",
+        "title": "Requirements of nutritional labelling",
+        "note": "Applied alongside GSO 9.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 839 / GSO 1863",
+        "title": "Food packaging - general requirements for food contact materials",
+        "note": "Food-contact material requirements are largely GSO-harmonised across the six states.",
+        "adopted_by_all_gcc": true
+      }
+    ],
+    "national_technical_regulations": [
+      {
+        "code": "QS 10050:2025",
+        "title": "Qatari Technical Regulation on the Shelf Life of Food Products",
+        "adopted_by": "Ministerial Decision No. 102 of 2025"
+      }
+    ],
+    "codex": {
+      "codex_alimentarius_member": true,
+      "note": "All six GCC states are Codex members; GSO standards are predominantly Codex-aligned, and national laws routinely allow Codex to be used where no GSO/national standard exists."
+    }
+  },
+  "food_business_requirements": {
+    "establishment_licensing": "Municipal licence (Ministry of Municipality) plus health approval; food service establishments must comply with the MOPH Food Safety Code of Practice.",
+    "food_safety_management_system": "Prerequisite programmes (GHP/GMP) mandatory per the Code of Practice; HACCP-based operational controls expected for food service and required for manufacturing.",
+    "person_in_charge_and_training": "Food safety training with certification (MOPH-recognised examinations, delivered via Prometric) for food handlers and persons in charge.",
+    "premises_requirements_summary": [
+      "Surrounding grounds and adjacent properties controlled to prevent contamination",
+      "Impervious, cleanable floors, walls and ceilings",
+      "Screened/self-closing doors and windows",
+      "Adequate lighting and controlled ambient temperature",
+      "Adequate ventilation and air quality",
+      "Potable water quality verification",
+      "Separate, adequate drainage and sewage systems",
+      "Staff welfare facilities segregated from food areas",
+      "Documented pest management programme",
+      "Documents and records maintained for each prerequisite area"
+    ],
+    "temperature_controls": "Chilled foods 0-5 C; frozen at or below -18 C; hot holding and cooking/cooling parameters per the Code of Practice.",
+    "allergen_management": "Menus must declare the presence of the allergens listed in GSO 9.",
+    "complaint_handling": "Documented complaint management procedure required (Section 8.4.1)."
+  },
+  "product_registration_and_label_approval": {
+    "required": "Yes for specified categories and label pre-approval in practice",
+    "description": "Imported food labels are reviewed for compliance with GSO 9 and Qatari technical regulations. Special-purpose foods (infant formula, supplements, foods for special medical purposes, energy drinks) require prior approval/registration with MOPH.",
+    "confidence": "medium; confirm current category list and workflow with MOPH Food Safety Department"
+  },
+  "labelling": {
+    "governing_standards": [
+      "GSO 9",
+      "GSO 2233",
+      "GSO 150-1/150-2",
+      "QS 10050:2025 shelf life"
+    ],
+    "language": "Arabic mandatory; other languages alongside Arabic and identical in content.",
+    "mandatory_particulars": [
+      "Product name",
+      "Ingredient list in descending order",
+      "Additives by common name or E-number",
+      "Allergen declaration (13 GCC categories)",
+      "Net content",
+      "Manufacturer/packer/importer name and address",
+      "Country of origin",
+      "Production date and expiry date",
+      "Storage conditions and instructions for use",
+      "Batch/lot identification",
+      "Nutrition declaration where applicable"
+    ],
+    "date_marking_rules": "Day-Month-Year for shelf life under 3 months; Month-Year for shelf life over 3 months. Producer-applied indelible dates only; no date stickers.",
+    "shelf_life_on_arrival": "Qatar applies a remaining-shelf-life rule at import (commonly at least half the shelf life remaining). Confirm the precise requirement under QS 10050:2025 and with MOPH.",
+    "prohibited": [
+      "Misleading descriptions and unauthorised health claims",
+      "Artificial sweeteners in infant and children's foods"
+    ]
+  },
+  "additives_contaminants_and_residues": {
+    "additives": "GSO 2500 positive list plus product-specific GSO additive standards (e.g. GSO 19 for edible oils and fats); sweeteners per GSO 995 with mandatory label warnings.",
+    "contaminants": "GSO/Codex-aligned maximum limits.",
+    "pesticide_mrls": "GSO 1863 / Codex.",
+    "microbiological": "GSO 1016 series.",
+    "prohibited": [
+      "Pork and pork derivatives (except in licensed outlets under strict conditions)",
+      "Alcohol outside licensed channels",
+      "Food contaminated with radioactive materials, pesticides or toxic substances (Law 8/1990)",
+      "Non-permitted additives"
+    ]
+  },
+  "halal_requirements": {
+    "mandatory_for": [
+      "Meat and poultry and their products",
+      "Products containing animal-derived ingredients"
+    ],
+    "standards": [
+      "GSO 2055-1",
+      "GSO 2055-2",
+      "GSO 2055-3"
+    ],
+    "certification": "Halal slaughter certificate from an approved Islamic body in the exporting country, endorsed as required; halal certificate for products with halal-relevant ingredients."
+  },
+  "import_clearance": {
+    "authorities": "MOPH Food Safety Department (health control at ports of entry) with the General Authority of Customs; Ministry of Municipality for veterinary/agricultural quarantine.",
+    "documents": [
+      "Health certificate from the exporting country's competent authority",
+      "Halal slaughter certificate for meat and poultry; halal certificate where applicable",
+      "Certificate of origin",
+      "Commercial invoice and packing list",
+      "Bill of lading / airway bill and customs declaration",
+      "Certificates of analysis for risk categories"
+    ],
+    "border_control": "Documentary and physical inspection with sampling and laboratory analysis; risk-based targeting.",
+    "non_compliance": "Detention, prohibition of handling, re-export or destruction under MOPH supervision, plus penalties under Law 8/1990."
+  },
+  "enforcement_and_penalties": {
+    "legal_basis": "Law No. 8 of 1990, Chapter on Crimes and Penalties (Articles 19-23), as amended by Law No. 4 of 2014.",
+    "measures": [
+      "Prohibition of handling non-compliant food",
+      "Seizure, withdrawal and destruction",
+      "Closure of premises",
+      "Fines",
+      "Imprisonment for serious offences"
+    ],
+    "amounts": "NOT STATED - specific fine and imprisonment ranges were not verifiable from a machine-readable official source at compile date. Verify Articles 19-23 as amended on Al Meezan before quoting figures.",
+    "inspection_regime": "MOPH FSD routine and risk-based inspections of restaurants, hotels, supermarkets and food factories."
+  },
+  "recent_developments": [
+    {
+      "date": "2025-12",
+      "item": "Ministerial Decision No. 102 of 2025 adopting Qatari Technical Regulation QS 10050:2025 on the shelf life of food products, developed jointly by MOCI, MOPH, Ministry of Municipality and QS.",
+      "status": "In force / phasing in"
+    },
+    {
+      "date": "2024",
+      "item": "MOPH reported 3,221 food establishment inspections in H1 2024 as part of intensified food control activity.",
+      "status": "Operational"
+    },
+    {
+      "date": "2026-02-17",
+      "item": "GSO draft GSO 2055-1:2026 halal food revision released for consultation (deadline 2026-04-18).",
+      "status": "Draft"
+    }
+  ],
+  "outdated_items_found_in_supplied_pdf": [
+    "The Code of Practice is 'Revision No. 0' dated October 2020 - check MOPH for a later revision.",
+    "It does not reflect Ministerial Decision No. 102 of 2025 / QS 10050:2025 on shelf life, which now governs shelf-life determination and declaration.",
+    "Several cited GSO editions are dated (GSO 21/1984, GSO 323/1994, GSO 969/1997, GSO 1694/2005, GSO 1909/2009, GSO 1971/2009, GSO 2309/2013). Verify current editions in the GSO standards store; GSO 2500 has consolidated much of the older additive framework.",
+    "'Supreme Council of Health' referenced in the 2014 amendment context is now the Ministry of Public Health; 'Ministry of Municipality and Urban Planning' is now the Ministry of Municipality."
+  ],
+  "official_sources": [
+    {
+      "title": "Law No. 8 of 1990 Regulation of Human Food Control (Al Meezan)",
+      "url": "https://www.almeezan.qa/LawView.aspx?opt=&LawID=2648&language=en"
+    },
+    {
+      "title": "Law No. 4 of 2014 amending Law No. 8 of 1990 (Al Meezan)",
+      "url": "https://almeezan.qa/LawView.aspx?LawID=6200&language=en&opt="
+    },
+    {
+      "title": "MOPH Food Safety Department - functions",
+      "url": "https://emsfsa.moph.gov.qa/en/Pages/AboutUs.aspx"
+    },
+    {
+      "title": "QNA - Minister of Commerce and Industry adopts Qatari technical regulation on shelf life of food products",
+      "url": "https://qna.org.qa/en/News-Area/News/2025-12/13/minister-of-commerce-industry-issues-decision-adopting-qatari-technical-regulation-on-shelf-life-of-food-products"
+    },
+    {
+      "title": "MOPH food safety examination (Prometric)",
+      "url": "https://www.prometric.com/exams/mhqfs/"
+    },
+    {
+      "title": "UNEP LEAP - Law No. 8 of 1990 on the organisation of food control",
+      "url": "https://leap.unep.org/en/countries/qa/national-legislation/law-no-8-1990-organisation-food-control"
+    },
+    {
+      "title": "MOPH H1 2024 food safety measures",
+      "url": "https://thepeninsulaqatar.com/article/19/07/2024/moph-reports-significant-food-safety-measures-for-2024-first-half"
+    },
+    {
+      "title": "US Trade.gov - Qatar labeling/marking requirements",
+      "url": "https://trade.gov/country-commercial-guides/qatar-labelingmarking-requirements"
+    }
+  ]
+}

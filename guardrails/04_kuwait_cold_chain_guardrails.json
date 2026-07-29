@@ -1,0 +1,323 @@
+{
+  "meta": {
+    "guardrail_pack": "GCC Perishable & Cold-Storage Guardrails for AI Agents",
+    "file_role": "country_overlay",
+    "version": "1.0.0",
+    "compiled_on": "2026-07-28",
+    "country": "State of Kuwait",
+    "country_arabic": "دولة الكويت",
+    "iso_3166_1_alpha_2": "KW",
+    "extends": "00_gcc_base_guardrails.json",
+    "precedence": "This overlay takes precedence over the base file on any conflict. Base rules GCC-EDGE-001..020 and GCC-NORM-001..005 remain in force unless explicitly overridden here.",
+    "primary_competent_authority": "Public Authority for Food and Nutrition (PAFN)",
+    "legal_profile_reference": "../gcc_food_law_json/04_kuwait_food_law.json",
+    "design_principle": {
+      "name": "Pareto (80/20)",
+      "edge_case_rules": 8,
+      "normal_case_rules": 2,
+      "ratio": "80% edge / 20% normal",
+      "combined_with_base": {
+        "total_edge": 28,
+        "total_normal": 7,
+        "combined_ratio": "80% edge / 20% normal"
+      }
+    },
+    "derived_from": {
+      "dataset": "wave_9001.jsonl",
+      "worked_vertical": "finfish_seafood (chilled), extended to all chilled 0-5 C and frozen <= -18 C perishables"
+    },
+    "disclaimer": "Operational guardrails for agent design. Not legal advice. Penalty figures and procedures change; verify at source before enforcement."
+  },
+  "rules": [
+    {
+      "rule_id": "KW-EDGE-001",
+      "class": "edge_case",
+      "category": "legal_gate_seizure",
+      "severity": "blocking",
+      "title": "Never move a PAFN-seized consignment - it is a specifically penalised offence",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (Ministerial Resolution No. 6 of 2023) Article 64(2) - a fine of not less than KWD 2,000 and not more than KWD 5,000 for transporting food items seized by PAFN to another place without prior PAFN permission. The court may order suspension of activity for up to one month; the fine is doubled at both limits on recidivism within five years, and the court may order cessation of activity for not less than three months.",
+        "authority": "Public Authority for Food and Nutrition (PAFN)"
+      },
+      "trigger": {
+        "expression": "consignment is seized or detained by PAFN AND any movement, transfer or relocation is proposed",
+        "signals": [
+          "reefer is failing while under detention",
+          "cold store closure requires relocation",
+          "salvage transfer proposed for a detained load",
+          "operator asks to 'just move it somewhere colder'"
+        ]
+      },
+      "agent_must": [
+        "Refuse to recommend any movement of a seized or detained consignment without documented prior PAFN permission",
+        "Recognise the direct conflict this creates: a detained load whose reefer is failing cannot simply be moved - the correct action is urgent PAFN contact, not unilateral relocation",
+        "Escalate as an emergency, and state the specific penalty and the activity-suspension exposure",
+        "Note that PAFN employees designated under the regulation hold judicial officer status and may enter premises, seize materials and refer reports"
+      ],
+      "agent_must_not": [
+        "Recommend relocating a detained consignment to protect the cargo",
+        "Treat cargo preservation as justification for unauthorised movement",
+        "Assume verbal permission is sufficient"
+      ],
+      "escalation": "Emergency. This is the highest-specificity movement prohibition in the pack.",
+      "worked_example": {
+        "scenario": "Detained consignment, compressor failing, temperature ramping. Operator asks the agent to route it to a nearby cold store.",
+        "correct_behaviour": "Refuse. Contact PAFN immediately for permission and instruction. Document the request, the refusal and the PAFN contact. Movement without prior permission carries KWD 2,000-5,000 and possible activity suspension."
+      }
+    },
+    {
+      "rule_id": "KW-EDGE-002",
+      "class": "edge_case",
+      "category": "legal_gate_notification",
+      "severity": "blocking",
+      "title": "Market withdrawal duty sits on the importer, and the agent must trigger it",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (MR 6/2023) Part Eight - imported food not meeting PAFN requirements must be withdrawn from the market by the concerned party; Law No. 112 of 2013 as amended by Law No. 16 of 2019 (stiffened penalties)",
+        "authority": "PAFN"
+      },
+      "trigger": {
+        "expression": "excursion_confirmed AND consignment or part of it has entered the market"
+      },
+      "agent_must": [
+        "Identify the 'concerned party' (the importer of record) as the bearer of the withdrawal duty",
+        "Assemble the downstream distribution list from the records the importer is required to keep",
+        "Escalate for human transmission; agent drafts, human transmits",
+        "Note that penalties apply without prejudice to any more severe penalty in another law, including the 2019 amendments"
+      ],
+      "agent_must_not": [
+        "Wait for PAFN to instruct withdrawal before escalating",
+        "Assume the carrier rather than the importer carries the duty"
+      ],
+      "escalation": "Immediate human escalation."
+    },
+    {
+      "rule_id": "KW-EDGE-003",
+      "class": "edge_case",
+      "category": "records",
+      "severity": "blocking",
+      "title": "Record-keeping failure is itself a penalised offence",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (MR 6/2023) Article 64(1) - a fine of not less than KWD 100 and not more than KWD 1,000 for violating Articles 41, 42 or 56, or for failure by the concerned party to keep the described records. The court may order suspension of activity for up to one month.",
+        "authority": "PAFN"
+      },
+      "trigger": {
+        "expression": "telemetry, certificate or consignment records are incomplete, missing or unretained",
+        "signals": [
+          "logger data not exported before the device was reused",
+          "raw artifact overwritten by a normalised version",
+          "consignment registration reference not retained"
+        ]
+      },
+      "agent_must": [
+        "Treat retention of the raw telemetry artifact as a legal obligation in Kuwait, not merely good practice",
+        "Report any retention gap as a compliance finding in its own right, separate from the temperature verdict",
+        "Preserve the PAFN automatic reference number issued at consignment registration"
+      ],
+      "agent_must_not": [
+        "Overwrite or normalise the raw artifact in place",
+        "Treat a records gap as a minor administrative point"
+      ],
+      "escalation": "Report as a distinct compliance finding regardless of the temperature disposition."
+    },
+    {
+      "rule_id": "KW-EDGE-004",
+      "class": "edge_case",
+      "category": "documentation_integrity",
+      "severity": "blocking",
+      "title": "Health certificate validity conditions are strict and time-bounded",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (MR 6/2023) Part Four - the health certificate must be original (paper or electronic), in Arabic and/or English, describe the shipment in detail including number and type of items; for electronic certificates the certificate number or an approved alternative verification reference is required; a certificate is invalid outside its stated validity conditions, for example beyond the permitted period for frozen meat of different types or products",
+        "authority": "PAFN"
+      },
+      "trigger": {
+        "expression": "cold-chain event causes delay, split, re-consolidation or extended dwell",
+        "signals": [
+          "certificate validity period at risk of expiry during a hold",
+          "consignment split across entries",
+          "multi-item consignment where one item fails"
+        ]
+      },
+      "agent_must": [
+        "Check whether a hold or investigation delay will push the consignment past the certificate's validity conditions",
+        "Flag that a multi-item health certificate covering a consignment where one item fails may invalidate the whole certificate - escalate rather than assume severability",
+        "Verify the electronic certificate number or the approved alternative verification reference"
+      ],
+      "agent_must_not": [
+        "Assume a certificate remains valid through an extended QA hold",
+        "Assume a multi-item certificate is severable"
+      ],
+      "escalation": "hold_for_qa with the certificate expiry date stated explicitly in the escalation."
+    },
+    {
+      "rule_id": "KW-EDGE-005",
+      "class": "edge_case",
+      "category": "halal_integrity",
+      "severity": "blocking",
+      "title": "Halal slaughter certificate requirements are itemised and survive no shortcut",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (MR 6/2023) Part Four - an original (paper or electronic) halal slaughter certificate is required for red meat, poultry and birds shipments; it must carry the data required by the halal regulations, a serial number and date of issue, and slaughtering dates indicated by day. Where meat is re-manufactured in a third country, halal certificates equivalent to the original certificates issued by the country of origin are required, with a copy of the original halal slaughter certificate attached, or the original on request.",
+        "authority": "PAFN"
+      },
+      "trigger": {
+        "expression": "halal-relevant consignment subject to a cold-chain event, salvage, transfer or re-manufacture"
+      },
+      "agent_must": [
+        "Verify the serial number, date of issue and per-day slaughtering dates, not merely the presence of a certificate",
+        "For re-manufactured meat, verify both the equivalent certificate and the attached original-country halal slaughter certificate",
+        "Treat halal integrity as a separate pass/fail dimension from temperature"
+      ],
+      "agent_must_not": [
+        "Accept a halal certificate lacking a serial number or slaughter dates",
+        "Assume a re-manufactured product inherits halal status without the paired certificates",
+        "Treat temperature recovery as curing a segregation break"
+      ],
+      "escalation": "reject the halal claim and escalate."
+    },
+    {
+      "rule_id": "KW-EDGE-006",
+      "class": "edge_case",
+      "category": "risk_classification",
+      "severity": "high",
+      "title": "PAFN risk classification drives inspection intensity and must not be assumed",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (MR 6/2023) - foods are classified by 'degree of risk', driving documentary, identity and physical check intensity and laboratory sampling; consignments are registered on paper or electronically and issued an automatic reference number",
+        "authority": "PAFN"
+      },
+      "trigger": {
+        "expression": "agent estimates inspection likelihood, dwell time or sampling probability"
+      },
+      "agent_must": [
+        "State that the degree-of-risk classification is PAFN's to assign, not the agent's to infer",
+        "Use the classification only when it has been supplied, and cite where it came from",
+        "Preserve the automatic reference number in all downstream records"
+      ],
+      "agent_must_not": [
+        "Infer a risk class from the product code and then plan around the inferred inspection intensity",
+        "Advise timing a movement to avoid inspection"
+      ],
+      "escalation": "None; prevents an inference error."
+    },
+    {
+      "rule_id": "KW-EDGE-007",
+      "class": "edge_case",
+      "category": "packaging_integrity",
+      "severity": "high",
+      "title": "Seal and package integrity is an independent rejection ground",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (MR 6/2023) - food packages must exhibit no visible signs of damage or tampering; indications that seals were broken are grounds for rejection",
+        "authority": "PAFN"
+      },
+      "trigger": {
+        "expression": "cold-chain event involved door opening, transfer, salvage or any seal break",
+        "signals": [
+          "door-open excursion signature",
+          "emergency transfer",
+          "salvage repack",
+          "seal number mismatch"
+        ]
+      },
+      "agent_must": [
+        "Cross-check any door-open excursion signature (base rule GCC-EDGE-009) against the seal record - an unexplained air-temperature spike with an intact seal is a different finding from one with a broken seal",
+        "Report seal status as a distinct field",
+        "Treat a broken seal as an independent rejection ground even where temperature recovered fully"
+      ],
+      "agent_must_not": [
+        "Treat seal integrity as subsumed by the temperature verdict",
+        "Explain away a door-open signature without checking the seal record"
+      ],
+      "escalation": "reject on broken seal regardless of temperature performance."
+    },
+    {
+      "rule_id": "KW-EDGE-008",
+      "class": "edge_case",
+      "category": "bilingual_input",
+      "severity": "high",
+      "title": "Arabic and English are both authoritative for Kuwaiti certificates",
+      "legal_basis": {
+        "instrument": "Imported Food Regulations (MR 6/2023) - the health certificate must be written in Arabic and/or English",
+        "authority": "PAFN"
+      },
+      "trigger": {
+        "expression": "artifact language is ar_msa OR a bilingual certificate is in evidence",
+        "signals": [
+          "°م notation",
+          "أغلبها / حوالي / تقريبًا",
+          "Arabic-Indic digits",
+          "Arabic and English certificate fields that diverge"
+        ]
+      },
+      "agent_must": [
+        "Parse °م as Celsius preserving exact values",
+        "Apply base rules GCC-EDGE-008 and GCC-EDGE-011 to Arabic hedge words",
+        "Reconcile Arabic and English certificate fields and report divergence as a defect",
+        "Quote the Arabic verbatim in evidence"
+      ],
+      "agent_must_not": [
+        "Read only one language version",
+        "Round or take midpoints during translation"
+      ],
+      "escalation": "hold_for_qa on certificate field divergence."
+    },
+    {
+      "rule_id": "KW-NORM-001",
+      "class": "normal_case",
+      "category": "routine_clearance",
+      "severity": "informational",
+      "title": "Normal Kuwaiti clearance path",
+      "trigger": {
+        "expression": "base GCC-NORM-001 or GCC-NORM-002 satisfied AND consignment registered with a PAFN automatic reference number AND health and halal certificates valid AND seals intact"
+      },
+      "agent_must": [
+        "Report telemetry verdict, PAFN registration reference, certificate validity and seal status as four separate confirmations",
+        "Cite Ministerial Resolution No. 6 of 2023 and the enabling Law No. 112 of 2013 as amended by Law No. 16 of 2019"
+      ],
+      "agent_must_not": [
+        "Cite the repealed Ministerial Resolution No. 19 of 2017 - it was expressly cancelled by Article 2 of MR 6/2023 with effect from 1 September 2023"
+      ],
+      "escalation": "None."
+    },
+    {
+      "rule_id": "KW-NORM-002",
+      "class": "normal_case",
+      "category": "record_contract",
+      "severity": "medium",
+      "title": "Kuwaiti record and citation contract",
+      "trigger": {
+        "expression": "any disposition emitted"
+      },
+      "agent_must": [
+        "Cite the specific article of MR 6/2023 relied on",
+        "Retain the raw telemetry artifact unmodified - retention is a legal obligation here, see KW-EDGE-003",
+        "Preserve the PAFN automatic reference number"
+      ],
+      "agent_must_not": [
+        "Cite the 2017 regulations",
+        "Cite older Kuwait Municipality food code material for imported food - it is superseded in that field"
+      ],
+      "escalation": "None."
+    }
+  ],
+  "rule_index": {
+    "blocking": [
+      "KW-EDGE-001",
+      "KW-EDGE-002",
+      "KW-EDGE-003",
+      "KW-EDGE-004",
+      "KW-EDGE-005"
+    ],
+    "edge_case": [
+      "KW-EDGE-001",
+      "KW-EDGE-002",
+      "KW-EDGE-003",
+      "KW-EDGE-004",
+      "KW-EDGE-005",
+      "KW-EDGE-006",
+      "KW-EDGE-007",
+      "KW-EDGE-008"
+    ],
+    "normal_case": [
+      "KW-NORM-001",
+      "KW-NORM-002"
+    ]
+  }
+}

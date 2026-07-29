@@ -1,0 +1,515 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "document_type": "country_food_law_and_food_safety_profile",
+    "country": "State of Kuwait",
+    "country_arabic": "دولة الكويت",
+    "iso_3166_1_alpha_2": "KW",
+    "iso_3166_1_alpha_3": "KWT",
+    "region": "Gulf Cooperation Council (GCC)",
+    "compiled_on": "2026-07-28",
+    "data_current_as_of": "2026-07-28",
+    "language_of_record": "en",
+    "source_document_supplied_by_user": {
+      "filename": "kuw221743E_KUWAIT.pdf",
+      "description": "Public Authority for Food and Nutrition Ministerial Resolution No. 6 of 2023 regarding the Regulation of Imported Food, with the annexed Imported Food Regulations (64 articles in ten parts plus a penalties section).",
+      "document_date": "2023-04-30 (issued 10 Shawwal 1444 AH); effective 2023-09-01",
+      "status": "used as base; all substantive content re-verified against current official and secondary sources"
+    },
+    "verification": {
+      "method": "Text extracted from the supplied PDF, then each legal instrument, authority name and requirement cross-checked against official gazettes/legal portals, the competent authority website, FAOLEX/ECOLEX, and current regulatory-intelligence reporting.",
+      "overall_confidence": "high",
+      "caveats": [
+        "This is a current instrument: Ministerial Resolution No. 6 of 2023 expressly cancelled the previous Imported Food Regulations issued by Ministerial Resolution No. 19 of 2017 (Art. 2) and took effect 1 September 2023.",
+        "The supplied PDF covers imported food only. Domestic food safety controls sit under Law No. 112 of 2013 (as amended), PAFN regulations, and Kuwait Municipality food code requirements.",
+        "The PDF is a two-column layout; article numbering in the extracted text interleaves. Article content has been reconciled but individual article numbers for definitions/data provisions should be checked against the original layout."
+      ]
+    }
+  },
+  "competent_authorities": {
+    "primary": {
+      "name": "Public Authority for Food and Nutrition",
+      "abbreviation": "PAFN",
+      "arabic_name": "الهيئة العامة للغذاء والتغذية",
+      "role": "National food control authority. Develops national food and nutrition policy, sets food safety criteria, controls food producers, importers and sellers, inspects food companies/markets/stores, supervises food-importing operations and food testing laboratories, operates port laboratories, and enforces the Imported Food Regulations.",
+      "established_by": "Law No. 112 of 2013",
+      "supervising_minister": "Minister of Health (designated by Cabinet Resolution No. 1162 of 2013)",
+      "board": "Board of Directors formed by Decree No. 22 of 2023"
+    },
+    "supporting_authorities": [
+      {
+        "name": "Ministry of Health",
+        "role": "Supervising ministry for PAFN; public health, food handler health certificates, foodborne disease surveillance."
+      },
+      {
+        "name": "Kuwait Municipality",
+        "role": "Licensing and inspection of food premises, restaurants and markets; historical Kuwait food code requirements."
+      },
+      {
+        "name": "Public Authority for Industry - Standards and Industrial Services Affairs",
+        "role": "Kuwaiti standards (KS) and adoption of GSO standards; technical regulations and conformity assessment."
+      },
+      {
+        "name": "General Administration of Customs",
+        "role": "Border clearance following PAFN release."
+      },
+      {
+        "name": "Public Authority for Agriculture Affairs and Fish Resources",
+        "abbreviation": "PAAAFR",
+        "role": "Veterinary and plant quarantine, primary production."
+      }
+    ]
+  },
+  "legal_framework": {
+    "primary_law": {
+      "citation": "Law No. 112 of 2013 Establishing the Public Authority for Food and Nutrition",
+      "arabic_citation": "قانون رقم 112 لسنة 2013 بإنشاء الهيئة العامة للغذاء والتغذية",
+      "status": "In force as amended",
+      "structure": {
+        "articles": 21
+      },
+      "objectives": [
+        "Develop a national food and nutrition policy",
+        "Set criteria for food safety",
+        "Promote healthier nutrition and lifestyles",
+        "Combat malnutrition",
+        "Reduce foodborne disease",
+        "Control food producers, importers and sellers",
+        "Inspect food companies, markets and stores",
+        "Supervise food-importing operations and food testing laboratories"
+      ],
+      "amendments": [
+        {
+          "citation": "Law No. 16 of 2019 amending Law No. 112 of 2013",
+          "effect": "Significantly stiffened penalties to deter illegal food trade and the sale of harmful products. Amended Article 12 to commit PAFN to establishing laboratories at all land, sea and air ports to examine imported food."
+        }
+      ]
+    },
+    "supporting_instruments": [
+      {
+        "citation": "Cabinet Resolution No. 1162 of 2013",
+        "effect": "Designated the minister responsible for supervising PAFN (Minister of Health)."
+      },
+      {
+        "citation": "Decree No. 22 of 2023",
+        "effect": "Formed the PAFN Board of Directors."
+      },
+      {
+        "citation": "PAFN Board of Directors decision, meeting No. 2 of 2023 (3 July 2023)",
+        "effect": "Adopted the Imported Food Regulations."
+      },
+      {
+        "citation": "Legal Advice and Legislation Department letter Ref. No. 202200004029 dated 29 March 2023",
+        "effect": "Legal clearance of the draft regulations."
+      }
+    ],
+    "operative_regulation": {
+      "citation": "Ministerial Resolution No. 6 of 2023 regarding the Regulation of Imported Food",
+      "arabic_citation": "قرار وزاري رقم 6 لسنة 2023 بشأن لائحة الغذاء المستورد",
+      "issued_by": "Minister of Health, Dr. Ahmed Abdel Wahab Al-Awadhi",
+      "issued": "2023-04-30 (10 Shawwal 1444 AH)",
+      "effective": "2023-09-01",
+      "repeals": "Imported Food Regulations issued by Ministerial Resolution No. 19 of 2017 (expressly cancelled by Art. 2)",
+      "resolution_articles": [
+        {
+          "article": 1,
+          "text": "The provisions of the Imported Food Regulations accompanying this resolution shall be implemented."
+        },
+        {
+          "article": 2,
+          "text": "The Imported Food Regulations issued by Ministerial Resolution No. 19 of 2017 shall be cancelled."
+        },
+        {
+          "article": 3,
+          "text": "The competent authorities must implement this resolution, each within its authority; effective from 1/9/2023 and published in the Official Gazette."
+        }
+      ],
+      "annexed_regulation_structure": {
+        "total_articles": 64,
+        "parts": [
+          {
+            "part": "One",
+            "title": "Definitions",
+            "articles": "1",
+            "note": "Defines food shipment/consignment, detained consignment, food spoilage, degree of risk of food items, halal certificate, halal slaughter certificate, health certificate, laboratory, packing list, food not fit for human consumption, automatic reference number, and related terms."
+          },
+          {
+            "part": "Two",
+            "title": "Food Materials",
+            "articles": "approx. 3-12",
+            "note": "Substantive requirements for imported food: must be safe and fit for human consumption; must be permissible under Islamic law (halal) and not harmful to health; must not contain prohibited or non-permitted substances; hormone/veterinary residue limits; prohibition of falsely described or misleadingly nutritionally-claimed food; prohibition of foods prohibited on health grounds."
+          },
+          {
+            "part": "Three",
+            "title": "Data (labelling and product information)",
+            "articles": "approx. 13-16",
+            "note": "Label data requirements, including reduced information allowances for small packages relative to larger packs; documentation of claims (nutrient content claims, disease-risk-reduction claims)."
+          },
+          {
+            "part": "Four",
+            "title": "Documents and Certificates",
+            "articles": "approx. 17-28",
+            "note": "Health certificates (paper or electronic), halal slaughter certificates, halal certificates, packing lists, and the rules on their validity, language (Arabic and/or English), serial numbers, issue dates, multi-item consignments, mutual recognition/equivalence, and re-manufactured meat products."
+          },
+          {
+            "part": "Five",
+            "title": "The Competent Department",
+            "articles": "approx. 29-35",
+            "note": "Verification that consignment data match the actual import, inspection procedures, release decisions."
+          },
+          {
+            "part": "Six",
+            "title": "Sampling",
+            "articles": "approx. 36-41",
+            "note": "Sampling for laboratory analysis, sample handling, and the treatment of samples imported for laboratory purposes."
+          },
+          {
+            "part": "Seven",
+            "title": "Stores / Warehouses",
+            "articles": "approx. 42-48",
+            "note": "Storage of detained and released consignments, transfer between locations, conditions where a warehouse is closed."
+          },
+          {
+            "part": "Eight",
+            "title": "The Concerned Party (importer obligations)",
+            "articles": "approx. 49-56",
+            "note": "Record keeping, withdrawal of non-compliant food from the market, cooperation with PAFN."
+          },
+          {
+            "part": "Nine",
+            "title": "The Authority (PAFN powers)",
+            "articles": "approx. 57-62",
+            "note": "PAFN discretion to take other measures where the public interest requires; alert and notification systems for risk zones."
+          },
+          {
+            "part": "Ten",
+            "title": "Seizure, Detention and Disposal",
+            "articles": "approx. 63",
+            "note": "Seizure powers; officers designated under the regulation have the status of judicial officers, may enter premises (excluding residences) within the scope of their work, seize violations and materials, write reports and refer them, and may seek the assistance of the public force."
+          },
+          {
+            "part": "Penalties (Secondly)",
+            "title": "Penalties",
+            "articles": "64",
+            "note": "See enforcement_and_penalties."
+          }
+        ]
+      }
+    }
+  },
+  "standards_framework": {
+    "regional_body": {
+      "name": "GCC Standardization Organization",
+      "abbreviation": "GSO",
+      "arabic_name": "هيئة التقييس لدول مجلس التعاون لدول الخليج العربية",
+      "role": "Regional standards body for the six GCC states plus Yemen. Issues GSO standards and GCC technical regulations which member states adopt as national standards, generally making them mandatory for food placed on the market.",
+      "website": "https://www.gso.org.sa",
+      "note": "Adoption is national: a GSO standard becomes legally binding in a member state only once that state's standards body/competent authority adopts it (as a national standard or via a national technical regulation)."
+    },
+    "national_prefix": "KS (Kuwaiti standards) issued/adopted by the Public Authority for Industry",
+    "key_standards": [
+      {
+        "code": "GSO 9",
+        "title": "Labelling of prepackaged food stuffs",
+        "note": "Core GCC horizontal labelling standard. Requires Arabic labelling (other languages alongside Arabic), name of food, ingredient list, nutrition information, net contents, name/address of manufacturer/packer/importer, country of origin, date marking, storage and use instructions, and declaration of the 13 GCC allergen categories.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-1",
+        "title": "Expiration dates for food products - Part 1: Mandatory expiration periods",
+        "note": "Applies to perishable foods (milk/milk products, eggs, meat, poultry, fish, crustaceans, infant foods, ready-to-eat foods, fresh table eggs) chilled at 0-5 C.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-2",
+        "title": "Expiration dates for food products - Part 2: Voluntary expiration periods",
+        "note": "Frozen products held at <= -18 C, certain non-perishable chilled products (0-5 C) and ambient products stored in ventilated stores at <= 25 C. Products outside the standard require expiry periods agreed with the competent authority on a scientific basis.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2500",
+        "title": "Food additives permitted for use in foodstuffs",
+        "note": "Positive list. Only additives with a JECFA ADI (or otherwise assessed as safe) and a Codex INS number are eligible. Replaced/consolidated earlier GSO additive standards.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 995",
+        "title": "Permitted sweeteners in foodstuffs",
+        "note": "Sweeteners not permitted in infant and children's foods. Label warnings required for aspartame (phenylketonuria), sucralose (<=25 C), and laxative-effect warnings for polyols (sorbitol >40 g/day, mannitol >20 g/day, xylitol >40 g/day, lactitol, maltitol, erythritol).",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1694",
+        "title": "General principles of food hygiene",
+        "note": "GCC adoption of Codex CAC/RCP 1.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 21",
+        "title": "Hygienic regulations for food plants and their personnel",
+        "note": "1984 base standard; still cited by national codes of practice.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 323",
+        "title": "General requirements for transportation and storage of chilled and frozen foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 969",
+        "title": "Stores for frozen and chilled foodstuff - Part 2: General requirements",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1909",
+        "title": "Requirements for handling of ready-to-eat foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1971",
+        "title": "Hygienic conditions for school canteens and handled food",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2309",
+        "title": "General requirements for food shops and establishments",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-1",
+        "title": "Halal food - Part 1: General requirements",
+        "note": "2015 edition is the operative version. A draft revision GSO 2055-1:2026 was released for public consultation on 2026-02-17 (comment deadline 2026-04-18) tightening supply-chain, certification and labelling rules. Treat GSO 2055-1:2015 as in force and GSO 2055-1:2026 as pending until formally adopted.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-2",
+        "title": "Halal food - Part 2: General requirements for halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-3",
+        "title": "Halal food - Part 3: General requirements for accreditation bodies accrediting halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016",
+        "title": "Microbiological criteria for foodstuffs",
+        "note": "Horizontal microbiological limits; multi-part.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1863",
+        "title": "Maximum limits of pesticide residues in agricultural and food products",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016 / GSO 2481",
+        "title": "Contaminants and toxins in food and feed",
+        "note": "GSO 2481 mirrors Codex GSCTFF for heavy metals and mycotoxins. Verify latest edition in the GSO standards store before use.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2233",
+        "title": "Requirements of nutritional labelling",
+        "note": "Applied alongside GSO 9.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 839 / GSO 1863",
+        "title": "Food packaging - general requirements for food contact materials",
+        "note": "Food-contact material requirements are largely GSO-harmonised across the six states.",
+        "adopted_by_all_gcc": true
+      }
+    ],
+    "codex": {
+      "codex_alimentarius_member": true,
+      "note": "All six GCC states are Codex members; GSO standards are predominantly Codex-aligned, and national laws routinely allow Codex to be used where no GSO/national standard exists."
+    },
+    "note": "Kuwait's imported food regulation refers to compliance with 'the approved technical requirements', national and GSO regulations and safety standards, with Codex as the international reference."
+  },
+  "food_business_requirements": {
+    "establishment_licensing": "Commercial licence plus municipal food premises licence; importers must be registered with PAFN and hold the appropriate activity.",
+    "record_keeping": "Importers ('the concerned party') must keep the records described in the Imported Food Regulations; failure is a penalised offence under Art. 64(1).",
+    "market_withdrawal": "Imported food not meeting PAFN requirements must be withdrawn from the market by the concerned party.",
+    "laboratories": "PAFN maintains laboratories at all land, sea and air ports (Law 112/2013 Art. 12 as amended in 2019) and supervises food testing laboratories."
+  },
+  "product_registration": {
+    "required": "Yes - electronic registration of consignments and, for specified categories, prior product approval",
+    "description": "Each consignment of imported foodstuffs is registered on paper or electronically with PAFN and receives an automatic reference number. Consignment data must include the type, size and total weight of the shipment, and the contents of each container where there is more than one. Special-purpose foods and products bearing claims require supporting documentation.",
+    "confidence": "high (drawn from the operative regulation)"
+  },
+  "labelling": {
+    "governing_standards": [
+      "GSO 9",
+      "GSO 2233",
+      "GSO 150-1/150-2",
+      "PAFN Imported Food Regulations Part Three"
+    ],
+    "language": "Arabic required on the label; accompanying certificates may be in Arabic and/or English.",
+    "mandatory_particulars": [
+      "Product name",
+      "Ingredient list",
+      "Additives by name or E-number",
+      "Allergen declaration",
+      "Net content",
+      "Manufacturer/packer/importer name and address",
+      "Country of origin",
+      "Production and expiry dates",
+      "Storage conditions",
+      "Batch/lot identification",
+      "Nutrition declaration where applicable"
+    ],
+    "small_package_allowance": "Reduced label information is permitted on small packages relative to larger packs (Part Three).",
+    "claims": "Documents proving nutrient-content claims, nutrient-comparative claims and disease-risk-reduction claims must be provided on request.",
+    "prohibited": [
+      "Food falsely described",
+      "Food carrying misleading nutritional claims",
+      "Non-permitted additives for the specific food"
+    ]
+  },
+  "additives_contaminants_and_residues": {
+    "additives": "Additives must be approved for use in that specific food in accordance with the applicable regulations (GSO 2500 basis).",
+    "hormones_and_veterinary_residues": "Consignments are rejected where there are residues of hormones or veterinary drugs above the permitted limits.",
+    "contaminants": "GSO/Codex-aligned limits; radioactive contamination controls with alert/notification systems for risk zones.",
+    "microbiological": "Food containing pathogenic microorganisms above criteria is 'food not fit for human consumption'.",
+    "prohibited": [
+      "Pork and pork derivatives",
+      "Alcohol and alcohol-containing food",
+      "Food containing a prohibited or non-permitted substance",
+      "Food that is spoiled or held under conditions that make it unfit",
+      "Food prohibited on health grounds"
+    ]
+  },
+  "halal_requirements": {
+    "mandatory": true,
+    "statutory_basis": "Imported food must be permissible according to Islamic law (halal) and not harmful to health.",
+    "certificates": [
+      {
+        "name": "Halal slaughter certificate",
+        "applies_to": "Red meat, poultry meat and birds shipments",
+        "requirements": [
+          "Original paper or electronic certificate",
+          "Must contain the data required by the halal regulations",
+          "Must bear a serial number and date of issue",
+          "Must state slaughtering dates by day",
+          "Where meat is re-manufactured in a third country, halal certificates equivalent to the original certificates issued by the country of origin are required, with a copy of the original halal slaughter certificate or, on request, the original attached"
+        ]
+      },
+      {
+        "name": "Halal certificate",
+        "applies_to": "Products containing halal-relevant ingredients",
+        "requirements": [
+          "Original paper certificate to be attached",
+          "Must contain the data required by the halal regulations"
+        ]
+      }
+    ],
+    "standards": [
+      "GSO 2055-1",
+      "GSO 2055-2",
+      "GSO 2055-3"
+    ]
+  },
+  "import_clearance": {
+    "legal_basis": "Ministerial Resolution No. 6 of 2023 and its annexed Imported Food Regulations.",
+    "risk_classification": "Foods are classified by 'degree of risk', driving the intensity of documentary, identity and physical checks and laboratory sampling.",
+    "consignment_registration": "Every consignment is registered (paper or electronic) with PAFN and issued an automatic reference number.",
+    "documents": [
+      "Original health certificate (paper or electronic) from the competent authority of the exporting country",
+      "Halal slaughter certificate (red meat, poultry, birds)",
+      "Halal certificate (products with halal-relevant ingredients)",
+      "Packing list with data for all items in the shipment, including per-container contents",
+      "Certificate of origin, commercial invoice",
+      "Documents proving any claims made on the label",
+      "Customs declaration and transport document"
+    ],
+    "health_certificate_rules": [
+      "Must be original (paper or electronic)",
+      "For electronic health certificates, the certificate number or an approved alternative verification reference is required",
+      "Must be written in Arabic and/or English",
+      "Must describe the shipment in detail, including the number and type of items",
+      "May cover multiple food items in one consignment where issued by the food safety authority of the exporting country",
+      "Mutual recognition / equivalence arrangements are recognised where in place",
+      "A certificate is invalid outside the stated validity conditions (e.g. beyond the permitted period for frozen meat of different types or products)"
+    ],
+    "detention_and_disposal": "Detained consignments are held from the port of shipment until proof of validity; PAFN may seize consignments, order withdrawal from the market, and require re-export or destruction. Transfer of seized food without prior PAFN permission is a penalised offence.",
+    "packaging_condition": "Food packages must exhibit no visible signs of damage or tampering; broken seals are grounds for rejection."
+  },
+  "enforcement_and_penalties": {
+    "regulation_penalties_article_64": [
+      {
+        "offence": "Violating Articles 41, 42 or 56 of the Imported Food Regulations, or failure to keep the required records",
+        "penalty": "Fine of not less than KWD 100 and not more than KWD 1,000"
+      },
+      {
+        "offence": "Transporting food items seized by PAFN to another place without prior PAFN permission",
+        "penalty": "Fine of not less than KWD 2,000 and not more than KWD 5,000"
+      }
+    ],
+    "additional_measures": [
+      "In all the above cases the court may order suspension of the activity for up to one month",
+      "Fines are doubled at both limits on recidivism (a similar act repeated within five years)",
+      "On recidivism the court may order cessation of the activity for not less than three months",
+      "The acts in clauses (1) and (2) are treated as similar for the purposes of recidivism"
+    ],
+    "without_prejudice": "Penalties apply without prejudice to any more severe penalty in another law or regulation - notably the stiffened penalties introduced by Law No. 16 of 2019 amending Law No. 112 of 2013.",
+    "judicial_officer_status": "PAFN employees designated under the regulation have judicial officer status: they may enter premises (excluding residences) within their remit, seize the violation and the materials concerned, write reports, refer them to the competent authority, and seek the assistance of the public force."
+  },
+  "recent_developments": [
+    {
+      "date": "2023-09-01",
+      "item": "Imported Food Regulations under Ministerial Resolution No. 6 of 2023 took effect, cancelling the 2017 regulations.",
+      "status": "In force"
+    },
+    {
+      "date": "2025",
+      "item": "Ministerial Decree No. 351 of 2025 overhauling the regulation of energy drinks nationwide (marketing, composition and sale restrictions with heavy fines).",
+      "status": "In force; confirm scope and transition dates with PAFN"
+    },
+    {
+      "date": "2026-02-17",
+      "item": "GSO draft GSO 2055-1:2026 halal food revision released for consultation (deadline 2026-04-18).",
+      "status": "Draft"
+    }
+  ],
+  "outdated_items_found_in_supplied_pdf": [
+    "None in the resolution itself - it is the current instrument and is itself the repealer of the 2017 regulations.",
+    "Context to add: the enabling law is Law No. 112 of 2013 as amended by Law No. 16 of 2019 (stiffer penalties; port laboratories under Art. 12).",
+    "The PDF does not cover Ministerial Decree No. 351 of 2025 on energy drinks, which post-dates it.",
+    "Any older Kuwait Municipality food code material (e.g. the 1992 food safety regulations circulating online) should not be relied on for imported food; it is superseded in that field by the 2023 regulations."
+  ],
+  "official_sources": [
+    {
+      "title": "Law No. 112 of 2013 establishing the Public Authority for Food and Nutrition (ECOLEX)",
+      "url": "https://www.ecolex.org/details/legislation/law-no112-of-2013-establishing-the-public-authority-for-food-and-nutrition-lex-faoc162595/"
+    },
+    {
+      "title": "Law No. 112 of 2013 (InforMEA)",
+      "url": "https://www.informea.org/en/legislation/law-no112-2013-establishing-public-authority-food-and-nutrition"
+    },
+    {
+      "title": "FAOLEX country profile - Kuwait",
+      "url": "https://www.fao.org/faolex/country-profiles/general-profile/en/?iso3=KWT"
+    },
+    {
+      "title": "KUNA - PAFN ushers in new stage of food control",
+      "url": "https://www.kuna.net.kw/ArticleDetails.aspx?id=2662763&language=en"
+    },
+    {
+      "title": "USDA FSIS - Kuwait import/export library",
+      "url": "https://www.fsis.usda.gov/inspection/import-export/import-export-library/kuwait"
+    },
+    {
+      "title": "Reporting on Ministerial Decree No. 351 of 2025 on energy drinks",
+      "url": "https://al-dostour.com/kuwait-energy-drinks-food-safety-law-2025/"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg
+
+# generated run artifacts -- regenerate via scripts/, never hand-authored
+export/
+exports/*
+!exports/wave_9001.jsonl
+CORPUS_GUARDRAIL_AUDIT*.md
+CORPUS_GUARDRAIL_AUDIT*.csv
+SYSTEM_EVALUATION_REPORT*.md
+results.txt
+*.log
+
+# jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editors / IDEs
+.vscode/
+.idea/
+*.swp
+
+# packaging / distribution
+*.tar.gz
+*.whl

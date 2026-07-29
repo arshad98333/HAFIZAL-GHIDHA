@@ -1,0 +1,76 @@
+<svg viewBox="0 0 1000 950" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Guardrail architecture</title>
+<desc>Guardrail flow from content and jurisdiction input through rule assembly, scanning, and flagging to a final compliance outcome.</desc>
+<rect x="0" y="0" width="1000" height="950" fill="#ffffff"/>
+<text x="500" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#111827">Guardrail Layer: How Content Gets Cleared</text>
+<text x="500" y="74" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#6b7280">Every piece of generated content is screened before it is ever kept</text>
+<circle cx="270" cy="140" r="30" fill="#0ea5e9"/>
+<rect x="257" y="128" width="26" height="22" rx="3" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+<path d="M257 136 h26 M262 142 h10" stroke="#ffffff" stroke-width="2"/>
+<text x="270" y="188" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#111827">Generated content</text>
+<text x="270" y="204" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">messages, logs, forms, voice transcripts</text>
+<circle cx="730" cy="140" r="30" fill="#0d9488"/>
+<circle cx="730" cy="133" r="7" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<path d="M718 152 a12 10 0 0 1 24 0" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<text x="730" y="188" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#111827">Country of origin</text>
+<text x="730" y="204" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">which of the six regions this shipment belongs to</text>
+<line x1="270" y1="170" x2="270" y2="228" stroke="#cbd5e1" stroke-width="2"/>
+<line x1="730" y1="170" x2="730" y2="228" stroke="#cbd5e1" stroke-width="2"/>
+<line x1="270" y1="228" x2="730" y2="228" stroke="#cbd5e1" stroke-width="2"/>
+<line x1="500" y1="228" x2="500" y2="250" stroke="#cbd5e1" stroke-width="2"/>
+<circle cx="500" cy="270" r="10" fill="#94a3b8"/>
+<line x1="120" y1="290" x2="120" y2="1090" stroke="#e5e7eb" stroke-width="3"/>
+<circle cx="120" cy="320" r="26" fill="#4f46e5"/>
+<rect x="108" y="308" width="24" height="24" rx="3" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<line x1="108" y1="316" x2="132" y2="316" stroke="#ffffff" stroke-width="2"/>
+<line x1="120" y1="316" x2="120" y2="332" stroke="#ffffff" stroke-width="2"/>
+<rect x="170" y="292" width="740" height="58" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="170" y="292" width="5" height="58" fill="#4f46e5"/>
+<text x="195" y="315" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#111827">1. Load the universal checklist</text>
+<text x="195" y="335" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">A common baseline that applies to every shipment, everywhere</text>
+<text x="895" y="326" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#4f46e5">Always active</text>
+<circle cx="120" cy="404" r="26" fill="#0d9488"/>
+<path d="M108 412 h24 M112 404 h16 M116 396 h8" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<rect x="170" y="376" width="740" height="58" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="170" y="376" width="5" height="58" fill="#0d9488"/>
+<text x="195" y="399" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#111827">2. Add the region's own rules</text>
+<text x="195" y="419" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Extra checks specific to that country's food safety law</text>
+<text x="895" y="410" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#0d9488">Country specific</text>
+<circle cx="120" cy="488" r="26" fill="#d97706"/>
+<circle cx="115" cy="483" r="8" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<line x1="121" y1="489" x2="129" y2="497" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round"/>
+<rect x="170" y="460" width="740" height="58" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="170" y="460" width="5" height="58" fill="#d97706"/>
+<text x="195" y="483" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#111827">3. Scan the content line by line</text>
+<text x="195" y="503" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Every applicable check runs against the full text, not a sample</text>
+<text x="895" y="494" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#d97706">Full coverage</text>
+<circle cx="120" cy="572" r="26" fill="#dc2626"/>
+<path d="M120 561 l9 16 h-18 z" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linejoin="round"/>
+<line x1="120" y1="567" x2="120" y2="573" stroke="#ffffff" stroke-width="2"/>
+<circle cx="120" cy="578" r="0.8" fill="#ffffff"/>
+<rect x="170" y="544" width="740" height="58" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="170" y="544" width="5" height="58" fill="#dc2626"/>
+<text x="195" y="567" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#111827">4. Flag anything that should never appear</text>
+<text x="195" y="587" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">Wording that pushes a sale, hides a fault, or leaks internal labels</text>
+<text x="895" y="572" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#dc2626">Blocked</text>
+<circle cx="120" cy="656" r="26" fill="#7c3aed"/>
+<rect x="112" y="656" width="16" height="12" rx="2" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<path d="M114 656 v-6 a6 6 0 0 1 12 0 v6" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+<rect x="170" y="628" width="740" height="58" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="170" y="628" width="5" height="58" fill="#7c3aed"/>
+<text x="195" y="651" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#111827">5. Enforce the one rule that never bends</text>
+<text x="195" y="671" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">A recommendation to sell anyway is never allowed to pass, in any region</text>
+<text x="895" y="662" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#7c3aed">Hard stop</text>
+<circle cx="120" cy="740" r="26" fill="#16a34a"/>
+<path d="M110 740 l7 7 l13 -15" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="170" y="712" width="740" height="52" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+<rect x="170" y="712" width="5" height="52" fill="#16a34a"/>
+<text x="195" y="735" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#111827">6. Nothing flagged</text>
+<text x="195" y="755" font-family="Arial, sans-serif" font-size="11" fill="#6b7280">The content passed every applicable check</text>
+<text x="895" y="740" text-anchor="end" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#16a34a">Cleared</text>
+<line x1="500" y1="780" x2="500" y2="806" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="230" y="808" width="540" height="72" rx="10" fill="#111827"/>
+<text x="500" y="838" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#ffffff">Cleared or flagged, with a reason attached</text>
+<text x="500" y="860" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#cbd5e1">Flagged content is set aside and never enters the kept dataset</text>
+<text x="500" y="908" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-style="italic" fill="#6b7280">One failed check is enough to stop content from being kept. No partial pass.</text>
+</svg>

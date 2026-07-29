@@ -1,0 +1,307 @@
+{
+  "meta": {
+    "guardrail_pack": "GCC Perishable & Cold-Storage Guardrails for AI Agents",
+    "file_role": "country_overlay",
+    "version": "1.0.0",
+    "compiled_on": "2026-07-28",
+    "country": "Sultanate of Oman",
+    "country_arabic": "سلطنة عُمان",
+    "iso_3166_1_alpha_2": "OM",
+    "extends": "00_gcc_base_guardrails.json",
+    "precedence": "This overlay takes precedence over the base file on any conflict. Base rules GCC-EDGE-001..020 and GCC-NORM-001..005 remain in force unless explicitly overridden here.",
+    "primary_competent_authority": "Food Safety and Quality Centre (FSQC), Ministry of Agriculture, Fisheries Wealth and Water Resources",
+    "legal_profile_reference": "../gcc_food_law_json/05_oman_food_law.json",
+    "design_principle": {
+      "name": "Pareto (80/20)",
+      "edge_case_rules": 8,
+      "normal_case_rules": 2,
+      "ratio": "80% edge / 20% normal",
+      "combined_with_base": {
+        "total_edge": 28,
+        "total_normal": 7,
+        "combined_ratio": "80% edge / 20% normal"
+      }
+    },
+    "derived_from": {
+      "dataset": "wave_9001.jsonl",
+      "worked_vertical": "finfish_seafood (chilled), extended to all chilled 0-5 C and frozen <= -18 C perishables"
+    },
+    "disclaimer": "Operational guardrails for agent design. Not legal advice. Penalty figures and procedures change; verify at source before enforcement."
+  },
+  "rules": [
+    {
+      "rule_id": "OM-EDGE-001",
+      "class": "edge_case",
+      "category": "authority_identification",
+      "severity": "blocking",
+      "title": "The competent authority is MAFWR, not the municipalities ministry",
+      "legal_basis": {
+        "instrument": "Royal Decree No. 92/2020 transferred the Food Safety and Quality Centre from the Ministry of Regional Municipalities and Water Resources to the Ministry of Agriculture, Fisheries Wealth and Water Resources (MAFWR), which is now the national competent authority for food safety. Food Safety Law RD 84/2008; Executive Regulations MD 2/2010.",
+        "authority": "Food Safety and Quality Centre (FSQC), MAFWR"
+      },
+      "trigger": {
+        "expression": "agent identifies the Omani competent authority or routes a notification"
+      },
+      "agent_must": [
+        "Route to FSQC under MAFWR",
+        "Treat any source document placing the FSQC under the Ministry of Regional Municipalities and Water Resources as outdated - this is a documented error in the supplied Omani source material",
+        "Recognise FSQC as the sole legislator for food safety, with other authorities adhering to its law and executive regulations"
+      ],
+      "agent_must_not": [
+        "Notify the municipalities ministry as the food safety competent authority",
+        "Reproduce a pre-2020 organisational chart"
+      ],
+      "escalation": "None if routed correctly; blocking if the agent routes to the wrong authority.",
+      "note": "This rule exists because the supplied Oman source PDF contains exactly this error."
+    },
+    {
+      "rule_id": "OM-EDGE-002",
+      "class": "edge_case",
+      "category": "seafood_specific",
+      "severity": "blocking",
+      "title": "Seafood consignments fall to the Fish Quality Control Centre, not general food control",
+      "legal_basis": {
+        "instrument": "Ministerial Decree No. 12/2009 governs seafood quality and safety. The Fish Quality Control Centre (FQCC), reallocated to FSQC by Royal Decree No. 92/2020, is the designated primary seafood safety regulator and Oman's competent authority in global fisheries markets. MAFWR holds market-access arrangements with the European Commission, the Eurasian Economic Union and the United States.",
+        "authority": "FQCC within FSQC, MAFWR"
+      },
+      "trigger": {
+        "expression": "consignment product class is finfish, seafood, crustacean or aquaculture product",
+        "signals": [
+          "product_code finfish_seafood",
+          "cargo_code FINFISH_SEAFOOD",
+          "chilled fish on ice",
+          "export consignment destined for the EU, EAEU or US"
+        ]
+      },
+      "agent_must": [
+        "Route seafood cold-chain events to FQCC, not to general food control",
+        "Recognise that an excursion on an export consignment can jeopardise Oman's market-access arrangement, not merely the individual load - escalate accordingly",
+        "Verify health certificate involvement of the DG Fisheries Development and veterinary quarantine where certification is affected"
+      ],
+      "agent_must_not": [
+        "Handle a seafood excursion through the general food pathway",
+        "Treat an export-consignment excursion as a purely commercial loss"
+      ],
+      "escalation": "Immediate, with the export market-access implication stated explicitly.",
+      "note": "This is the directly applicable rule for the wave_9001 dataset, which is entirely finfish_seafood."
+    },
+    {
+      "rule_id": "OM-EDGE-003",
+      "class": "edge_case",
+      "category": "registration_gate",
+      "severity": "blocking",
+      "title": "Article 30 bis - FSQC may audit the foreign facility's HACCP before licensing, at the trader's cost",
+      "legal_basis": {
+        "instrument": "Article 30 bis added to the Food Safety Regulation (MD 2/2010) by a 2025 ministerial decision: 'The competent authority may, before issuing the licence stipulated in Article (30) of these regulations, verify the health and manufacturing practices of the food product and the HACCP system applied in the food facility and evaluate them in the country of export or the country of origin, and the importer or exporter, or both, shall bear all expenses incurred by the competent authority in this regard.'",
+        "authority": "FSQC, MAFWR",
+        "verification_flag": "The decision number is unverified - confirm in the Official Gazette."
+      },
+      "trigger": {
+        "expression": "repeat cold-chain failures traced to a specific foreign manufacturing facility OR a product licence application follows an excursion history"
+      },
+      "agent_must": [
+        "Flag that a pattern of excursions attributable to a foreign facility can trigger a pre-licensing verification audit of that facility's HACCP system in the country of origin",
+        "State that the importer and/or exporter bear all costs of that verification",
+        "Maintain a facility-level excursion history, not only a consignment-level one"
+      ],
+      "agent_must_not": [
+        "Treat each excursion as an isolated consignment event when they share a source facility",
+        "Advise on a product licence application without disclosing the excursion history"
+      ],
+      "escalation": "Escalate the facility pattern to a named human at the point the second attributable excursion occurs."
+    },
+    {
+      "rule_id": "OM-EDGE-004",
+      "class": "edge_case",
+      "category": "traceability",
+      "severity": "blocking",
+      "title": "MD 69/2024 traceability database write-back is mandatory, not optional",
+      "legal_basis": {
+        "instrument": "Ministerial Decision No. 69/2024 issuing the Regulation of Registering, Advertising and Promoting Food Products, which establishes a comprehensive database for tracking food products as part of a broader food traceability system",
+        "authority": "FSQC, MAFWR"
+      },
+      "trigger": {
+        "expression": "any disposition emitted on an Omani consignment"
+      },
+      "agent_must": [
+        "Write the disposition and its evidence to the traceability record and confirm the write succeeded before closing the case",
+        "Preserve the linkage required by the tracking database",
+        "Treat a failed write-back as an open case, not a closed one"
+      ],
+      "agent_must_not": [
+        "Close a case on a successful disposition with a failed traceability write",
+        "Treat traceability write-back as a post-hoc reporting step"
+      ],
+      "escalation": "Reopen the case on write-back failure."
+    },
+    {
+      "rule_id": "OM-EDGE-005",
+      "class": "edge_case",
+      "category": "advertising_gate",
+      "severity": "high",
+      "title": "Promotional and clearance-sale routes require an FSQC permit",
+      "legal_basis": {
+        "instrument": "FSQC verifies and issues permits for food-related advertising, promotional campaigns and events; MD 69/2024 governs registering, advertising and promoting food products",
+        "authority": "FSQC, MAFWR"
+      },
+      "trigger": {
+        "expression": "a discount, clearance sale or promotional route is proposed for stock affected by a cold-chain event",
+        "signals": [
+          "move it at a discount",
+          "clearance promotion to shift short-dated stock",
+          "bundle it into a campaign"
+        ]
+      },
+      "agent_must": [
+        "Flag that promoting or advertising the affected stock requires an FSQC permit and cannot be treated as a purely commercial decision",
+        "Combine this with base rule GCC-EDGE-015 - a discount route is a commercial-pressure variant of expedite_sale"
+      ],
+      "agent_must_not": [
+        "Treat a clearance promotion as a safety-neutral commercial action",
+        "Propose promotional disposal of excursion-affected stock"
+      ],
+      "escalation": "Escalate as both a safety and a permitting question."
+    },
+    {
+      "rule_id": "OM-EDGE-006",
+      "class": "edge_case",
+      "category": "penalty_exposure",
+      "severity": "blocking",
+      "title": "Penalty amounts are unverified - never state a figure",
+      "legal_basis": {
+        "instrument": "Food Safety Law RD 84/2008 (fines and penalties provisions) and Food Safety Regulation MD 2/2010; Food Control Regulation MD 29/2016",
+        "authority": "FSQC, MAFWR"
+      },
+      "trigger": {
+        "expression": "agent is asked to state Omani penalty exposure"
+      },
+      "agent_must": [
+        "State that specific fine bands under RD 84/2008 and MD 2/2010 are not verified in the sibling country profile and must be read from the Official Gazette or mjla.gov.om",
+        "Describe the available measures (inspection, sampling, market withdrawal, detention, re-export, destruction, licence suspension or withdrawal, fines, prosecution) without quoting amounts"
+      ],
+      "agent_must_not": [
+        "Invent, estimate or infer an Omani fine figure",
+        "Transfer a figure from another GCC state by analogy"
+      ],
+      "escalation": "Named human authorisation, recorded.",
+      "note": "Deliberate known-gap rule, mirroring the NOT STATED marker in the sibling Oman profile."
+    },
+    {
+      "rule_id": "OM-EDGE-007",
+      "class": "edge_case",
+      "category": "labelling_integrity",
+      "severity": "blocking",
+      "title": "No re-dating or relabelling; halal segregation during transfer",
+      "legal_basis": {
+        "instrument": "Adopted GSO 9 date marking (producer-applied indelible dates, no stickers, one date per pack); adopted GSO 2055-1 halal requirements; the Ministry of Endowments and Religious Affairs is involved on religious aspects",
+        "authority": "FSQC with MCIIP and the Ministry of Endowments and Religious Affairs"
+      },
+      "trigger": {
+        "expression": "proposal to alter a date or label after an excursion, OR emergency transfer of a halal-relevant consignment"
+      },
+      "agent_must": [
+        "Refuse all date and label alteration including shortening",
+        "Verify prior-load history and segregation of any substitute cold unit",
+        "Treat halal integrity as a separate pass/fail dimension from temperature"
+      ],
+      "agent_must_not": [
+        "Propose a date sticker or re-grading",
+        "Optimise only for temperature when selecting a substitute unit"
+      ],
+      "escalation": "Immediate."
+    },
+    {
+      "rule_id": "OM-EDGE-008",
+      "class": "edge_case",
+      "category": "bilingual_input",
+      "severity": "high",
+      "title": "Arabic operator narrative parsing",
+      "legal_basis": {
+        "instrument": "Adopted GSO 9 Arabic labelling requirement; bilingual operations",
+        "authority": "FSQC"
+      },
+      "trigger": {
+        "expression": "artifact language is ar_msa OR mixed",
+        "signals": [
+          "°م notation",
+          "أغلبها / حوالي / تقريبًا",
+          "Arabic-Indic digits",
+          "Hijri dates"
+        ]
+      },
+      "agent_must": [
+        "Parse °م as Celsius preserving exact values",
+        "Apply base rules GCC-EDGE-008 and GCC-EDGE-011 to Arabic hedge words",
+        "Convert Hijri dates to Gregorian and show both",
+        "Quote the Arabic verbatim in evidence"
+      ],
+      "agent_must_not": [
+        "Round during translation",
+        "Take the midpoint of an approximate range"
+      ],
+      "escalation": "hold_for_qa where translation ambiguity changes the disposition."
+    },
+    {
+      "rule_id": "OM-NORM-001",
+      "class": "normal_case",
+      "category": "routine_clearance",
+      "severity": "informational",
+      "title": "Normal Omani clearance path",
+      "trigger": {
+        "expression": "base GCC-NORM-001 or GCC-NORM-002 satisfied AND product licensed under MD 2/2010 Article 30 AND release permit issued AND traceability write-back confirmed"
+      },
+      "agent_must": [
+        "Confirm the FSQC release permit and, for seafood, the FQCC pathway, separately",
+        "Cite RD 84/2008, MD 2/2010 and, for seafood, MD 12/2009"
+      ],
+      "agent_must_not": [
+        "Report clearance before the MD 69/2024 traceability write-back is confirmed"
+      ],
+      "escalation": "None."
+    },
+    {
+      "rule_id": "OM-NORM-002",
+      "class": "normal_case",
+      "category": "record_contract",
+      "severity": "medium",
+      "title": "Omani record and citation contract",
+      "trigger": {
+        "expression": "any disposition emitted"
+      },
+      "agent_must": [
+        "Cite the specific royal decree or ministerial decision relied on",
+        "Retain the raw telemetry artifact unmodified",
+        "Confirm the traceability database write"
+      ],
+      "agent_must_not": [
+        "Cite the Ministry of Regional Municipalities and Water Resources as the food safety authority",
+        "Cite the Plant Quarantine Law without noting the unresolved citation conflict (RD 91/2000 amended to 47/2007 versus RD 47/2004) recorded in the sibling profile"
+      ],
+      "escalation": "None."
+    }
+  ],
+  "rule_index": {
+    "blocking": [
+      "OM-EDGE-001",
+      "OM-EDGE-002",
+      "OM-EDGE-003",
+      "OM-EDGE-004",
+      "OM-EDGE-006",
+      "OM-EDGE-007"
+    ],
+    "edge_case": [
+      "OM-EDGE-001",
+      "OM-EDGE-002",
+      "OM-EDGE-003",
+      "OM-EDGE-004",
+      "OM-EDGE-005",
+      "OM-EDGE-006",
+      "OM-EDGE-007",
+      "OM-EDGE-008"
+    ],
+    "normal_case": [
+      "OM-NORM-001",
+      "OM-NORM-002"
+    ]
+  }
+}

@@ -1,0 +1,667 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "document_type": "country_food_law_and_food_safety_profile",
+    "country": "Kingdom of Bahrain",
+    "country_arabic": "مملكة البحرين",
+    "iso_3166_1_alpha_2": "BH",
+    "iso_3166_1_alpha_3": "BHR",
+    "region": "Gulf Cooperation Council (GCC)",
+    "compiled_on": "2026-07-28",
+    "data_current_as_of": "2026-07-28",
+    "language_of_record": "en",
+    "source_document_supplied_by_user": {
+      "filename": "638242460024477544_BAHRAIN.pdf",
+      "description": "Ministry of Health, Public Health Directorate, Food Control Section - 'Food Safety Guidelines' (Food Safety Guideline in Food Premises), Document No. FCS/3, Version 4, 11 sections.",
+      "document_date": "undated in document; Version 4",
+      "status": "used as base; all substantive content re-verified against current official and secondary sources"
+    },
+    "verification": {
+      "method": "Text extracted from the supplied PDF, then each legal instrument, authority name and requirement cross-checked against official gazettes/legal portals, the competent authority website, FAOLEX/ECOLEX, and current regulatory-intelligence reporting.",
+      "overall_confidence": "medium-high",
+      "caveats": [
+        "The supplied PDF is a guideline for food premises, not a statute. The statutory basis was added from official sources: the operative general framework is Public Health Law No. 34 of 2018.",
+        "Bahrain has NO single consolidated food safety act. Food control rests on the Public Health Law No. 34 of 2018, older instruments such as Legislative Decree No. 3 of 1985 on the control of imported foodstuffs, product-specific decrees and ministerial resolutions, and adopted GSO standards.",
+        "There is NO 'Bahrain National Food Safety Authority'. Search results returning that name refer to other countries' bodies. The competent authority is the Food Control Section of the Public Health Directorate, Ministry of Health.",
+        "The status of Legislative Decree No. 3 of 1985 relative to Public Health Law No. 34 of 2018 was not fully verified - the 2018 law may have superseded parts of it. Flagged for legal verification.",
+        "Version 4 of the guideline is undated; the companion Food Importers Guide has a 2024 edition which is the better current reference for import rules."
+      ]
+    }
+  },
+  "competent_authorities": {
+    "primary": {
+      "name": "Ministry of Health - Public Health Directorate - Food Control Section",
+      "abbreviation": "MOH PHD FCS",
+      "arabic_name": "وزارة الصحة - إدارة الصحة العامة - قسم مراقبة الأغذية",
+      "role": "Implements health policy in all matters of food safety under Public Health Law No. 34 of 2018. Licenses and inspects food establishments, approves premises sketches and plans, approves new production lines and equipment, controls imported food at ports of entry through the Imported Food Safety Group, applies risk-based inspection, and handles rejected shipments (re-export or destruction).",
+      "website": "https://www.moh.gov.bh",
+      "sub_units": [
+        {
+          "name": "Imported Food Safety Group / Imported Food Unit",
+          "role": "Inspects all food arriving through the three ports of entry (seaport, air cargo, King Fahd Causeway) applying risk-based systems and global best practice. Public health specialists are stationed at each port."
+        },
+        {
+          "name": "Licensing Department (Public Health Directorate)",
+          "role": "Issues the certificate to practise commercial activities under health surveillance."
+        }
+      ],
+      "document_reference": "Guideline document No. FCS/3, Version 4"
+    },
+    "supporting_authorities": [
+      {
+        "name": "Ministry of Industry and Commerce",
+        "abbreviation": "MOIC",
+        "role": "Commercial registration (Sijilat), consumer protection, and - via the Standards and Metrology Directorate - national standards, adoption of GSO standards and the standards store.",
+        "website": "https://www.moic.gov.bh",
+        "standards_store": "https://bsmd.moic.gov.bh"
+      },
+      {
+        "name": "Standards and Metrology Directorate (BSMD), MOIC",
+        "role": "Develops and adopts national standards including food safety and quality standards; technical evaluation of products; issues resolutions adopting Gulf technical regulations."
+      },
+      {
+        "name": "Ministry of Municipalities Affairs and Agriculture",
+        "abbreviation": "MMAA",
+        "role": "Municipal licensing and inspection of food premises; agriculture, veterinary and marine resources; co-formulates food import regulations.",
+        "note": "Also referenced in official material as the National Agri-trade and Food Safety Authority function area - verify the current organisational naming."
+      },
+      {
+        "name": "Customs Affairs (Ministry of Interior)",
+        "role": "Border control; verifies that food imports comply with health and safety requirements before entry; HS-code classification and tariffs.",
+        "website": "https://www.bahraincustoms.gov.bh"
+      },
+      {
+        "name": "Municipalities",
+        "role": "Licensing and inspection of food service outlets, sanitary conditions and waste management."
+      }
+    ],
+    "governance_model": "Multi-agency. MOH Public Health Directorate (Food Control Section) is the enforcement authority for food safety; import regulations are formulated jointly by MOH PHD, the MOIC Standards and Metrology Directorate and MMAA."
+  },
+  "legal_framework": {
+    "primary_law": {
+      "citation": "Public Health Law No. 34 of 2018",
+      "arabic_citation": "قانون الصحة العامة رقم 34 لسنة 2018",
+      "status": "In force",
+      "role": "The operative legal basis for food control in Bahrain. Covers all public health services for individuals, precautionary measures to maintain infrastructure, water monitoring, waste management, and precautionary measures for communicable and non-communicable diseases. The Food Control Section acts under this law.",
+      "food_specific_powers": [
+        "Licensing of food activities - operating without a licence is a violation subject to penalties under the Public Health Law",
+        "Prohibition of unauthorised food activities",
+        "Basis for the decision to re-export or destroy rejected food shipments"
+      ],
+      "note": "Bahrain does not have a dedicated consolidated food safety act. Food safety obligations are distributed across this law, product-specific decrees and ministerial resolutions, and adopted GSO standards."
+    },
+    "other_legislation": [
+      {
+        "citation": "Legislative Decree No. 3 of 1985 on the control of imported foodstuffs",
+        "status": "Historically the principal imported-food instrument",
+        "verification_flag": "Verify whether it remains in force in whole or part following Public Health Law No. 34 of 2018."
+      },
+      {
+        "citation": "Decree Law No. 4 of 1995 on the control of the use, marketing and promotion of breast milk substitutes",
+        "relevance": "Infant formula and breast milk substitute marketing controls."
+      },
+      {
+        "citation": "Ministerial Resolution No. 1 of 2014 (MOIC) adopting the Gulf Regulations for Children's Toys",
+        "relevance": "Food items accompanied by children's toys must bear the Gulf Conformity mark."
+      },
+      {
+        "citation": "Ministerial Resolution No. 89 of 2022 on the import and trading of gelatin candy for children",
+        "content": "Prohibits the import and trading of gelatin candy for children containing konjac (E425) or any of its alternative names (Klakumanan, Konyako, Konjonak, tarot powder, yam flour, or any other name).",
+        "status": "In force"
+      },
+      {
+        "citation": "Resolution No. 115 of 2024 regulating the import, trade and use of veterinary preparations in the poultry and food-producing animals sector",
+        "relevance": "Veterinary drug controls upstream of food safety.",
+        "status": "In force"
+      }
+    ],
+    "key_guidance_documents": [
+      {
+        "citation": "Food Safety Guidelines - Food Safety Guideline in Food Premises, Doc. No. FCS/3, Version 4 (the supplied PDF)",
+        "issuer": "MOH Public Health Directorate, Food Control Section",
+        "structure": [
+          {
+            "section": 1,
+            "title": "Objectives"
+          },
+          {
+            "section": 2,
+            "title": "Scope"
+          },
+          {
+            "section": 3,
+            "title": "Definitions"
+          },
+          {
+            "section": 4,
+            "title": "Registration and Licensing"
+          },
+          {
+            "section": 5,
+            "title": "Establishment's Design and Facilities"
+          },
+          {
+            "section": 6,
+            "title": "Operating Control"
+          },
+          {
+            "section": 7,
+            "title": "Facilities: Maintenance and Health Conditions"
+          },
+          {
+            "section": 8,
+            "title": "Facilities: Personal Hygiene"
+          },
+          {
+            "section": 9,
+            "title": "Transport"
+          },
+          {
+            "section": 10,
+            "title": "Product Information and Consumer Awareness"
+          },
+          {
+            "section": 11,
+            "title": "Training"
+          }
+        ]
+      },
+      {
+        "citation": "Food Importers Guide to the Kingdom of Bahrain (2024 edition)",
+        "issuer": "MOH Public Health Directorate, Food Control Section",
+        "url": "https://www.ofoq.gov.bh/pdf/FoodImportersGuide_2024_EN.pdf",
+        "structure": [
+          "Phase 1 Pre-import: classification, licensing, awareness, general specification requirements",
+          "Phase 2 After import: required documents, inspection procedures, non-commercial/personal-use imports, handling of rejected shipments, health certificate forms"
+        ]
+      },
+      {
+        "citation": "Guideline for licensing of special foods",
+        "scope": "Baby food, energy drinks, athletes'/sports foods and similar functional foods - these require registration before import.",
+        "service_page": "https://www.bahrain.bh/wps/portal/en/BNP/ServicesCatalogue/GSX-UI-PServiceDetails?psID=1272"
+      },
+      {
+        "citation": "Food Based Dietary Guidelines for the Kingdom of Bahrain",
+        "issuer": "MOH",
+        "relevance": "Nutrition policy, not enforcement."
+      }
+    ]
+  },
+  "standards_framework": {
+    "regional_body": {
+      "name": "GCC Standardization Organization",
+      "abbreviation": "GSO",
+      "arabic_name": "هيئة التقييس لدول مجلس التعاون لدول الخليج العربية",
+      "role": "Regional standards body for the six GCC states plus Yemen. Issues GSO standards and GCC technical regulations which member states adopt as national standards, generally making them mandatory for food placed on the market.",
+      "website": "https://www.gso.org.sa",
+      "note": "Adoption is national: a GSO standard becomes legally binding in a member state only once that state's standards body/competent authority adopts it (as a national standard or via a national technical regulation)."
+    },
+    "national_prefix": "BS/GSO adoptions via the MOIC Standards and Metrology Directorate (BSMD); standards available through the BSMD standards store",
+    "key_standards": [
+      {
+        "code": "GSO 9",
+        "title": "Labelling of prepackaged food stuffs",
+        "note": "Core GCC horizontal labelling standard. Requires Arabic labelling (other languages alongside Arabic), name of food, ingredient list, nutrition information, net contents, name/address of manufacturer/packer/importer, country of origin, date marking, storage and use instructions, and declaration of the 13 GCC allergen categories.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-1",
+        "title": "Expiration dates for food products - Part 1: Mandatory expiration periods",
+        "note": "Applies to perishable foods (milk/milk products, eggs, meat, poultry, fish, crustaceans, infant foods, ready-to-eat foods, fresh table eggs) chilled at 0-5 C.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 150-2",
+        "title": "Expiration dates for food products - Part 2: Voluntary expiration periods",
+        "note": "Frozen products held at <= -18 C, certain non-perishable chilled products (0-5 C) and ambient products stored in ventilated stores at <= 25 C. Products outside the standard require expiry periods agreed with the competent authority on a scientific basis.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2500",
+        "title": "Food additives permitted for use in foodstuffs",
+        "note": "Positive list. Only additives with a JECFA ADI (or otherwise assessed as safe) and a Codex INS number are eligible. Replaced/consolidated earlier GSO additive standards.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 995",
+        "title": "Permitted sweeteners in foodstuffs",
+        "note": "Sweeteners not permitted in infant and children's foods. Label warnings required for aspartame (phenylketonuria), sucralose (<=25 C), and laxative-effect warnings for polyols (sorbitol >40 g/day, mannitol >20 g/day, xylitol >40 g/day, lactitol, maltitol, erythritol).",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1694",
+        "title": "General principles of food hygiene",
+        "note": "GCC adoption of Codex CAC/RCP 1.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 21",
+        "title": "Hygienic regulations for food plants and their personnel",
+        "note": "1984 base standard; still cited by national codes of practice.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 323",
+        "title": "General requirements for transportation and storage of chilled and frozen foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 969",
+        "title": "Stores for frozen and chilled foodstuff - Part 2: General requirements",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1909",
+        "title": "Requirements for handling of ready-to-eat foods",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1971",
+        "title": "Hygienic conditions for school canteens and handled food",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2309",
+        "title": "General requirements for food shops and establishments",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-1",
+        "title": "Halal food - Part 1: General requirements",
+        "note": "2015 edition is the operative version. A draft revision GSO 2055-1:2026 was released for public consultation on 2026-02-17 (comment deadline 2026-04-18) tightening supply-chain, certification and labelling rules. Treat GSO 2055-1:2015 as in force and GSO 2055-1:2026 as pending until formally adopted.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-2",
+        "title": "Halal food - Part 2: General requirements for halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2055-3",
+        "title": "Halal food - Part 3: General requirements for accreditation bodies accrediting halal certification bodies",
+        "note": "2021 edition.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016",
+        "title": "Microbiological criteria for foodstuffs",
+        "note": "Horizontal microbiological limits; multi-part.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1863",
+        "title": "Maximum limits of pesticide residues in agricultural and food products",
+        "note": "",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 1016 / GSO 2481",
+        "title": "Contaminants and toxins in food and feed",
+        "note": "GSO 2481 mirrors Codex GSCTFF for heavy metals and mycotoxins. Verify latest edition in the GSO standards store before use.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 2233",
+        "title": "Requirements of nutritional labelling",
+        "note": "Applied alongside GSO 9.",
+        "adopted_by_all_gcc": true
+      },
+      {
+        "code": "GSO 839 / GSO 1863",
+        "title": "Food packaging - general requirements for food contact materials",
+        "note": "Food-contact material requirements are largely GSO-harmonised across the six states.",
+        "adopted_by_all_gcc": true
+      }
+    ],
+    "codex": {
+      "codex_alimentarius_member": true,
+      "note": "All six GCC states are Codex members; GSO standards are predominantly Codex-aligned, and national laws routinely allow Codex to be used where no GSO/national standard exists."
+    },
+    "note": "The Bahrain importers guide identifies GSO 9 (labelling), GSO 150-1/150-2 (expiration dates) and GSO 2500 (permitted additives) as the three core horizontal standards, plus GSO 995 for sweeteners and product-specific GSO standards for each commodity."
+  },
+  "food_business_requirements": {
+    "licensing_chain": [
+      "Commercial registration certificate (CR) from the Ministry of Industry and Commerce via the Sijilat electronic system, with the correct activity (e.g. sale/trade of food and beverages, or sale/trade of food and beverages - health food)",
+      "Certificate to practise commercial activities under health surveillance from the Public Health Directorate, Licensing Department (activities such as food stores, import, export and sale of foodstuffs)"
+    ],
+    "core_licensing_rules_from_guideline": [
+      "A food establishment owner may not operate or display products in markets without licences or approvals from the Department of Public Health",
+      "Engaging in food activities without a licence is a violation subject to penalties under the Public Health Law",
+      "Operating outside the authorised activities is prohibited; legal action is taken against violators",
+      "No changes may be made to the previously approved sketch and plans of a food establishment, nor may new production lines or devices be added, without formal approval from the Food Control Section",
+      "The food premises licence is valid for one year from the date of issuance",
+      "The Food Control Section may suspend a licence at any time in the event of violations of approved food safety legislation",
+      "The licence must be displayed in an apparent location",
+      "The Ministry of Health determines the fees payable for registration and licensing"
+    ],
+    "design_and_facilities_principles": [
+      "Minimise pollution/contamination",
+      "Design permitting proper maintenance, cleaning and disinfection",
+      "Reduce air pollution/contamination",
+      "Location, equipment, facilities and plans assessed at construction stage"
+    ],
+    "personal_hygiene": "Section 8 sets personal hygiene requirements for food handlers; health certificates and hygienic practice requirements apply.",
+    "transport": "Section 9 sets requirements for food transport, consistent with GSO 323 and GSO 969 for chilled and frozen foods.",
+    "consumer_information": "Section 10 covers product information and consumer awareness.",
+    "training": "Section 11 requires food hygiene training, with the level of training determined by risk factors; programmes must be evaluated for effectiveness and reviewed and updated periodically."
+  },
+  "product_registration": {
+    "required": "Category-dependent",
+    "rules": [
+      {
+        "category": "Functional / special foods - baby food, energy drinks, athletes' and sports foods",
+        "requirement": "Prior registration with the competent authority before import (see the special foods licensing guideline)."
+      },
+      {
+        "category": "Regular food",
+        "requirement": "No prior registration or authorisation required before import, but the product must comply with the applicable Gulf specifications and standards. Optional pre-approval of food products is available and encouraged - a pre-approval form can be submitted to the Food Control Section, and label pre-approval significantly speeds clearance."
+      }
+    ],
+    "importer_preparation": [
+      "Determine the product HS code (Customs Affairs) to establish procedures and tariffs",
+      "Ensure the CR and health surveillance certificate cover the exact activity required",
+      "Check whether the product needs prior registration from another regulator"
+    ]
+  },
+  "labelling": {
+    "governing_standards": [
+      "GSO 9 (labelling of prepackaged foodstuffs)",
+      "GSO 150-1 / GSO 150-2 (expiration dates)",
+      "GSO 2500 (permitted additives)",
+      "GSO 995 (sweeteners)"
+    ],
+    "mandatory_particulars_gso_9": [
+      "Name of the food",
+      "List of ingredients - artificial sweeteners and added nutrients are not allowed in any baby food; the animal source must be declared where the food or a component contains an animal component",
+      "Nutritional information",
+      "Net contents",
+      "Name and address",
+      "Country of origin",
+      "Date marking and instructions for storage and use",
+      "Language",
+      "Declaration of hypersensitivity-causing (allergen) ingredients"
+    ],
+    "language_rule": "Labelling and adjoining explanatory statements must be in Arabic; where another language is used it must appear alongside Arabic, and all information in the other language must be identical to the Arabic.",
+    "date_marking_rules": [
+      "Products with a minimum durability of less than three months: Day - Month - Year",
+      "Products with a minimum durability of more than three months: Month - Year, with the shelf life calculated to the end of the month recorded as expiry",
+      "Dates must be engraved or in relief, printed, or stamped with irremovable ink directly on all packages or on the original label by the producer only",
+      "Adding stickers for production and expiry dates is NOT permissible",
+      "There must be no more than one production date and one expiry date on the same package, and neither may be subject to deletion, change or deceit",
+      "Statements on the label must be clearly visible and easily legible and must not obscure any required information",
+      "American date format (Month/Day/Year) is not acceptable and can lead to rejection"
+    ],
+    "allergen_list_13_categories": [
+      "Cereals containing gluten (wheat, barley, oats, rye, spelt, their hybridised strains and products)",
+      "Crustacea and their products",
+      "Eggs and egg products",
+      "Fish and fish products",
+      "Peanuts, soybeans and their products",
+      "Walnuts and their products",
+      "Milk and milk products (including lactose)",
+      "Sulphite at 10 ppm or more",
+      "Celery and its products",
+      "Mustard and its products",
+      "Sesame seeds and their products",
+      "Clams and their products",
+      "Lupin and its products"
+    ],
+    "additional_declarations": [
+      "Food additives must be declared by common name or E-number",
+      "For gelatin, lecithins and mono- and di-glycerides the source must be mentioned",
+      "Food items accompanied by children's toys must bear the Gulf Conformity mark (Ministerial Resolution No. 1 of 2014)"
+    ],
+    "arabic_label_exemptions": "Small consignments of 20 cartons or fewer, and ethnic food products, may be exempted from Arabic label requirements subject to prior authorisation.",
+    "personal_use_imports": "Labelling and adjoining explanatory statements may be in Arabic OR English; if another language is used, a sticker from an approved translation office must be attached."
+  },
+  "additives_contaminants_and_residues": {
+    "additives_standard": "GSO 2500 - a positive list. Only additives with a JECFA-assigned ADI (or otherwise assessed as safe by JECFA) and a Codex INS designation are eligible for inclusion. Use in conformance with the standard is treated as technologically justified. The standard covers additive use in all foods, whether or not previously standardised; for foods with their own specifications, additive use is subject to the conditions set by the GSO food standards committees.",
+    "sweeteners_gso_995": {
+      "not_permitted_in": "Infant and children's foods",
+      "label_warnings": [
+        {
+          "ins": "E951",
+          "name": "Aspartame",
+          "warning": "Not to be used by persons who have phenylketonuria"
+        },
+        {
+          "ins": "E955",
+          "name": "Sucralose",
+          "warning": "Temperature should not exceed 25 C"
+        },
+        {
+          "ins": "E420",
+          "name": "Sorbitol and sorbitol syrup",
+          "warning": "Consumption in excess of 40 g/day may cause laxative effects"
+        },
+        {
+          "ins": "E421",
+          "name": "Mannitol",
+          "warning": "Consumption in excess of 20 g/day may cause laxative effects"
+        },
+        {
+          "ins": "E965",
+          "name": "Maltitol and maltitol syrup",
+          "warning": "Excess consumption may cause laxative effects"
+        },
+        {
+          "ins": "E966",
+          "name": "Lactitol",
+          "warning": "Excess consumption may cause laxative effects"
+        },
+        {
+          "ins": "E967",
+          "name": "Xylitol",
+          "warning": "Consumption in excess of 40 g/day may cause laxative effects"
+        },
+        {
+          "ins": "E968",
+          "name": "Erythritol",
+          "warning": "Excess consumption may cause laxative effects"
+        },
+        {
+          "ins": "E954",
+          "name": "Saccharin and its salts",
+          "warning": "None specified"
+        },
+        {
+          "ins": "E950",
+          "name": "Acesulfame potassium",
+          "warning": "None specified"
+        },
+        {
+          "ins": "E957",
+          "name": "Thaumatin",
+          "warning": "None specified"
+        },
+        {
+          "ins": "E953",
+          "name": "Isomaltitol (isomalt)",
+          "warning": "None specified"
+        },
+        {
+          "ins": "E961",
+          "name": "Neotame",
+          "warning": "None specified"
+        },
+        {
+          "ins": "E956",
+          "name": "Alitame",
+          "warning": "None specified"
+        },
+        {
+          "ins": "E960",
+          "name": "Steviol glycosides",
+          "warning": "None specified"
+        },
+        {
+          "ins": "E962",
+          "name": "Aspartame-acesulfame salt",
+          "warning": "None specified"
+        }
+      ]
+    },
+    "shelf_life_regime_gso_150": {
+      "part_1_mandatory": "Perishable foods containing, wholly or partly, milk or milk products, eggs, meat, chicken, fish, crustaceans, or ingredients supporting microbial growth causing spoilage, poisoning or foodborne disease, kept chilled at 0-5 C; plus children's food, and food that by nature requires a specific preservation temperature such as fresh table eggs, fresh food and ready-to-eat foods.",
+      "part_2_voluntary": "Frozen food products kept at not exceeding -18 C; certain non-perishable chilled products kept at 0-5 C; and food products kept at an appropriate temperature in well-ventilated stores (not greater than 25 C).",
+      "products_outside_the_standard": "Expiry periods must be specified in consultation with the authority on a scientific basis and with its permission; the manufacturer guarantees validity and safety for consumption during the prescribed period.",
+      "reprocessed_products": "The expiry period for processed or repackaged products made from limited-shelf-life materials without thermal processing may not exceed the remaining expiry period of the materials from which they were prepared."
+    },
+    "prohibited": [
+      "Gelatin candy for children containing konjac (E425) or any of its alternative names - Ministerial Resolution No. 89 of 2022",
+      "Artificial sweeteners and added nutrients in baby food",
+      "Non-permitted additives",
+      "Foods prohibited domestically or internationally, or containing domestically or internationally prohibited components",
+      "Pork and alcohol outside licensed channels"
+    ]
+  },
+  "halal_requirements": {
+    "mandatory_for": [
+      "Meat and poultry and their products",
+      "Products containing animal-derived ingredients"
+    ],
+    "standards": [
+      "GSO 2055-1 (available via the BSMD standards store)",
+      "GSO 2055-2",
+      "GSO 2055-3"
+    ],
+    "certification": "Halal slaughter certificate from an approved Islamic body in the exporting country for meat and poultry; halal certificate for products containing halal-relevant ingredients. Animal source declaration is mandatory on the label for gelatin, lecithins and mono-/di-glycerides."
+  },
+  "import_clearance": {
+    "ports_of_entry": [
+      "Seaport (Khalifa Bin Salman Port)",
+      "Air cargo (Bahrain International Airport)",
+      "King Fahd Causeway (land)"
+    ],
+    "authority_at_border": "Imported Food Safety Group, Food Control Section, Public Health Directorate - public health specialists stationed at each of the three ports.",
+    "approach": "Risk-based inspection systems and global best practices.",
+    "phase_1_pre_import": [
+      "Classification - determine the HS code and the exact activity needed on the CR and health surveillance certificate",
+      "Licensing - CR via Sijilat, plus certificate to practise commercial activities under health surveillance from the Public Health Directorate",
+      "Prior registration for special/functional foods",
+      "Optional pre-approval of food products and labels (strongly encouraged - speeds clearance)",
+      "Awareness - importer and supplier familiarity with the applicable GSO standards"
+    ],
+    "phase_2_after_import": [
+      "Submission of required documents",
+      "Inspection procedures at the port of entry",
+      "Sampling for laboratory examination where deemed necessary",
+      "Release, or rejection with re-export or destruction"
+    ],
+    "documents": [
+      "Commercial invoice and packing list",
+      "Certificate of origin",
+      "Health certificate on the prescribed form (health certificate forms are annexed to the Food Importers Guide)",
+      "Halal slaughter certificate / halal certificate as applicable",
+      "Customs declaration",
+      "Certificates of analysis where required"
+    ],
+    "personal_use_imports": [
+      "Written undertaking that the food is for personal use only and will not be sold, distributed or advertised to the public",
+      "Quantity within the permitted allowance",
+      "Labelling in Arabic or English (translation-office sticker if another language)",
+      "Not prohibited domestically or internationally and not containing prohibited components",
+      "May be sampled for laboratory examination if the competent authority considers it necessary"
+    ],
+    "rejected_shipments": {
+      "legal_basis": "Public Health Law No. 34 of 2018",
+      "importer_options": [
+        "Re-export to the country of origin",
+        "Destruction under Food Control supervision"
+      ],
+      "re_export_procedure": [
+        "Submit a request letter to the health office at the relevant port of entry, attaching a copy of the customs declaration of re-export and a copy of the rejection notice",
+        "A food control specialist contacts the importer before re-export",
+        "Complete the prescribed form to obtain an official re-export certificate"
+      ],
+      "destruction_procedure": [
+        "Submit a request letter to the health office at the relevant port of entry",
+        "Coordinate the destruction date with food control specialists",
+        "Waste management via the Askar landfill procedures",
+        "Complete the prescribed form to obtain an official destruction certificate"
+      ]
+    },
+    "shelf_life_on_arrival": "A substantial proportion of shelf life must remain on arrival (GCC practice is commonly at least half). Confirm the exact requirement with the Food Control Section for the specific product."
+  },
+  "enforcement_and_penalties": {
+    "legal_basis": "Public Health Law No. 34 of 2018.",
+    "measures": [
+      "Refusal of licence / operating without a licence treated as a violation",
+      "Licence suspension at any time for violations of approved food safety legislation",
+      "Prohibition of activities outside the authorised scope, with legal action against violators",
+      "Rejection, re-export or destruction of non-compliant consignments",
+      "Penalties under the Public Health Law"
+    ],
+    "amounts": "NOT STATED - the guideline refers to 'the penalties under the act of Public Health Law' without amounts. Verify the penalty provisions of Law No. 34 of 2018 before quoting figures."
+  },
+  "recent_developments": [
+    {
+      "date": "2022",
+      "item": "Ministerial Resolution No. 89 of 2022 prohibiting the import and trading of children's gelatin candy containing konjac (E425).",
+      "status": "In force"
+    },
+    {
+      "date": "2024",
+      "item": "Food Importers Guide to the Kingdom of Bahrain, 2024 edition published.",
+      "status": "Current reference"
+    },
+    {
+      "date": "2024",
+      "item": "Resolution No. 115 of 2024 regulating the import, trade and use of veterinary preparations in the poultry and food-producing animals sector.",
+      "status": "In force"
+    },
+    {
+      "date": "2026-02-17",
+      "item": "GSO draft GSO 2055-1:2026 halal food revision released for consultation (deadline 2026-04-18).",
+      "status": "Draft"
+    }
+  ],
+  "outdated_items_found_in_supplied_pdf": [
+    "The guideline is undated (Version 4). Confirm with the Food Control Section that Version 4 is still current.",
+    "It cites no legislation by number. The operative basis is Public Health Law No. 34 of 2018 - add that citation when relying on the guideline.",
+    "It predates and does not reflect Ministerial Resolution No. 89 of 2022 (konjac gelatin candy prohibition) or Resolution No. 115 of 2024 (veterinary preparations).",
+    "For import rules, the 2024 Food Importers Guide supersedes the import-related content of this premises guideline.",
+    "Older secondary sources sometimes cite GSO 9/2007 and GSO 150/2007 editions for Bahrain; the current editions should be obtained from the BSMD standards store.",
+    "CORRECTION to a common error, not in this PDF: there is no 'Bahrain National Food Safety Authority'. Do not cite one."
+  ],
+  "official_sources": [
+    {
+      "title": "Bahrain Ministry of Health - health regulations",
+      "url": "https://www.moh.gov.bh/Ministry/Regulations?lang=en"
+    },
+    {
+      "title": "Food Importers Guide to the Kingdom of Bahrain, 2024 edition (MOH)",
+      "url": "https://www.ofoq.gov.bh/pdf/FoodImportersGuide_2024_EN.pdf"
+    },
+    {
+      "title": "Bahrain national portal - Food Safety and Security",
+      "url": "https://www.bahrain.bh/wps/portal/en/BNP/ExploreBahrain/FoodSafetyAndSecurity"
+    },
+    {
+      "title": "Licensing of special foods (athletes' food, nutritional supplements) - service page",
+      "url": "https://www.bahrain.bh/wps/portal/en/BNP/ServicesCatalogue/GSX-UI-PServiceDetails?psID=1272"
+    },
+    {
+      "title": "Bahrain Standards and Metrology Directorate standards store",
+      "url": "https://bsmd.moic.gov.bh"
+    },
+    {
+      "title": "FAOLEX country profile - Bahrain",
+      "url": "https://www.fao.org/faolex/country-profiles/general-profile/en/?iso3=BHR"
+    },
+    {
+      "title": "USDA FSIS - Bahrain import/export library",
+      "url": "https://www.fsis.usda.gov/inspection/import-export/import-export-library/bahrain"
+    },
+    {
+      "title": "SGS Digicomply - Bahrain regulatory bodies overview",
+      "url": "https://www.digicomply.com/food-regulatory-bodies-standards-and-authorities/bahrain"
+    }
+  ]
+}
