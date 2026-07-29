@@ -10,6 +10,8 @@ This project trains an AI model to check food shipment records — temperature l
 
 In short: real food-safety rules, turned into training data, so an AI can learn to make the same call a compliance officer would.
 
+**For a full executive summary, read [`One_Engine_Six_Jurisdictions.pdf`](One_Engine_Six_Jurisdictions.pdf).**
+
 ## How it works
 
 **The full picture.** Seven specialized steps generate a shipment record, check it against the rules, and write everything to one traceable log a person can read back at any time.
@@ -50,11 +52,76 @@ In short: real food-safety rules, turned into training data, so an AI can learn 
 | [`ROADMAP.md`](ROADMAP.md) | What's built, what's next |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to contribute |
 | [`MANUAL_TESTING_GUIDE.md`](MANUAL_TESTING_GUIDE.md) | Step-by-step commands to set up and run a full batch, for engineers |
+| [`One_Engine_Six_Jurisdictions.pdf`](One_Engine_Six_Jurisdictions.pdf) | Executive summary of the project |
 | [`LICENSE`](LICENSE) | MIT |
 
-## Getting started (for engineers)
+## How to run this, step by step
 
-Full setup — Python environment, database, credentials, and running a batch end to end — is in [`MANUAL_TESTING_GUIDE.md`](MANUAL_TESTING_GUIDE.md). Deployment to Azure is covered in [`DEPLOYMENT.md`](DEPLOYMENT.md).
+This walks through running it on your own computer from scratch. It assumes nothing installed yet except [Python 3.11 or 3.12](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads).
+
+**1. Get the code**
+
+```
+git clone https://github.com/arshad98333/HAFIZAL-GHIDHA.git
+cd HAFIZAL-GHIDHA
+```
+
+**2. Create a Python environment and install dependencies**
+
+Windows:
+```
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Mac/Linux:
+```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**3. Set up a database (MongoDB Atlas)**
+
+This pipeline stores its results in MongoDB, not local files.
+
+1. Create a free account and cluster at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas).
+2. In Atlas, go to **Database Access** and add a database user with read/write access to a database named `cold_chain`.
+3. Go to **Network Access** and allow your current IP address.
+4. Copy your connection string (Atlas → Connect → Drivers).
+
+**4. Configure your environment file**
+
+```
+cp .env.example .env
+```
+
+Open `.env` in any text editor and fill in:
+- `MONGODB_URI` — the connection string from step 3
+- `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — your Azure OpenAI deployment details
+
+Never commit this file — it holds real credentials.
+
+**5. Run a small test batch**
+
+```
+python -m cold_chain.runner plan     --wave 1
+python -m cold_chain.runner generate --wave 1 --max-records 10
+python -m cold_chain.runner gate-a   --wave 1
+```
+
+If `gate-a` prints a list of failed checks and exits, that's the system correctly stopping on a problem — read the list, it tells you exactly what to fix.
+
+**6. Look at what it produced**
+
+```
+python scripts/export_wave.py --wave 1
+```
+
+This writes the kept records to `exports/generation_log_wave01.jsonl` so you can open and read them.
+
+That's the smallest working loop. For the full run (all 8 waves, training, and evaluation), see [`MANUAL_TESTING_GUIDE.md`](MANUAL_TESTING_GUIDE.md). Deployment to Azure is covered in [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ## The safeguards, in plain terms
 
