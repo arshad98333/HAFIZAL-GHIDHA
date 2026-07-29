@@ -1,5 +1,14 @@
 # GCC cold-chain fine-tuning pipeline
 
+[![CI](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml/badge.svg)](https://github.com/<OWNER>/<REPO>/actions/workflows/ci.yml)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri=https%3A%2F%2Fraw.githubusercontent.com%2F<OWNER>%2F<REPO>%2Fmain%2Finfra%2Fmain.json)
+
+> Replace `<OWNER>/<REPO>` above with this repo's actual GitHub path once
+> pushed — GitHub badges and the Deploy-to-Azure button both need a real,
+> public URL to resolve. See [`DEPLOYMENT.md`](DEPLOYMENT.md) for full
+> Azure Container Apps CI/CD setup (OIDC login, required GitHub secrets,
+> one-time role assignments).
+
 An agentic data-generation and evaluation pipeline that builds a 5,304-record,
 English-language training corpus (8 waves of 663) for a student model that
 triages messy GCC cold-chain field artifacts — logger CSV dumps, chat
@@ -44,6 +53,10 @@ Mongo: ledger, coverage_state ├─→ cold_chain/curriculum.py ─→ plan.jso
 | `CURRICULUM.md`, `AUTORESEARCH.md` | The two files a human edits between waves |
 | `MANUAL_TESTING_GUIDE.md` | Ordered, copy-pasteable commands from first setup through a full-corpus audit |
 | `scripts/` | Connectivity smoke test, Mongo export, corpus guardrail audit, real-time stream demo, second-pass review, system report |
+| `Dockerfile`, `.dockerignore` | Container image for any stage (`docker run --env-file .env <image> generate --wave 1`) |
+| `infra/main.json` | ARM template provisioning an Azure Container Apps Job to run pipeline stages unattended — see [`DEPLOYMENT.md`](DEPLOYMENT.md) |
+| `.github/workflows/ci.yml` | pytest across Python 3.11/3.12 + a Docker build check on every push/PR |
+| `.github/workflows/cd.yml` | Builds and pushes the image to GHCR, then updates the Azure Container Apps Job on push to `main` |
 
 ### `cold_chain/`
 

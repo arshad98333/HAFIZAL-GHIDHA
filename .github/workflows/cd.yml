@@ -1,0 +1,104 @@
+name: CD - Azure Container Apps
+
+# Builds the pipeline image, pushes it to GitHub Container Registry, and
+# deploys/updates it as an Azure Container Apps Job. A Job (not a long-running
+# App) is the right shape here: cold_chain.runner is a set of one-off,
+# resumable CLI stages (plan/generate/gate-a/train/gate-b), not an HTTP
+# service.
+#
+# One-time setup before this workflow can deploy anything -- see
+# DEPLOYMENT.md for the full walkthrough:
+#   1. Provision the Azure resources once, either via the "Deploy to Azure"
+#      button in README.md (infra/main.json) or `az deployment group create`.
+#   2. Create an Azure AD app registration + federated credential trusting
+#      this repo's GitHub OIDC token (no client secret needed).
+#   3. Set these as GitHub Actions repo variables/secrets:
+#      Variables: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
+#                 AZURE_RESOURCE_GROUP, CONTAINER_APP_JOB_NAME
+#   4. Make the ghcr.io package public (Package settings -> Change visibility)
+#      so the Container Apps Job can pull it without a registry secret, or
+#      add one -- see DEPLOYMENT.md.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  workflow_dispatch:
+    inputs:
+      run_stage:
+        description: "Pipeline stage to execute after deploying the new image (leave blank to only deploy, not run)"
+        type: choice
+        options: ["", "plan", "generate", "gate-a", "train", "gate-b"]
+        default: ""
+      wave:
+        description: "Wave number for run_stage"
+        type: string
+        default: "1"
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write # required for Azure OIDC login
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: []
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        id: meta
+        run: |
+          IMAGE="${REGISTRY}/${IMAGE_NAME,,}"
+          TAG="${GITHUB_SHA::12}"
+          docker build -t "${IMAGE}:${TAG}" -t "${IMAGE}:latest" .
+          docker push "${IMAGE}:${TAG}"
+          docker push "${IMAGE}:latest"
+          echo "image=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    environment: production
+    steps:
+      - name: Azure login (OIDC, no stored secret)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Point the Container Apps Job at the new image
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az containerapp job update \
+              --name "${{ vars.CONTAINER_APP_JOB_NAME }}" \
+              --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+              --image "${{ needs.build-and-push.outputs.image }}"
+
+      - name: Trigger a pipeline stage (optional, manual dispatch only)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_stage != '' }}
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az containerapp job start \
+              --name "${{ vars.CONTAINER_APP_JOB_NAME }}" \
+              --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+              --args "${{ inputs.run_stage }}" "--wave" "${{ inputs.wave }}"

@@ -1,0 +1,188 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Deploys the GCC cold-chain pipeline as an Azure Container Apps Job (manual trigger). One execution = one pipeline stage (plan / generate / gate-a / train / gate-b) for one wave, matching cold_chain.runner's resumable-stage design. Pulls the image built by .github/workflows/cd.yml from GitHub Container Registry."
+  },
+  "parameters": {
+    "jobName": {
+      "type": "string",
+      "defaultValue": "cold-chain-pipeline",
+      "metadata": { "description": "Name of the Container Apps Job." }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": { "description": "Azure region for all resources." }
+    },
+    "containerImage": {
+      "type": "string",
+      "metadata": { "description": "Full image reference, e.g. ghcr.io/<github-owner>/<repo>:latest. Make the GHCR package public (package Settings -> Change visibility) so Container Apps can pull without registry credentials -- see DEPLOYMENT.md to add a private pull secret instead." }
+    },
+    "mongodbUri": {
+      "type": "securestring",
+      "metadata": { "description": "MongoDB Atlas connection string for a user scoped to mongodbDbName only (readWrite, no access to any golden-set database)." }
+    },
+    "mongodbDbName": {
+      "type": "string",
+      "defaultValue": "cold_chain",
+      "metadata": { "description": "MongoDB Atlas database name." }
+    },
+    "azureOpenAiEndpoint": {
+      "type": "string",
+      "metadata": { "description": "Azure OpenAI Foundry endpoint, e.g. https://<resource>.openai.azure.com/. Auth is AAD via the job's managed identity (DefaultAzureCredential), not an API key -- grant it 'Cognitive Services OpenAI User' on this resource after deployment (see outputs.jobPrincipalId)." }
+    },
+    "azureOpenAiDeployment": {
+      "type": "string",
+      "defaultValue": "gpt-5.4-mini",
+      "metadata": { "description": "Azure OpenAI deployment name used for render/screen/extract/judge." }
+    },
+    "foundryProjectEndpoint": {
+      "type": "string",
+      "metadata": { "description": "Azure AI Foundry project endpoint used by the train stage to submit the managed SFT job." }
+    },
+    "foundryComputeCluster": {
+      "type": "string",
+      "metadata": { "description": "Name of the training compute cluster the train stage submits to." }
+    },
+    "foundryBaseModel": {
+      "type": "string",
+      "metadata": { "description": "Student base-model checkpoint this run fine-tunes." }
+    },
+    "trainingRegion": {
+      "type": "string",
+      "metadata": { "description": "Region tag attached to the submitted training job for tracking. Not validated by the pipeline." }
+    },
+    "waveSize": {
+      "type": "int",
+      "defaultValue": 663,
+      "metadata": { "description": "Records per wave." }
+    },
+    "cellTarget": {
+      "type": "int",
+      "defaultValue": 265,
+      "metadata": { "description": "Per-cell coverage target." }
+    },
+    "cpuCores": {
+      "type": "string",
+      "defaultValue": "1.0",
+      "metadata": { "description": "vCPU allocated to each job execution (must pair with a valid memory value below)." }
+    },
+    "memorySize": {
+      "type": "string",
+      "defaultValue": "2Gi",
+      "metadata": { "description": "Memory allocated to each job execution." }
+    },
+    "replicaTimeoutSeconds": {
+      "type": "int",
+      "defaultValue": 3600,
+      "metadata": { "description": "Max seconds a single execution may run before Container Apps kills it. A full 663-record wave stage can take a while under Azure OpenAI rate limits -- raise if generate/gate-a routinely need longer." }
+    }
+  },
+  "variables": {
+    "uniqueSuffix": "[uniqueString(resourceGroup().id, parameters('jobName'))]",
+    "logAnalyticsName": "[format('law-{0}-{1}', parameters('jobName'), variables('uniqueSuffix'))]",
+    "environmentName": "[format('env-{0}-{1}', parameters('jobName'), variables('uniqueSuffix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[variables('logAnalyticsName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": { "name": "PerGB2018" },
+        "retentionInDays": 30
+      }
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2024-03-01",
+      "name": "[variables('environmentName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName'))]"
+      ],
+      "properties": {
+        "appLogsConfiguration": {
+          "destination": "log-analytics",
+          "logAnalyticsConfiguration": {
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName')), '2022-10-01').customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsName')), '2022-10-01').primarySharedKey]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/jobs",
+      "apiVersion": "2024-03-01",
+      "name": "[parameters('jobName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', variables('environmentName'))]"
+      ],
+      "properties": {
+        "environmentId": "[resourceId('Microsoft.App/managedEnvironments', variables('environmentName'))]",
+        "configuration": {
+          "triggerType": "Manual",
+          "replicaTimeout": "[parameters('replicaTimeoutSeconds')]",
+          "replicaRetryLimit": 0,
+          "manualTriggerConfig": {
+            "replicaCompletionCount": 1,
+            "parallelism": 1
+          },
+          "secrets": [
+            {
+              "name": "mongodb-uri",
+              "value": "[parameters('mongodbUri')]"
+            }
+          ]
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "cold-chain-pipeline",
+              "image": "[parameters('containerImage')]",
+              "resources": {
+                "cpu": "[json(parameters('cpuCores'))]",
+                "memory": "[parameters('memorySize')]"
+              },
+              "args": ["--help"],
+              "env": [
+                { "name": "MONGODB_URI", "secretRef": "mongodb-uri" },
+                { "name": "MONGODB_DB_NAME", "value": "[parameters('mongodbDbName')]" },
+                { "name": "AZURE_OPENAI_ENDPOINT", "value": "[parameters('azureOpenAiEndpoint')]" },
+                { "name": "AZURE_OPENAI_DEPLOYMENT", "value": "[parameters('azureOpenAiDeployment')]" },
+                { "name": "FOUNDRY_PROJECT_ENDPOINT", "value": "[parameters('foundryProjectEndpoint')]" },
+                { "name": "FOUNDRY_COMPUTE_CLUSTER", "value": "[parameters('foundryComputeCluster')]" },
+                { "name": "FOUNDRY_BASE_MODEL", "value": "[parameters('foundryBaseModel')]" },
+                { "name": "TRAINING_REGION", "value": "[parameters('trainingRegion')]" },
+                { "name": "WAVE_SIZE", "value": "[string(parameters('waveSize'))]" },
+                { "name": "CELL_TARGET", "value": "[string(parameters('cellTarget'))]" },
+                { "name": "LOG_LEVEL", "value": "INFO" },
+                { "name": "ENVIRONMENT", "value": "production" }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "jobName": {
+      "type": "string",
+      "value": "[parameters('jobName')]"
+    },
+    "jobPrincipalId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.App/jobs', parameters('jobName')), '2024-03-01', 'full').identity.principalId]"
+    },
+    "startExecutionCommand": {
+      "type": "string",
+      "value": "[format('az containerapp job start --name {0} --resource-group {1} --args \"plan\" \"--wave\" \"1\"', parameters('jobName'), resourceGroup().name)]"
+    }
+  }
+}
