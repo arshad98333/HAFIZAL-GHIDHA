@@ -86,8 +86,10 @@ make test-fast
 Windows without Make:
 
 ```powershell
-python -m pytest tests/unit tests/test_*.py -v --ignore=tests/integration -m "not integration"
+python -m pytest -v -m "not integration" --ignore=tests/integration
 ```
+
+PowerShell does not expand `tests/test_*.py` like bash. Do not use that glob on Windows.
 
 This runs 340+ tests against the deterministic core (`rules_engine`, `guardrails`, `knowledge_base`, `curriculum`). No network, no MongoDB, no Azure account required.
 
@@ -103,7 +105,7 @@ Windows without Make:
 python -m ruff check cold_chain tests scripts
 python -m ruff format --check cold_chain tests scripts
 python -m mypy cold_chain/config.py cold_chain/ports.py cold_chain/adapters/fakes.py --ignore-missing-imports --follow-imports=skip
-python -m pytest tests/unit tests/test_*.py -v --ignore=tests/integration -m "not integration"
+python -m pytest -v -m "not integration" --ignore=tests/integration
 ```
 
 ### Step 4: Configure environment variables
@@ -298,6 +300,7 @@ CI builds the Docker image on every push to `main`. Deploy to Azure is a manual 
 | `source` is not recognized (PowerShell) | Use `.\.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate` |
 | `make` is not recognized (Windows) | Use `pip install -r requirements-dev.txt` and `python -m pytest ...` (see Step 2 and Step 3) |
 | `No module named pytest` | You installed `requirements.txt` by mistake. Run `pip install -r requirements-dev.txt` |
+| `file or directory not found: tests/test_*.py` (Windows) | PowerShell does not expand globs. Use `python -m pytest -v -m "not integration" --ignore=tests/integration` |
 | `Missing required environment variables` on startup | Fill every required field in `.env` (see Step 4 table) |
 | `az login` / AAD errors during `generate` | Run `az login`; confirm OpenAI User role on the resource |
 | MongoDB connection timeout | Check Atlas IP allowlist and `MONGODB_URI` |
