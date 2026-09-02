@@ -131,6 +131,52 @@ To confirm MongoDB is reachable:
 python -m cold_chain.runner ready
 ```
 
+### Two ways to run the pipeline
+
+After `.env` is configured and `az login` is done, pick **one** of these:
+
+**Option A -- one command (recommended):**
+
+```bash
+# Smoke: tests + health + ready + plan + generate(10) + gate-a + export + audit
+python scripts/local_run.py all --wave 1 --max-records 10
+
+# Full wave (~663 records)
+python scripts/local_run.py all --wave 1
+```
+
+Windows PowerShell:
+
+```powershell
+.\scripts\local_run.ps1 all -Wave 1 -MaxRecords 10
+.\scripts\local_run.ps1 all -Wave 1
+```
+
+Audit the last Gate A result:
+
+```bash
+python scripts/local_run.py audit --wave 1
+```
+
+**Option B -- step by step (manual):**
+
+Print the exact command list:
+
+```bash
+python scripts/local_run.py steps --wave 1 --max-records 10
+```
+
+Or run one stage at a time:
+
+```bash
+python scripts/local_run.py step setup
+python scripts/local_run.py step plan --wave 1
+python scripts/local_run.py step generate --wave 1 --max-records 10
+python scripts/local_run.py step gate-a --wave 1
+python scripts/local_run.py step export --wave 1
+python scripts/local_run.py step audit --wave 1
+```
+
 ### Step 8: Run a smoke wave (10 records)
 
 ```bash
@@ -250,6 +296,10 @@ CI builds the Docker image on every push to `main`. Deploy to Azure is a manual 
 | `make check` | Lint + typecheck + fast tests (same as CI) |
 | `make build` | Build Docker image locally |
 | `make health` | Run `python -m cold_chain.runner health` |
+| `make local-setup` | Run tests + health + ready |
+| `make smoke-run WAVE=1 MAX=10` | One-command smoke pipeline |
+| `make wave-run WAVE=1` | One-command full wave pipeline |
+| `make local-audit WAVE=1` | Summarize Gate A metrics for a wave |
 | `make lock` | Regenerate `requirements.txt` from `requirements.in` |
 
 ## Troubleshooting
@@ -260,6 +310,9 @@ CI builds the Docker image on every push to `main`. Deploy to Azure is a manual 
 | `az login` / AAD errors during `generate` | Run `az login`; confirm OpenAI User role on the resource |
 | MongoDB connection timeout | Check Atlas IP allowlist and `MONGODB_URI` |
 | Gate A fails on a 10-record smoke run | Expected; thresholds target 663-record waves. Try `--max-records 100` or a full wave |
+| Gate A `near_duplicate_rate: not measured` on full wave | Pull latest (embeddings are batched). Rerun `python scripts/local_run.py step gate-a --wave 1` |
+| `train` refuses: Gate A has not passed | Gate A must pass first. Run `python scripts/local_run.py audit --wave 1` |
+| `gate-b`: no student inference endpoint | Set `STUDENT_INFERENCE_ENDPOINT` after deploying a fine-tuned checkpoint |
 | `pip install` fails on Python 3.11 | Use the committed lockfile (`requirements-dev.txt`); scientific stack is capped for 3.11 |
 | Import errors after upgrade | Old import paths still work via shims (`cold_chain.rules_engine` etc.) |
 

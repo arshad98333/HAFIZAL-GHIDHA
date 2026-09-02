@@ -177,13 +177,22 @@ class AzureClient:
         reraise=True,
     )
     async def embed(self, texts: list[str]) -> list[list[float]]:
-        async with self._sem:
-            resp = await self._client.embeddings.create(
-                model=self._settings.azure_embedding_deployment,
-                input=texts,
-            )
-            data = sorted(resp.data, key=lambda d: d.index)
-            return [d.embedding for d in data]
+        if not texts:
+            return []
+        # Azure caps each embeddings request (~300k tokens). Batch so Gate A on a
+        # full wave does not send the entire corpus in one call.
+        batch_size = 64
+        all_embeddings: list[list[float]] = []
+        for start in range(0, len(texts), batch_size):
+            chunk = texts[start : start + batch_size]
+            async with self._sem:
+                resp = await self._client.embeddings.create(
+                    model=self._settings.azure_embedding_deployment,
+                    input=chunk,
+                )
+                data = sorted(resp.data, key=lambda d: d.index)
+                all_embeddings.extend(d.embedding for d in data)
+        return all_embeddings
 
 
 class ContentSafetyClient:

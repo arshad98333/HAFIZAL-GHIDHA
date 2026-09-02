@@ -1,4 +1,4 @@
-.PHONY: install dev test test-fast test-integration lint format typecheck check build clean health
+.PHONY: install dev test test-fast test-integration lint format typecheck check build clean health local-setup smoke-run wave-run local-audit
 
 PYTHON ?= python3
 VENV ?= .venv
@@ -59,3 +59,15 @@ clean:
 
 health:
 	$(PY) -m cold_chain.runner health
+
+local-setup:
+	$(PY) scripts/local_run.py step setup
+
+smoke-run:
+	$(PY) scripts/local_run.py all --wave $(or $(WAVE),1) --max-records $(or $(MAX),10)
+
+wave-run:
+	$(PY) scripts/local_run.py all --wave $(or $(WAVE),1)
+
+local-audit:
+	$(PY) scripts/local_run.py audit --wave $(or $(WAVE),1)
