@@ -109,7 +109,7 @@ guardrail:
 
 ## Pull request checklist
 
-- [ ] `pytest` passes locally
+- [ ] `make check` passes locally (lint, typecheck, fast tests)
 - [ ] New/changed behavior has a test
 - [ ] No `.env`, credentials, or generated run artifacts (`exports/*.jsonl`
       other than `wave_9001.jsonl`, `CORPUS_GUARDRAIL_AUDIT*`, `results.txt`)
@@ -118,6 +118,17 @@ guardrail:
       bumped, source cited, test added (see above)
 - [ ] PR description explains the *why*, not just the *what* — this
       project's existing docstrings are the bar to match
+
+## Definition of done (guidebook)
+
+A change is done when:
+
+- **Change:** one logical unit; normal, empty, boundary, and failure cases handled; no secrets logged.
+- **Tests:** failing test existed before fix; full fast suite passes offline; coverage did not drop.
+- **Repo:** lockfile current; `make check` green; README/CHANGELOG updated if user-visible.
+- **Ops:** health CLI still passes; migrations documented if data shape changed.
+
+See [`docs/operations.md`](docs/operations.md) for rollback and weekly/monthly rhythms.
 
 ## Code of conduct
 

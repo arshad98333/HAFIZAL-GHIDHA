@@ -6,11 +6,13 @@ ifeq ($(wildcard $(VENV)/bin/python),)
   PIP := $(PYTHON) -m pip
   RUFF := $(PYTHON) -m ruff
   MYPY := $(PYTHON) -m mypy
+  PYTEST := $(PYTHON) -m pytest
 else
   PY := $(VENV)/bin/python
   PIP := $(VENV)/bin/pip
   RUFF := $(VENV)/bin/ruff
   MYPY := $(VENV)/bin/mypy
+  PYTEST := $(VENV)/bin/pytest
 endif
 VENV ?= .venv
 
@@ -23,10 +25,10 @@ dev:
 	@echo "Run a stage, e.g.: $(PY) -m cold_chain.runner plan --wave 1"
 
 test-fast:
-	PYTHONPATH=. $(PY) -m pytest tests/unit tests/test_*.py -v --ignore=tests/integration -m "not integration"
+	PYTHONPATH=. $(PYTEST) tests/unit tests/test_*.py -v --ignore=tests/integration -m "not integration"
 
 test-integration:
-	PYTHONPATH=. $(PY) -m pytest tests/integration -v -m integration
+	PYTHONPATH=. $(PYTEST) tests/integration -v -m integration
 
 test: test-fast test-integration
 

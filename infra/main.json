@@ -21,7 +21,13 @@
     },
     "mongodbUri": {
       "type": "securestring",
-      "metadata": { "description": "MongoDB Atlas connection string for a user scoped to mongodbDbName only (readWrite, no access to any golden-set database)." }
+      "defaultValue": "",
+      "metadata": { "description": "MongoDB Atlas connection string (used when mongodbKeyVaultSecretUri is empty). Prefer Key Vault in production." }
+    },
+    "mongodbKeyVaultSecretUri": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": { "description": "Optional Key Vault secret URI for MONGODB_URI, e.g. https://<vault>.vault.azure.net/secrets/mongo-uri/<version>. When set, the job's system-assigned identity fetches the secret (grant Key Vault Secrets User on the vault)." }
     },
     "mongodbDbName": {
       "type": "string",
@@ -134,12 +140,7 @@
             "replicaCompletionCount": 1,
             "parallelism": 1
           },
-          "secrets": [
-            {
-              "name": "mongodb-uri",
-              "value": "[parameters('mongodbUri')]"
-            }
-          ]
+          "secrets": "[if(empty(parameters('mongodbKeyVaultSecretUri')), createArray(createObject('name', 'mongodb-uri', 'value', parameters('mongodbUri'))), createArray(createObject('name', 'mongodb-uri', 'keyVaultUrl', parameters('mongodbKeyVaultSecretUri'), 'identity', 'system')))]"
         },
         "template": {
           "containers": [

@@ -5,20 +5,43 @@ from __future__ import annotations
 import copy
 from typing import Any
 
+from cold_chain.domain.catalog import all_cells
+
+
+def _empty_coverage() -> dict[str, Any]:
+    from cold_chain.domain import catalog as cat
+
+    return {
+        "cells": {c: {"kept": 0, "requested": 0, "last_wave": 0} for c in all_cells()},
+        "languages": {lang: 0 for lang in cat.LANGUAGES},
+        "artifacts": {a: 0 for a in cat.ARTIFACTS},
+        "jurisdictions": {j: 0 for j in cat.JURISDICTIONS},
+        "adversarial": 0,
+        "abstention": 0,
+        "total_kept": 0,
+    }
+
 
 class FakeLogbook:
     """In-memory logbook matching LogbookPort."""
 
     def __init__(self) -> None:
-        self.coverage: dict[str, Any] = {}
+        self.coverage: dict[str, Any] = _empty_coverage()
         self.artifacts: dict[tuple[int, str], Any] = {}
         self.decisions: list[tuple[int, str]] = []
+        self._ledger: list[dict[str, Any]] = []
 
     async def get_coverage(self) -> dict[str, Any]:
         return copy.deepcopy(self.coverage)
 
     async def put_coverage(self, coverage: dict[str, Any]) -> None:
         self.coverage = copy.deepcopy(coverage)
+
+    async def load_coverage(self) -> dict[str, Any]:
+        return copy.deepcopy(self.coverage)
+
+    async def read_ledger(self) -> list[dict[str, Any]]:
+        return copy.deepcopy(self._ledger)
 
     async def get_wave_artifact(self, wave: int, name: str) -> Any | None:
         return self.artifacts.get((wave, name))
@@ -67,6 +90,6 @@ class FakeTrainingSubmitter:
     def __init__(self) -> None:
         self.submissions: list[tuple[int, str]] = []
 
-    async def submit(self, wave: int, *, export_path: str) -> str:
-        self.submissions.append((wave, export_path))
+    async def submit(self, wave: int, *, export_path: str = "", dataset_hash: str = "") -> str:
+        self.submissions.append((wave, export_path or dataset_hash))
         return f"job-fake-wave-{wave}"

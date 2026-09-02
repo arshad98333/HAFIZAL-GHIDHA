@@ -72,15 +72,19 @@ Windows:
 ```
 python -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+make install
 ```
 
 Mac/Linux:
 ```
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+make install
 ```
+
+Or without Make: `pip install -r requirements-dev.txt`
+
+**Requirements:** Python 3.11 or 3.12, pip, Docker (for image build), Make (optional but recommended).
 
 **3. Set up a database (MongoDB Atlas)**
 
@@ -106,9 +110,16 @@ Never commit this file — it holds real credentials.
 **5. Run a small test batch**
 
 ```
+make test-fast
 python -m cold_chain.runner plan     --wave 1
 python -m cold_chain.runner generate --wave 1 --max-records 10
 python -m cold_chain.runner gate-a   --wave 1
+```
+
+Health check (no wave required):
+
+```
+python -m cold_chain.runner health
 ```
 
 If `gate-a` prints a list of failed checks and exits, that's the system correctly stopping on a problem — read the list, it tells you exactly what to fix.
