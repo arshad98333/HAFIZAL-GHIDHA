@@ -59,6 +59,52 @@ function Resolve-PlaceholderValue([string]$Value, [string]$Fallback) {
     return $Value
 }
 
+function Get-DefaultAcrName([string]$SubscriptionId) {
+    return ("gccchain" + ($SubscriptionId -replace "-", "").Substring(0, 8)).ToLower()
+}
+
+function Resolve-AcrImage {
+    param(
+        [string]$ResourceGroup,
+        [string]$SubscriptionId,
+        [string]$Tag,
+        [string]$PreferredName = ""
+    )
+
+    $candidates = @()
+    if ($PreferredName) { $candidates += $PreferredName }
+    $defaultName = Get-DefaultAcrName $SubscriptionId
+    if ($candidates -notcontains $defaultName) { $candidates += $defaultName }
+
+    $listed = az acr list --resource-group $ResourceGroup --query "[].name" -o tsv 2>$null
+    if ($LASTEXITCODE -eq 0 -and $listed) {
+        foreach ($name in ($listed -split "[\r\n]+")) {
+            $name = $name.Trim()
+            if ($name -and $candidates -notcontains $name) { $candidates += $name }
+        }
+    }
+
+    foreach ($acr in $candidates) {
+        if (-not $acr) { continue }
+        az acr show --name $acr --resource-group $ResourceGroup -o none 2>$null
+        if ($LASTEXITCODE -ne 0) { continue }
+
+        $tagExists = az acr repository show-tags --name $acr --repository api --query "[?@=='$Tag'] | [0]" -o tsv 2>$null
+        if ($LASTEXITCODE -ne 0 -or -not $tagExists) { continue }
+
+        $server = "$acr.azurecr.io"
+        return @{
+            AcrName   = $acr
+            Server    = $server
+            Username  = (az acr credential show --name $acr --query username -o tsv)
+            Password  = (az acr credential show --name $acr --query "passwords[0].value" -o tsv)
+            Image     = "$server/api:$Tag"
+        }
+    }
+
+    return $null
+}
+
 function Write-ArmParametersFile([string]$Path, [hashtable]$Values) {
     $parameters = @{}
     foreach ($key in $Values.Keys) {
@@ -160,6 +206,23 @@ if (-not $SkipApiImage) {
         docker push $image
         if ($LASTEXITCODE -ne 0) { throw 'docker push failed - run: gh auth login' }
     }
+}
+elseif ($BuildMethod -eq "Acr") {
+    az group create --name $ResourceGroup --location $Location | Out-Null
+    Write-Host 'SkipApiImage: resolving existing ACR image...'
+    $resolved = Resolve-AcrImage -ResourceGroup $ResourceGroup -SubscriptionId $sub -Tag $ImageTag -PreferredName $AcrName
+    if (-not $resolved) {
+        Write-Error "No api:$ImageTag image found in ACR for resource group $ResourceGroup. Run without -SkipApiImage first."
+    }
+    $AcrName = $resolved.AcrName
+    $acrServer = $resolved.Server
+    $acrUsername = $resolved.Username
+    $acrPassword = $resolved.Password
+    $image = $resolved.Image
+    Write-Host "Using existing image: $image"
+}
+else {
+    Write-Error '-SkipApiImage only supports -BuildMethod Acr. Remove -SkipApiImage to rebuild the image.'
 }
 
 if (-not $image) {
