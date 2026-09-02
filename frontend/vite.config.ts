@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ""),
         },
+        "/openapi.json": { target: apiTarget, changeOrigin: true },
+        "/docs": { target: apiTarget, changeOrigin: true },
+        "/redoc": { target: apiTarget, changeOrigin: true },
       },
     },
     build: {

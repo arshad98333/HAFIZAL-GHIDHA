@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from cold_chain.api.routes import data, health, jobs, pipeline, waves
+from cold_chain.api.routes import data, health, jobs, pipeline, simulate, waves
 
 
 def create_app() -> FastAPI:
@@ -25,6 +25,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(health.router)
+    app.include_router(simulate.router)
     app.include_router(waves.router)
     app.include_router(data.router)
     app.include_router(pipeline.router)

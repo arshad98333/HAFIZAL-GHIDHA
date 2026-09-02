@@ -61,7 +61,13 @@
             "external": true,
             "targetPort": 8080,
             "transport": "auto"
-          }
+          },
+          "secrets": [
+            {
+              "name": "mongodb-uri",
+              "value": "[parameters('mongodbUri')]"
+            }
+          ]
         },
         "template": {
           "scale": { "minReplicas": 0, "maxReplicas": 3 },

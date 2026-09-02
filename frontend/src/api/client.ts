@@ -19,6 +19,34 @@ export type WaveAudit = {
   gate_a_failures?: string[];
 };
 
+export type SimulateResult = {
+  product: string;
+  fault_mode: string;
+  jurisdiction: string;
+  artifact_type: string;
+  seed: number;
+  readings_c: number[];
+  interval_min: number;
+  ambient_c: number | null;
+  days_since_production: number | null;
+  sensor_fault: boolean;
+  peak_season: boolean;
+  missing_fields: string[];
+  temp_band_min_c: number | null;
+  temp_band_max_c: number;
+  disposition: string;
+  rule_id: string;
+  excursion_minutes: number;
+  peak_temp_c: number | null;
+  remaining_shelf_days: number | null;
+  render_prompt: string;
+  artifact_preview: string;
+  guardrail_violations: string[];
+  steps: { id: string; title: string; detail: string; status: string }[];
+  spec_regime: string;
+  spec_clause: string;
+};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
@@ -57,8 +85,21 @@ export const api = {
   ledger: () => request<Record<string, unknown>[]>("/ledger"),
   post: (path: string, body?: unknown) =>
     request<Job>(path, { method: "POST", body: body ? JSON.stringify(body) : undefined }),
+  simulate: (body: {
+    product: string;
+    fault_mode: string;
+    jurisdiction: string;
+    artifact_type: string;
+    seed: number;
+    is_adversarial?: boolean;
+    is_abstention?: boolean;
+  }) => request<SimulateResult>("/simulate", { method: "POST", body: JSON.stringify(body) }),
 };
 
+const API_DIRECT = (import.meta.env.VITE_API_DIRECT_URL || "").replace(/\/$/, "");
+
 export function getApiDocsUrl(): string {
-  return `${API_BASE}/docs`;
+  if (API_DIRECT) return `${API_DIRECT}/docs`;
+  if (API_BASE.startsWith("http")) return `${API_BASE}/docs`;
+  return "http://127.0.0.1:8080/docs";
 }

@@ -24,6 +24,9 @@ export function LandingPage() {
             <Link to="/dashboard" className="btn-primary bg-white text-gcc-navy hover:bg-gcc-sand">
               {t("landing.ctaPrimary")}
             </Link>
+            <Link to="/simulation" className="btn-secondary border-white/30 bg-transparent text-white hover:bg-white/10">
+              {t("landing.ctaSimulation")}
+            </Link>
             <Link to="/guide" className="btn-secondary border-white/30 bg-transparent text-white hover:bg-white/10">
               {t("landing.ctaGuide")}
             </Link>

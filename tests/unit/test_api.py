@@ -105,3 +105,23 @@ def test_wave_audit(client):
         response = client.get("/waves/1/audit")
     assert response.status_code == 200
     assert response.json()["kept_records"] == 750
+
+
+def test_simulate_door_open(client):
+    response = client.post(
+        "/simulate",
+        json={
+            "product": "finfish_seafood",
+            "fault_mode": "door_open",
+            "jurisdiction": "AE",
+            "artifact_type": "logger_csv",
+            "seed": 42,
+        },
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["product"] == "finfish_seafood"
+    assert len(payload["readings_c"]) == 96
+    assert payload["disposition"] in {"accept", "hold_for_qa", "reject", "insufficient_data"}
+    assert payload["rule_id"].startswith("R")
+    assert len(payload["steps"]) >= 4

@@ -1,16 +1,20 @@
 name: Deploy Web + API
 
-# Builds the React dashboard and FastAPI image, deploys to Azure Static Web Apps
-# and Azure Container Apps (HTTP, scale-to-zero).
+# Manual deploy: builds API image, updates Container App, builds frontend with live API URL,
+# deploys to Azure Static Web Apps.
 #
-# Required GitHub secrets/variables (see DEPLOYMENT.md):
-#   AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID
-#   AZURE_RESOURCE_GROUP, AZURE_STATIC_WEB_APPS_API_TOKEN
-#   AZURE_API_APP_NAME (Container App name)
-#   VITE_API_BASE_URL (optional override; otherwise fetched from deployed API)
+# GitHub secrets: AZURE_STATIC_WEB_APPS_API_TOKEN, MONGODB_URI (provision only)
+# GitHub vars: AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID,
+#   AZURE_RESOURCE_GROUP, AZURE_API_APP_NAME, AZURE_STATIC_WEB_APP_NAME,
+#   AZURE_OPENAI_ENDPOINT, FOUNDRY_*, TRAINING_REGION, VITE_API_BASE_URL (fallback)
 
 on:
   workflow_dispatch:
+    inputs:
+      provision:
+        description: "Provision infra (first deploy only)"
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -31,6 +35,7 @@ env:
 
 jobs:
   build-api:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       image: ${{ steps.meta.outputs.image }}
@@ -50,32 +55,43 @@ jobs:
           docker push "${IMAGE}:latest"
           echo "image=${IMAGE}:${TAG}" >> "$GITHUB_OUTPUT"
 
-  build-frontend:
+  provision-infra:
+    if: github.event_name == 'workflow_dispatch' && inputs.provision && vars.AZURE_CLIENT_ID != ''
     runs-on: ubuntu-latest
+    needs: build-api
+    environment: production
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: azure/login@v2
         with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - name: Install and build
-        working-directory: frontend
-        env:
-          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || '/api' }}
-        run: |
-          npm ci 2>/dev/null || npm install
-          npm run build
-      - uses: actions/upload-artifact@v4
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - uses: azure/CLI@v2
         with:
-          name: frontend-dist
-          path: frontend/dist
+          inlineScript: |
+            az deployment group create \
+              --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+              --template-file infra/web-stack.json \
+              --parameters \
+                apiAppName="${{ vars.AZURE_API_APP_NAME }}" \
+                staticWebAppName="${{ vars.AZURE_STATIC_WEB_APP_NAME }}" \
+                apiImage="${{ needs.build-api.outputs.image }}" \
+                mongodbUri="${{ secrets.MONGODB_URI }}" \
+                azureOpenAiEndpoint="${{ vars.AZURE_OPENAI_ENDPOINT }}" \
+                foundryProjectEndpoint="${{ vars.FOUNDRY_PROJECT_ENDPOINT }}" \
+                foundryComputeCluster="${{ vars.FOUNDRY_COMPUTE_CLUSTER }}" \
+                foundryBaseModel="${{ vars.FOUNDRY_BASE_MODEL }}" \
+                trainingRegion="${{ vars.TRAINING_REGION }}"
 
   deploy-api:
     if: github.event_name == 'workflow_dispatch' && vars.AZURE_CLIENT_ID != ''
     runs-on: ubuntu-latest
     needs: build-api
     environment: production
+    outputs:
+      api_fqdn: ${{ steps.fqdn.outputs.fqdn }}
+      api_url: ${{ steps.fqdn.outputs.url }}
     steps:
       - uses: azure/login@v2
         with:
@@ -89,6 +105,49 @@ jobs:
               --name "${{ vars.AZURE_API_APP_NAME }}" \
               --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
               --image "${{ needs.build-api.outputs.image }}"
+      - id: fqdn
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            FQDN=$(az containerapp show \
+              --name "${{ vars.AZURE_API_APP_NAME }}" \
+              --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+              --query "properties.configuration.ingress.fqdn" -o tsv)
+            echo "fqdn=${FQDN}" >> "$GITHUB_OUTPUT"
+            echo "url=https://${FQDN}" >> "$GITHUB_OUTPUT"
+
+  build-frontend:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    needs: deploy-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Resolve API base URL
+        id: api
+        run: |
+          if [ -n "${{ needs.deploy-api.outputs.api_url }}" ]; then
+            echo "base=${{ needs.deploy-api.outputs.api_url }}" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ vars.VITE_API_BASE_URL }}" ]; then
+            echo "base=${{ vars.VITE_API_BASE_URL }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=/api" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install and build
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ steps.api.outputs.base }}
+        run: |
+          npm ci 2>/dev/null || npm install
+          npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
 
   deploy-frontend:
     if: github.event_name == 'workflow_dispatch' && secrets.AZURE_STATIC_WEB_APPS_API_TOKEN != ''
@@ -109,8 +168,8 @@ jobs:
           skip_app_build: true
 
   frontend-ci:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    if: github.event_name != 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

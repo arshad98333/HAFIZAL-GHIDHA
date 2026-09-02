@@ -2,6 +2,7 @@
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "simulation": "Simulation",
     "pipeline": "Pipeline",
     "guide": "Setup Guide",
     "jobs": "Jobs",
@@ -12,6 +13,7 @@
     "title": "Cold-chain compliance AI for the Gulf",
     "subtitle": "Automate inspection of temperature logs, QC forms, chat messages, and voice notes — grounded in GCC food-safety law. Every training label from a deterministic rules engine, never from an LLM.",
     "ctaPrimary": "Open Dashboard",
+    "ctaSimulation": "Try simulation",
     "ctaGuide": "Setup in one command",
     "valueTitle": "Business value for regulators & operators",
     "value1Title": "GSO & national standards alignment",
@@ -78,6 +80,36 @@
     "status": "Status",
     "name": "Stage",
     "wave": "Wave"
+  },
+  "simulation": {
+    "seoTitle": "Cold-Chain Simulation | GCC Compliance AI",
+    "seoDesc": "Interactive demo: synthesize temperature logs, run the rules engine, and preview field artifacts.",
+    "title": "How it works — live simulation",
+    "subtitle": "Pick a product, fault scenario, and jurisdiction. The rules engine labels the shipment before any LLM sees the data — exactly like the production pipeline.",
+    "inputs": "Scenario inputs",
+    "product": "Product",
+    "fault": "Fault mode",
+    "jurisdiction": "Jurisdiction",
+    "artifact": "Artifact type",
+    "seed": "Random seed",
+    "run": "Run simulation",
+    "empty": "Configure inputs and run to see temperature physics, disposition, and pipeline steps.",
+    "pipeline": "Pipeline steps",
+    "artifactPreview": "Artifact preview (template)",
+    "renderPrompt": "Render prompt (disposition stripped)",
+    "faults": {
+      "in_spec": "In spec (normal)",
+      "door_open": "Door open excursion",
+      "compressor_fail": "Compressor failure",
+      "setpoint_drift": "Setpoint drift",
+      "sensor_artifact": "Sensor artifact"
+    },
+    "artifacts": {
+      "logger_csv": "Reefer logger CSV",
+      "chat_message": "Chat message",
+      "qc_form_ocr": "QC form (OCR)",
+      "voice_note": "Voice note transcript"
+    }
   },
   "common": {
     "loading": "Loading…",

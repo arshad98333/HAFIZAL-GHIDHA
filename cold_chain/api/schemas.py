@@ -86,3 +86,48 @@ class RecordsCount(BaseModel):
     total: int
     kept: int
     by_outcome: dict[str, int]
+
+
+class SimulateRequest(BaseModel):
+    product: str = "finfish_seafood"
+    fault_mode: str = "door_open"
+    jurisdiction: str = "AE"
+    artifact_type: str = "logger_csv"
+    seed: int = 42
+    is_adversarial: bool = False
+    is_abstention: bool = False
+
+
+class SimulateStep(BaseModel):
+    id: str
+    title: str
+    detail: str
+    status: str = "done"
+
+
+class SimulateResponse(BaseModel):
+    product: str
+    fault_mode: str
+    jurisdiction: str
+    artifact_type: str
+    seed: int
+    readings_c: list[float]
+    interval_min: int
+    ambient_c: float | None
+    days_since_production: int | None
+    sensor_fault: bool
+    peak_season: bool
+    missing_fields: list[str]
+    temp_band_min_c: float | None
+    temp_band_max_c: float
+    disposition: str
+    rule_id: str
+    excursion_minutes: int
+    peak_temp_c: float | None
+    remaining_shelf_days: int | None
+    render_prompt: str
+    artifact_preview: str
+    guardrail_violations: list[str]
+    steps: list[SimulateStep]
+    spec_regime: str
+    spec_clause: str
