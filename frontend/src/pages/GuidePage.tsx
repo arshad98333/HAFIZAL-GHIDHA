@@ -6,6 +6,11 @@ type CmdBlock = { titleKey: string; win: string; unix: string };
 
 const commands: CmdBlock[] = [
   {
+    titleKey: "guide.goalUpdateAll",
+    win: ".\\scripts\\update-all.ps1",
+    unix: "make update-all",
+  },
+  {
     titleKey: "guide.goalRescore",
     win: ".\\scripts\\run.ps1",
     unix: "make run",

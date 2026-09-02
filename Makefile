@@ -1,6 +1,6 @@
 .PHONY: install dev test test-fast test-integration lint format typecheck check build clean \
 	health run run-smoke run-wave run-rescore run-full api \
-	local-setup smoke-run wave-run local-audit kpi preflight rescore
+	local-setup smoke-run wave-run local-audit kpi preflight rescore update-all
 
 PYTHON ?= python3
 VENV ?= .venv
@@ -106,6 +106,15 @@ api-windows:
 
 ui-windows:
 	@echo "On Windows use: .\\scripts\\ui.ps1"
+
+update-all:
+	@if [ "$(DEPLOY)" = "1" ]; then \
+		echo "Deploy flag set: run deploy-azure-web.ps1 on Windows after sync"; \
+	fi
+	git pull origin main
+	$(PIP) install -q -r requirements-dev.txt
+	cd frontend && npm install
+	./scripts/sync-desktop-folder.ps1 -RobocopyOnly || true
 
 # --------------------------------------------------------------------------- #
 # Legacy aliases (delegate to run profiles)

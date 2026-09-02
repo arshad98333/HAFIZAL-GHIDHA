@@ -118,6 +118,8 @@ Example: `POST https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontai
 | **Start web UI** | `.\scripts\ui.ps1` | `make ui` |
 | **Try simulation** | Open http://127.0.0.1:5173/simulation | same |
 | **Deploy to Azure** | `.\scripts\deploy-azure-web.ps1` | see DEPLOYMENT-WEB.md |
+| **Update all** (git + deps + sync) | `.\scripts\update-all.ps1` | `make update-all` |
+| **Update + deploy Azure** | `.\scripts\update-all.ps1 -Deploy` | `make update-all DEPLOY=1` |
 | **Sync to `-main` folder** | `.\scripts\watch-sync-desktop.ps1` | `./scripts/sync-desktop-folder.ps1` |
 | **Health check** | `python -m cold_chain.runner health` | `make health` |
 

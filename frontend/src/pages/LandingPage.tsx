@@ -49,9 +49,9 @@ export function LandingPage() {
 
       <section className="bg-white py-16">
         <div className="mx-auto max-w-6xl px-4 text-center">
-          <p className="text-sm uppercase tracking-wider text-slate-500">GSO · HACCP · SFDA · ESMA</p>
+          <p className="text-sm uppercase tracking-wider text-slate-500">GSO | HACCP | SFDA | ESMA</p>
           <p className="mt-4 text-slate-600">
-            Deterministic rules engine · Agentic Gate A/B · 12 KPI dimensions · MongoDB audit trail
+            Deterministic rules engine | Agentic Gate A/B | 12 KPI dimensions | MongoDB audit trail
           </p>
         </div>
       </section>

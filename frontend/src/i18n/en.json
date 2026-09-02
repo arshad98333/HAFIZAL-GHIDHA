@@ -9,22 +9,22 @@
     "apiDocs": "API Docs"
   },
   "landing": {
-    "badge": "GSO-aligned · Six GCC jurisdictions",
+    "badge": "GSO-aligned | Six GCC jurisdictions",
     "title": "Cold-chain compliance AI for the Gulf",
-    "subtitle": "Automate inspection of temperature logs, QC forms, chat messages, and voice notes — grounded in GCC food-safety law. Every training label from a deterministic rules engine, never from an LLM.",
+    "subtitle": "Automate inspection of temperature logs, QC forms, chat messages, and voice notes. Grounded in GCC food-safety law. Every training label from a deterministic rules engine, never from an LLM.",
     "ctaPrimary": "Open Dashboard",
     "ctaSimulation": "Try simulation",
     "ctaGuide": "Setup in one command",
-    "valueTitle": "Business value for regulators & operators",
-    "value1Title": "GSO & national standards alignment",
+    "valueTitle": "Business value for regulators and operators",
+    "value1Title": "GSO and national standards alignment",
     "value1Body": "Maps to Gulf Standardization Organization food-safety frameworks and jurisdiction-specific instruments (SFDA, ESMA, MoPH Qatar, and more).",
     "value2Title": "Audit-ready provenance",
-    "value2Body": "Every record carries wave, cell, rules-engine hash, and screener verdict — built for HACCP cold-chain audits and traceability.",
+    "value2Body": "Every record carries wave, cell, rules-engine hash, and screener verdict. Built for HACCP cold-chain audits and traceability.",
     "value3Title": "Faster gate reviews",
     "value3Body": "Gate A/B KPIs score corpus quality before training spend. Rescore existing data in one command without regenerating.",
     "value4Title": "Multilingual field reality",
-    "value4Body": "English and Arabic artifacts with authenticity scoring — designed for how GCC logistics teams actually communicate.",
-    "jurisdictions": "SA · AE · QA · BH · KW · OM",
+    "value4Body": "English and Arabic artifacts with authenticity scoring. Designed for how GCC logistics teams actually communicate.",
+    "jurisdictions": "SA | AE | QA | BH | KW | OM",
     "seoTitle": "GCC Cold-Chain Compliance AI | GSO Food Safety",
     "seoDesc": "AI-assisted cold-chain compliance for GCC food operators. GSO-aligned, rules-engine labels, Gate A/B quality gates."
   },
@@ -45,7 +45,7 @@
   },
   "pipeline": {
     "title": "Pipeline Control",
-    "subtitle": "Trigger stages via the API. Long jobs run in the background — poll Jobs page for status.",
+    "subtitle": "Trigger stages via the API. Long jobs run in the background. Poll the Jobs page for status.",
     "plan": "Plan wave",
     "generate": "Generate corpus",
     "gateA": "Run Gate A",
@@ -61,7 +61,8 @@
     "prereqList": "Python 3.11+, Git, MongoDB Atlas URI, Azure OpenAI endpoint, az login",
     "windows": "Windows (PowerShell)",
     "linux": "Linux / macOS",
-    "goals": "Goals — single command each",
+    "goals": "Goals - single command each",
+    "goalUpdateAll": "Update GitHub, local copy, deps, and deploy to Azure",
     "goalRescore": "Re-score existing wave 1 data",
     "goalSmoke": "First-time 10-record test",
     "goalWave": "Full wave regenerate (~663 records)",
@@ -70,9 +71,9 @@
     "goalSync": "Sync to HAFIZAL-GHIDHA-main folder",
     "backendLink": "Backend connects to",
     "troubleshoot": "Troubleshooting",
-    "t1": "API ModuleNotFoundError uvicorn → run .\\scripts\\api_server.ps1",
-    "t2": "Gate A fails on rescore → reset MongoDB then run wave profile",
-    "t3": "PowerShell parse error → git pull main for ASCII-only scripts"
+    "t1": "API ModuleNotFoundError uvicorn: run .\\scripts\\api_server.ps1",
+    "t2": "Gate A fails on rescore: reset MongoDB then run wave profile",
+    "t3": "PowerShell parse error: git pull main for ASCII-only scripts"
   },
   "jobs": {
     "title": "Background Jobs",
@@ -84,8 +85,8 @@
   "simulation": {
     "seoTitle": "Cold-Chain Simulation | GCC Compliance AI",
     "seoDesc": "Interactive demo: synthesize temperature logs, run the rules engine, and preview field artifacts.",
-    "title": "How it works — live simulation",
-    "subtitle": "Pick a product, fault scenario, and jurisdiction. The rules engine labels the shipment before any LLM sees the data — exactly like the production pipeline.",
+    "title": "How it works - live simulation",
+    "subtitle": "Pick a product, fault scenario, and jurisdiction. The rules engine labels the shipment before any LLM sees the data, exactly like the production pipeline.",
     "inputs": "Scenario inputs",
     "product": "Product",
     "fault": "Fault mode",
@@ -112,7 +113,7 @@
     }
   },
   "common": {
-    "loading": "Loading…",
+    "loading": "Loading...",
     "error": "Error",
     "retry": "Retry",
     "online": "Online",

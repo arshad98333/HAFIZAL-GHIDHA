@@ -75,7 +75,10 @@ if (-not $RobocopyOnly) {
     Write-Host "Branch: $Branch ($(git -C $Source rev-parse --short HEAD))"
 }
 Write-Host ""
-Write-Host "Next (two terminals):"
+Write-Host "Next (one command for everything):"
+Write-Host "  .\scripts\update-all.ps1"
+Write-Host ""
+Write-Host "Or run API + UI (two terminals):"
 Write-Host "  cd $Dest"
 Write-Host "  .\scripts\api_server.ps1"
 Write-Host "  .\scripts\ui.ps1"
