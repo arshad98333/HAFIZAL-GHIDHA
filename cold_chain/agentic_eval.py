@@ -53,11 +53,12 @@ log = get_logger(__name__)
 # self-consistency voting primitive
 # --------------------------------------------------------------------------- #
 
+
 @dataclass
 class Verdict:
     votes: list[Any]
     consensus: Any
-    agreement: float           # fraction of votes matching the consensus
+    agreement: float  # fraction of votes matching the consensus
     escalated: bool
     rationale: str
 
@@ -74,14 +75,19 @@ async def _vote_once(azure: AzureClient, prompt: str, max_tokens: int) -> tuple[
     except Exception as exc:  # noqa: BLE001
         return None, f"judge call failed: {exc}"
     try:
-        parsed = json.loads(raw[raw.index("{"): raw.rindex("}") + 1])
+        parsed = json.loads(raw[raw.index("{") : raw.rindex("}") + 1])
         return parsed.get("verdict"), parsed.get("rationale", "")
     except Exception:
         return None, f"unparseable judge output: {raw[:200]}"
 
 
 async def self_consistency_vote(
-    azure: AzureClient, prompt: str, k: int, agreement_floor: float, *, max_tokens: int = 600,
+    azure: AzureClient,
+    prompt: str,
+    k: int,
+    agreement_floor: float,
+    *,
+    max_tokens: int = 600,
     escalation_prompt: str | None = None,
 ) -> Verdict:
     """Calls the judge ``k`` times independently and takes the modal verdict.
@@ -155,16 +161,20 @@ class AgenticReviewBoard:
         self._floor = agreement_floor
 
     async def review(self, texts: list[str], sample_n: int = 30) -> dict[str, Any]:
-        sample = texts[:sample_n] if len(texts) <= sample_n else texts[: sample_n]
+        sample = texts[:sample_n] if len(texts) <= sample_n else texts[:sample_n]
         blob = "\n---\n".join(sample)
 
         authenticity = await self_consistency_vote(
-            self._azure, LANGUAGE_AUTHENTICITY_PROMPT.format(samples=blob),
-            self._votes, self._floor,
+            self._azure,
+            LANGUAGE_AUTHENTICITY_PROMPT.format(samples=blob),
+            self._votes,
+            self._floor,
         )
         leakage = await self_consistency_vote(
-            self._azure, LEAKAGE_REVIEW_PROMPT.format(samples=blob),
-            self._votes, self._floor,
+            self._azure,
+            LEAKAGE_REVIEW_PROMPT.format(samples=blob),
+            self._votes,
+            self._floor,
         )
 
         return {
@@ -223,7 +233,7 @@ class HoldoutItem:
     is_abstention: bool
     artifact_text: str
     ground_truth_disposition: str
-    model_output: dict[str, Any] | None   # None if inference failed
+    model_output: dict[str, Any] | None  # None if inference failed
     model_output_raw: str
 
 
@@ -253,8 +263,10 @@ class AutoGateB:
         record["malformed_json"] = False
 
         hallucination = await self_consistency_vote(
-            self._azure, HALLUCINATION_PROMPT.format(artifact=item.artifact_text, output=out),
-            self._votes, self._floor,
+            self._azure,
+            HALLUCINATION_PROMPT.format(artifact=item.artifact_text, output=out),
+            self._votes,
+            self._floor,
         )
         record["hallucination_score"] = hallucination.consensus
         record["hallucination_agreement"] = hallucination.agreement
@@ -262,8 +274,10 @@ class AutoGateB:
 
         if item.is_abstention:
             abst = await self_consistency_vote(
-                self._azure, ABSTENTION_PROMPT.format(artifact=item.artifact_text, output=out),
-                self._votes, self._floor,
+                self._azure,
+                ABSTENTION_PROMPT.format(artifact=item.artifact_text, output=out),
+                self._votes,
+                self._floor,
             )
             record["abstention_correct"] = bool(abst.consensus)
             record["abstention_agreement"] = abst.agreement

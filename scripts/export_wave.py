@@ -31,11 +31,17 @@ from cold_chain.logbook import Logbook  # noqa: E402
 async def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--wave", type=int, help="omit to export every wave")
-    ap.add_argument("--collection", default="generation_log",
-                     help="any Mongo collection name (generation_log, ledger, decisions, "
-                          "wave_artifacts, autoresearch_log, gate_b_deliberation, live_logs)")
-    ap.add_argument("--all", action="store_true",
-                     help="generation_log only: include dropped records, not just kept")
+    ap.add_argument(
+        "--collection",
+        default="generation_log",
+        help="any Mongo collection name (generation_log, ledger, decisions, "
+        "wave_artifacts, autoresearch_log, gate_b_deliberation, live_logs)",
+    )
+    ap.add_argument(
+        "--all",
+        action="store_true",
+        help="generation_log only: include dropped records, not just kept",
+    )
     ap.add_argument("--format", choices=["jsonl", "csv"], default="jsonl")
     ap.add_argument("--out", help="output path (default: exports/<collection>[_wave<N>].<ext>)")
     args = ap.parse_args()

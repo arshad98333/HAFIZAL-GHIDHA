@@ -110,6 +110,7 @@ def _extract_text(response: Any) -> str:
 # --ping: smallest possible connectivity check
 # --------------------------------------------------------------------------- #
 
+
 def _ping_sync() -> tuple[bool, str]:
     client, deployment = _build_client()
     response = client.responses.create(model=deployment, input="Reply with exactly the word: PONG")
@@ -133,6 +134,7 @@ async def ping() -> int:
 # --------------------------------------------------------------------------- #
 # loading records to review (identical contract to the earlier k2_review.py)
 # --------------------------------------------------------------------------- #
+
 
 async def load_from_mongo(wave: int, limit: int) -> list[dict[str, Any]]:
     from cold_chain.config import get_settings
@@ -195,7 +197,7 @@ def _review_one_sync(client: Any, deployment: str, row: dict[str, Any]) -> dict[
         # No output token cap, by request -- omit max_output_tokens entirely.
         response = client.responses.create(model=deployment, input=prompt)
         raw = _extract_text(response)
-        parsed = json.loads(raw[raw.index("{"): raw.rindex("}") + 1])
+        parsed = json.loads(raw[raw.index("{") : raw.rindex("}") + 1])
     except Exception as exc:  # noqa: BLE001
         parsed = {"error": f"{type(exc).__name__}: {exc}", "raw": raw}
     return {
@@ -229,12 +231,17 @@ def summarize_reviews(results: list[dict[str, Any]]) -> dict[str, Any]:
     agree = sum(1 for r in results if r["review"].get("agrees") is True)
     disagree = sum(1 for r in results if r["review"].get("agrees") is False)
     errored = sum(1 for r in results if "error" in r["review"])
-    flagged = [r for r in results if "error" not in r["review"]
-               and r["review"].get("concerns") not in ([], ["none"], None)]
+    flagged = [
+        r for r in results if "error" not in r["review"] and r["review"].get("concerns") not in ([], ["none"], None)
+    ]
     n = len(results) or 1
     return {
-        "n": len(results), "agree": agree, "disagree": disagree, "errored": errored,
-        "flagged": flagged, "agreement_rate": agree / n,
+        "n": len(results),
+        "agree": agree,
+        "disagree": disagree,
+        "errored": errored,
+        "flagged": flagged,
+        "agreement_rate": agree / n,
     }
 
 
@@ -244,8 +251,10 @@ async def run_review(rows: list[dict[str, Any]], out_path: Path | None) -> int:
         return 1
 
     settings = get_reviewer_settings()
-    print(f"Reviewing {len(rows)} record(s) with {settings.deployment} via the Responses API "
-          f"(no output token cap -- this may take a while)...\n")
+    print(
+        f"Reviewing {len(rows)} record(s) with {settings.deployment} via the Responses API "
+        f"(no output token cap -- this may take a while)...\n"
+    )
     results = await gather_reviews(rows)
     summary = summarize_reviews(results)
 
@@ -255,15 +264,21 @@ async def run_review(rows: list[dict[str, Any]], out_path: Path | None) -> int:
             print(f"[ERROR   ] {r['cell']:35} pipeline={r['pipeline_disposition']:16} {rv['error']}")
         else:
             tag = "AGREE" if rv.get("agrees") else "DISAGREE"
-            print(f"[{tag:8}] {r['cell']:35} pipeline={r['pipeline_disposition']:16} "
-                  f"reviewer={rv.get('your_disposition', '?'):16} concerns={rv.get('concerns', [])}")
+            print(
+                f"[{tag:8}] {r['cell']:35} pipeline={r['pipeline_disposition']:16} "
+                f"reviewer={rv.get('your_disposition', '?'):16} concerns={rv.get('concerns', [])}"
+            )
 
-    print(f"\n{summary['agree']}/{summary['n']} agree, {summary['disagree']}/{summary['n']} disagree, "
-          f"{summary['errored']}/{summary['n']} errored, {len(summary['flagged'])}/{summary['n']} flagged a concern.")
+    print(
+        f"\n{summary['agree']}/{summary['n']} agree, {summary['disagree']}/{summary['n']} disagree, "
+        f"{summary['errored']}/{summary['n']} errored, {len(summary['flagged'])}/{summary['n']} flagged a concern."
+    )
     if summary["disagree"] or summary["flagged"]:
-        print("\nDisagreements/flags are worth reading in full -- remember this reviewer is the same "
-              "deployment as the pipeline itself (see this script's module docstring), so agreement "
-              "here is weaker evidence than an independently-trained model agreeing would be.")
+        print(
+            "\nDisagreements/flags are worth reading in full -- remember this reviewer is the same "
+            "deployment as the pipeline itself (see this script's module docstring), so agreement "
+            "here is weaker evidence than an independently-trained model agreeing would be."
+        )
 
     if out_path:
         with out_path.open("w", encoding="utf-8") as fh:
@@ -277,6 +292,7 @@ async def run_review(rows: list[dict[str, Any]], out_path: Path | None) -> int:
 # --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
+
 
 async def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -293,11 +309,7 @@ async def main() -> int:
     if not args.wave and not args.export:
         ap.error("pass --wave N (reads MongoDB) or --export path/to/file.jsonl, or --ping to just test the setup")
 
-    rows = (
-        load_from_export(args.export, args.limit)
-        if args.export
-        else await load_from_mongo(args.wave, args.limit)
-    )
+    rows = load_from_export(args.export, args.limit) if args.export else await load_from_mongo(args.wave, args.limit)
     return await run_review(rows, args.out)
 
 

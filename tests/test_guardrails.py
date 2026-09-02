@@ -56,8 +56,8 @@ def test_temperature_sentinel_values_excludes_zero():
 
 def test_is_sentinel_reading_magnitude_check():
     assert gr.is_sentinel_reading(-99.9) is True
-    assert gr.is_sentinel_reading(-60.0) is True   # <= -50
-    assert gr.is_sentinel_reading(90.0) is True    # >= 80
+    assert gr.is_sentinel_reading(-60.0) is True  # <= -50
+    assert gr.is_sentinel_reading(90.0) is True  # >= 80
     assert gr.is_sentinel_reading(0.0) is False
     assert gr.is_sentinel_reading(2.5) is False
     assert gr.is_sentinel_reading(None) is True

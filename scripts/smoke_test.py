@@ -64,11 +64,17 @@ async def check_content_safety(settings) -> tuple[bool, str]:
 
 async def check_foundry(settings) -> tuple[bool, str]:
     if not settings.foundry_compute_cluster or settings.foundry_compute_cluster == "<gpu-cluster-name>":
-        return False, "FOUNDRY_COMPUTE_CLUSTER not filled in -- not tested (submitting a real " \
-                      "training job is a separate, explicit action, not part of this smoke test)"
-    return False, "connectivity check not implemented -- MLClient.from_config() needs a " \
-                  "config.json (subscription/resource group/workspace) that isn't part of .env; " \
-                  "verify manually with `az ml workspace show` or MLClient before running `train`"
+        return (
+            False,
+            "FOUNDRY_COMPUTE_CLUSTER not filled in -- not tested (submitting a real "
+            "training job is a separate, explicit action, not part of this smoke test)",
+        )
+    return (
+        False,
+        "connectivity check not implemented -- MLClient.from_config() needs a "
+        "config.json (subscription/resource group/workspace) that isn't part of .env; "
+        "verify manually with `az ml workspace show` or MLClient before running `train`",
+    )
 
 
 async def check_student(settings) -> tuple[bool, str]:
@@ -87,7 +93,10 @@ async def check_knowledge_base(settings) -> tuple[bool, str]:
     problems = kb.validate_loaded(settings.knowledge_base_dir)
     if problems:
         return False, "; ".join(problems)
-    return True, f"{len(kb.JURISDICTIONS)} country profiles loaded from {settings.knowledge_base_dir}"
+    return (
+        True,
+        f"{len(kb.JURISDICTIONS)} country profiles loaded from {settings.knowledge_base_dir}",
+    )
 
 
 async def check_guardrails(settings) -> tuple[bool, str]:

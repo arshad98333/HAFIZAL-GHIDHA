@@ -60,7 +60,7 @@ def all_cells() -> list[str]:
 def _empty_coverage() -> dict[str, Any]:
     return {
         "cells": {c: {"kept": 0, "requested": 0, "last_wave": 0} for c in all_cells()},
-        "languages": {l: 0 for l in LANGUAGES},
+        "languages": {lang: 0 for lang in LANGUAGES},
         "artifacts": {a: 0 for a in ARTIFACTS},
         "jurisdictions": {j: 0 for j in JURISDICTIONS},
         "adversarial": 0,
@@ -70,12 +70,13 @@ def _empty_coverage() -> dict[str, Any]:
 
 
 def _now() -> datetime.datetime:
-    return datetime.datetime.now(datetime.timezone.utc)
+    return datetime.datetime.now(datetime.UTC)
 
 
 # --------------------------------------------------------------------------- #
 # provenance envelope — attached to every generated record
 # --------------------------------------------------------------------------- #
+
 
 @dataclass
 class Envelope:
@@ -132,7 +133,7 @@ class Logbook:
         self._gen_buffer: list[dict[str, Any]] = []
         self._gen_lock = asyncio.Lock()
 
-    async def __aenter__(self) -> "Logbook":
+    async def __aenter__(self) -> Logbook:
         self._client = AsyncIOMotorClient(self._settings.mongodb_uri)
         self._db = self._client[self._settings.mongodb_db_name]
         await self._client.admin.command("ping")
@@ -181,8 +182,9 @@ class Logbook:
     # would round-trip far more than necessary)
     # ----------------------------------------------------------------- #
 
-    async def write_generation(self, envelope: Envelope, outcome: str, note: str = "",
-                                extra: dict[str, Any] | None = None) -> None:
+    async def write_generation(
+        self, envelope: Envelope, outcome: str, note: str = "", extra: dict[str, Any] | None = None
+    ) -> None:
         row = envelope.as_dict()
         row["outcome"] = outcome
         row["note"] = note
@@ -316,15 +318,29 @@ class Logbook:
     # ----------------------------------------------------------------- #
 
     async def append_autoresearch(
-        self, wave: int, hypothesis: str, diff_summary: str,
-        metric_before: float, metric_after: float, decision: str, duration_s: float,
+        self,
+        wave: int,
+        hypothesis: str,
+        diff_summary: str,
+        metric_before: float,
+        metric_after: float,
+        decision: str,
+        duration_s: float,
     ) -> None:
         assert self._db is not None
-        await self._db.autoresearch_log.insert_one({
-            "wave": wave, "hypothesis": hypothesis, "diff_summary": diff_summary,
-            "metric_before": metric_before, "metric_after": metric_after,
-            "decision": decision, "duration_s": duration_s, "run_id": self._run_id, "ts": _now(),
-        })
+        await self._db.autoresearch_log.insert_one(
+            {
+                "wave": wave,
+                "hypothesis": hypothesis,
+                "diff_summary": diff_summary,
+                "metric_before": metric_before,
+                "metric_after": metric_after,
+                "decision": decision,
+                "duration_s": duration_s,
+                "run_id": self._run_id,
+                "ts": _now(),
+            }
+        )
 
     # ----------------------------------------------------------------- #
     # access audit — standing constraint #2: the golden set is never mounted
@@ -333,11 +349,24 @@ class Logbook:
 
     async def audit_access(self, principal: str, resource: str, action: str, allowed: bool) -> None:
         assert self._db is not None
-        await self._db.access_audit.insert_one({
-            "principal": principal, "resource": resource, "action": action,
-            "allowed": allowed, "run_id": self._run_id, "ts": _now(),
-        })
+        await self._db.access_audit.insert_one(
+            {
+                "principal": principal,
+                "resource": resource,
+                "action": action,
+                "allowed": allowed,
+                "run_id": self._run_id,
+                "ts": _now(),
+            }
+        )
         if not allowed:
-            log.error("blocked access", extra={"extra_fields": {
-                "principal": principal, "resource": resource, "action": action,
-            }})
+            log.error(
+                "blocked access",
+                extra={
+                    "extra_fields": {
+                        "principal": principal,
+                        "resource": resource,
+                        "action": action,
+                    }
+                },
+            )

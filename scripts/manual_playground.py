@@ -17,17 +17,18 @@ Each cell is self-contained: change the input, rerun, read the output.
 # %% Setup -- run this cell first
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from cold_chain.rules_engine import WorldState, label
 from cold_chain import guardrails as gr
 from cold_chain import knowledge_base as kb
-from cold_chain.gates import evaluate, GATE_A
+from cold_chain.gates import GATE_A, evaluate
+from cold_chain.rules_engine import WorldState, label
 
 # %% 1. Rules engine -- a normal in-spec chilled shipment
 state = WorldState(
     product="chilled_dairy",
-    readings_c=[2.1, 2.4, 2.0, 2.6, 2.3],   # change these numbers
+    readings_c=[2.1, 2.4, 2.0, 2.6, 2.3],  # change these numbers
     interval_min=15,
     days_since_production=3,
 )
@@ -51,7 +52,7 @@ print(f"rule that fired:   {result.rule_id}")
 # %% 3. Rules engine -- frozen partial thaw (GCC-EDGE-013)
 state = WorldState(
     product="frozen_goods",
-    readings_c=[-19.0, -18.5, -10.0, -19.2],   # one reading crosses the -12C flag
+    readings_c=[-19.0, -18.5, -10.0, -19.2],  # one reading crosses the -12C flag
     interval_min=15,
     days_since_production=30,
 )
@@ -65,7 +66,7 @@ state = WorldState(
     readings_c=[1.0, 1.2, 0.9],
     interval_min=15,
     days_since_production=1,
-    sensor_fault=True,   # try flipping this to False and compare
+    sensor_fault=True,  # try flipping this to False and compare
 )
 result = label(state)
 print(f"disposition:      {result.disposition}")
@@ -93,7 +94,7 @@ for v in violations:
     print(f"  {v.rule_id}: {v.detail}")
 
 # %% 8. Knowledge base -- pull the legal citation for any of the six states
-citation = kb.citation("AE")   # try "SA", "QA", "KW", "OM", "BH"
+citation = kb.citation("AE")  # try "SA", "QA", "KW", "OM", "BH"
 print(citation)
 
 # %% 9. Temperature bands -- see the exact numbers the rules engine is built on

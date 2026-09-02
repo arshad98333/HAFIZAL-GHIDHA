@@ -56,8 +56,13 @@ async def gather_pipeline_data(wave: int) -> dict[str, Any]:
         rows = await book.read_generation(wave)
         decisions = await book.read_decisions(wave)
     return {
-        "wave": wave, "plan": plan, "gate_a": gate_a, "gate_b": gate_b,
-        "coverage": coverage, "rows": rows, "decisions": decisions,
+        "wave": wave,
+        "plan": plan,
+        "gate_a": gate_a,
+        "gate_b": gate_b,
+        "coverage": coverage,
+        "rows": rows,
+        "decisions": decisions,
     }
 
 
@@ -70,8 +75,9 @@ def _fmt_metric_table(metrics: dict[str, Any], checks: dict[str, Any] | None) ->
         return "\n".join(f"- `{k}`: {v}" for k, v in metrics.items())
     lines = ["| Metric | Value | Bound | Result |", "|---|---|---|---|"]
     for name, c in checks.items():
-        lines.append(f"| `{name}` | {c['value']} | {c.get('op', '')} {c['bound']} | "
-                      f"{'PASS' if c['passed'] else 'FAIL'} |")
+        lines.append(
+            f"| `{name}` | {c['value']} | {c.get('op', '')} {c['bound']} | {'PASS' if c['passed'] else 'FAIL'} |"
+        )
     return "\n".join(lines)
 
 
@@ -82,13 +88,15 @@ async def build_report(wave: int, review_limit: int) -> str:
     drops = _drop_reasons(rows)
     cov = data["coverage"]
 
-    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%d %H:%M UTC")
     lines: list[str] = []
     lines.append(f"# System Evaluation Report -- Wave {wave}")
     lines.append("")
-    lines.append(f"Generated {now}. Covers data generation, guardrail enforcement, and (if requested) "
-                  "a second-pass review, for this wave only. Not a replacement for the sealed golden-set "
-                  "evaluation (README \"Standing constraints\" #2).")
+    lines.append(
+        f"Generated {now}. Covers data generation, guardrail enforcement, and (if requested) "
+        "a second-pass review, for this wave only. Not a replacement for the sealed golden-set "
+        'evaluation (README "Standing constraints" #2).'
+    )
     lines.append("")
 
     # -- architecture recap -------------------------------------------------
@@ -99,8 +107,8 @@ async def build_report(wave: int, review_limit: int) -> str:
         "disposition. Every ground-truth label in this wave came from `cold_chain/rules_engine.py`, a pure "
         "Python function -- never a language model. Its thresholds and the guardrail checks applied to "
         "every rendered artifact both trace to `gcc_food_law_json/` (six GCC country food-law profiles) "
-        "and `guardrails/` (the 85-rule pack derived from it). See README \"The knowledge base and "
-        "guardrail pack\" for the full wiring."
+        'and `guardrails/` (the 85-rule pack derived from it). See README "The knowledge base and '
+        'guardrail pack" for the full wiring.'
     )
     lines.append("")
 
@@ -110,7 +118,7 @@ async def build_report(wave: int, review_limit: int) -> str:
     total = len(rows)
     lines.append(f"- Requested: {plan['total'] if plan else 'unknown (no plan.json for this wave)'}")
     lines.append(f"- Attempted: {total}")
-    lines.append(f"- Kept: {len(kept)} ({(len(kept)/total*100 if total else 0):.1f}% survival)")
+    lines.append(f"- Kept: {len(kept)} ({(len(kept) / total * 100 if total else 0):.1f}% survival)")
     if drops:
         lines.append("- Dropped, by reason:")
         for reason, n in drops.most_common():
@@ -141,8 +149,9 @@ async def build_report(wave: int, review_limit: int) -> str:
             for f in gate_a["failures"]:
                 lines.append(f"- {f}")
     else:
-        lines.append("No `gate_a.json` found for this wave -- run `python -m cold_chain.runner gate-a --wave "
-                      f"{wave}` first.")
+        lines.append(
+            f"No `gate_a.json` found for this wave -- run `python -m cold_chain.runner gate-a --wave {wave}` first."
+        )
     lines.append("")
 
     # -- Gate B ---------------------------------------------------------------
@@ -150,31 +159,40 @@ async def build_report(wave: int, review_limit: int) -> str:
     lines.append("")
     if gate_b:
         lines.append(f"Gatekeeper: `{gate_b.get('gatekeeper', 'human-sealed-eval')}`")
-        lines.append(f"Result: **{'PASS' if gate_b.get('passed') else 'FAIL'}**  "
-                      f"(ratchet: {gate_b.get('ratchet_note', 'n/a')})")
+        lines.append(
+            f"Result: **{'PASS' if gate_b.get('passed') else 'FAIL'}**  (ratchet: {gate_b.get('ratchet_note', 'n/a')})"
+        )
         lines.append("")
         lines.append(_fmt_metric_table(gate_b.get("metrics", {}), gate_b.get("checks")))
         lines.append("")
-        lines.append(f"Worst cell: `{gate_b.get('worst_cell', 'n/a')}` @ "
-                      f"{gate_b.get('worst_cell_f1', 'n/a')}, "
-                      f"{gate_b.get('cells_passing', 'n/a')} cells passing 0.80.")
+        lines.append(
+            f"Worst cell: `{gate_b.get('worst_cell', 'n/a')}` @ "
+            f"{gate_b.get('worst_cell_f1', 'n/a')}, "
+            f"{gate_b.get('cells_passing', 'n/a')} cells passing 0.80."
+        )
     else:
-        lines.append("No `gate_b.json` found for this wave -- Gate B has not run yet (needs a trained "
-                      "checkpoint deployed, or a human-sealed-eval results file).")
+        lines.append(
+            "No `gate_b.json` found for this wave -- Gate B has not run yet (needs a trained "
+            "checkpoint deployed, or a human-sealed-eval results file)."
+        )
     lines.append("")
 
     # -- second-pass review ---------------------------------------------------
     lines.append("## 5. Second-pass review (Azure OpenAI Responses API)")
     lines.append("")
-    lines.append("**Note:** this reviewer calls the same Azure OpenAI deployment the pipeline itself uses "
-                  "for rendering, screening, and its own Gate A/B judging, just through a different API "
-                  "surface. It is a structurally separate second pass, not an independently-trained "
-                  "second opinion -- a systematic blind spot in this deployment's judgment will not be "
-                  "caught here. See `scripts/azure_review.py`'s module docstring.")
+    lines.append(
+        "**Note:** this reviewer calls the same Azure OpenAI deployment the pipeline itself uses "
+        "for rendering, screening, and its own Gate A/B judging, just through a different API "
+        "surface. It is a structurally separate second pass, not an independently-trained "
+        "second opinion -- a systematic blind spot in this deployment's judgment will not be "
+        "caught here. See `scripts/azure_review.py`'s module docstring."
+    )
     lines.append("")
     if review_limit <= 0:
-        lines.append("Skipped (`--review-limit 0` or omitted). Run again with `--review-limit N` to "
-                      "include a review of a sample of kept records.")
+        lines.append(
+            "Skipped (`--review-limit 0` or omitted). Run again with `--review-limit N` to "
+            "include a review of a sample of kept records."
+        )
     elif not kept:
         lines.append("Skipped -- no kept records to sample from this wave.")
     else:
@@ -185,15 +203,18 @@ async def build_report(wave: int, review_limit: int) -> str:
             reviewer_settings = None
         if reviewer_settings is not None:
             sample = kept[:review_limit]
-            lines.append(f"Sampled {len(sample)}/{len(kept)} kept records, reviewed by "
-                          f"`{reviewer_settings.deployment}` via the Responses API, no output token cap. "
-                          "Only the rendered artifact and the assigned disposition were shown to it -- "
-                          "see `scripts/azure_review.py`'s prompt for exactly what it was asked.")
+            lines.append(
+                f"Sampled {len(sample)}/{len(kept)} kept records, reviewed by "
+                f"`{reviewer_settings.deployment}` via the Responses API, no output token cap. "
+                "Only the rendered artifact and the assigned disposition were shown to it -- "
+                "see `scripts/azure_review.py`'s prompt for exactly what it was asked."
+            )
             lines.append("")
             results = await azure_review.gather_reviews(sample)
             summary = azure_review.summarize_reviews(results)
-            lines.append(f"- Agreement rate: {summary['agreement_rate']*100:.1f}% "
-                          f"({summary['agree']}/{summary['n']})")
+            lines.append(
+                f"- Agreement rate: {summary['agreement_rate'] * 100:.1f}% ({summary['agree']}/{summary['n']})"
+            )
             lines.append(f"- Disagreements: {summary['disagree']}")
             lines.append(f"- Errored calls: {summary['errored']}")
             lines.append(f"- Flagged a concern: {len(summary['flagged'])}")
@@ -208,13 +229,17 @@ async def build_report(wave: int, review_limit: int) -> str:
                     if "error" in rv:
                         continue
                     if rv.get("agrees") is False or rv.get("concerns") not in ([], ["none"], None):
-                        lines.append(f"| `{r['cell']}` | {r['jurisdiction']} | {r['pipeline_disposition']} | "
-                                      f"{rv.get('your_disposition', '?')} | {rv.get('concerns', [])} |")
+                        lines.append(
+                            f"| `{r['cell']}` | {r['jurisdiction']} | {r['pipeline_disposition']} | "
+                            f"{rv.get('your_disposition', '?')} | {rv.get('concerns', [])} |"
+                        )
                 lines.append("")
-                lines.append("Every disagreement/flag here is either a real pipeline defect (worth filing "
-                              "against `rules_engine.py`, `simulate.py`, or `guardrails.py`) or a case where "
-                              "the reviewer's own judgment is wrong -- both are worth reading the artifact "
-                              "text for before concluding which.")
+                lines.append(
+                    "Every disagreement/flag here is either a real pipeline defect (worth filing "
+                    "against `rules_engine.py`, `simulate.py`, or `guardrails.py`) or a case where "
+                    "the reviewer's own judgment is wrong -- both are worth reading the artifact "
+                    "text for before concluding which."
+                )
 
     lines.append("")
     lines.append("## 6. Recommendation")
@@ -222,14 +247,18 @@ async def build_report(wave: int, review_limit: int) -> str:
     gate_a_ok = bool(gate_a and gate_a.get("passed"))
     gate_b_ok = gate_b is None or bool(gate_b.get("passed"))
     if gate_a_ok and gate_b_ok:
-        lines.append("Gate A passed (and Gate B passed or has not run yet). No blocking data-quality issue "
-                      "found by the pipeline's own gates. If the review above surfaced disagreements, read "
-                      "them before treating this wave as trustworthy -- remember it is a same-deployment "
-                      "second pass, not independent corroboration.")
+        lines.append(
+            "Gate A passed (and Gate B passed or has not run yet). No blocking data-quality issue "
+            "found by the pipeline's own gates. If the review above surfaced disagreements, read "
+            "them before treating this wave as trustworthy -- remember it is a same-deployment "
+            "second pass, not independent corroboration."
+        )
     else:
-        lines.append("At least one gate failed for this wave. Do not proceed to `train` (or trust this "
-                      "wave's data) until the failures listed in section 3/4 above are resolved and the "
-                      "gate is re-run.")
+        lines.append(
+            "At least one gate failed for this wave. Do not proceed to `train` (or trust this "
+            "wave's data) until the failures listed in section 3/4 above are resolved and the "
+            "gate is re-run."
+        )
 
     return "\n".join(lines) + "\n"
 
@@ -237,10 +266,18 @@ async def build_report(wave: int, review_limit: int) -> str:
 async def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--wave", type=int, required=True)
-    ap.add_argument("--review-limit", type=int, default=20,
-                     help="how many kept records to run through the second-pass review; 0 to skip")
-    ap.add_argument("--out", type=Path, default=None,
-                     help="output path (default: SYSTEM_EVALUATION_REPORT_wave<N>.md)")
+    ap.add_argument(
+        "--review-limit",
+        type=int,
+        default=20,
+        help="how many kept records to run through the second-pass review; 0 to skip",
+    )
+    ap.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="output path (default: SYSTEM_EVALUATION_REPORT_wave<N>.md)",
+    )
     args = ap.parse_args()
 
     out = args.out or Path(f"SYSTEM_EVALUATION_REPORT_wave{args.wave:02d}.md")

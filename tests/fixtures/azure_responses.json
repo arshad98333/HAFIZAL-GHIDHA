@@ -1,0 +1,11 @@
+{
+  "completion": {
+    "id": "resp-fake-001",
+    "output_text": "{\"temperature_c\": 4.2, \"confidence\": 0.95}"
+  },
+  "error_rate_limit": {
+    "type": "rate_limit_error",
+    "message": "Rate limit exceeded",
+    "code": "429"
+  }
+}

@@ -42,10 +42,10 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 from cold_chain import guardrails as gr  # noqa: E402
 
-
 # --------------------------------------------------------------------------- #
 # loading records (same contract as audit_corpus_guardrails.py)
 # --------------------------------------------------------------------------- #
+
 
 async def load_from_mongo(wave: int | None) -> list[dict[str, Any]]:
     from cold_chain.config import get_settings
@@ -77,11 +77,13 @@ def load_from_export(path: Path) -> list[dict[str, Any]]:
 # the simulation
 # --------------------------------------------------------------------------- #
 
+
 def _status_line(i: int, n: int, elapsed: float, violations: int, dispositions: Counter) -> str:
     rate = i / elapsed if elapsed > 0 else 0.0
     top = ", ".join(f"{k}={v}" for k, v in dispositions.most_common(3))
-    return (f"\r[{i:>6}/{n}] {rate:6.1f} rec/s  violations={violations:>4} "
-            f"({violations/i*100:5.1f}%)  {top}").ljust(110)
+    return (
+        f"\r[{i:>6}/{n}] {rate:6.1f} rec/s  violations={violations:>4} ({violations / i * 100:5.1f}%)  {top}"
+    ).ljust(110)
 
 
 async def run_stream(rows: list[dict[str, Any]], delay: float, verbose_flags: bool) -> dict[str, Any]:
@@ -91,8 +93,10 @@ async def run_stream(rows: list[dict[str, Any]], delay: float, verbose_flags: bo
     violations = 0
     per_record_latencies: list[float] = []
 
-    print(f"Streaming {n} record(s) as if arriving live "
-          f"({'no artificial delay' if delay <= 0 else f'{delay}s between records'})...\n")
+    print(
+        f"Streaming {n} record(s) as if arriving live "
+        f"({'no artificial delay' if delay <= 0 else f'{delay}s between records'})...\n"
+    )
 
     start = time.perf_counter()
     for i, r in enumerate(rows, start=1):
@@ -108,8 +112,10 @@ async def run_stream(rows: list[dict[str, Any]], delay: float, verbose_flags: bo
                 rule_id_counts[h.rule_id] += 1
             if verbose_flags:
                 print()  # move off the status line before printing a flagged record
-                print(f"  FLAGGED  state_id={r.get('state_id')}  cell={r.get('cell')}  "
-                      f"jurisdiction={r.get('jurisdiction')}  rules={[h.rule_id for h in hits]}")
+                print(
+                    f"  FLAGGED  state_id={r.get('state_id')}  cell={r.get('cell')}  "
+                    f"jurisdiction={r.get('jurisdiction')}  rules={[h.rule_id for h in hits]}"
+                )
 
         elapsed = time.perf_counter() - start
         sys.stdout.write(_status_line(i, n, elapsed, violations, dispositions))
@@ -121,12 +127,20 @@ async def run_stream(rows: list[dict[str, Any]], delay: float, verbose_flags: bo
     print()  # newline after the final status line
     total_elapsed = time.perf_counter() - start
     return {
-        "n": n, "violations": violations, "rule_id_counts": rule_id_counts,
-        "dispositions": dispositions, "total_elapsed_s": total_elapsed,
+        "n": n,
+        "violations": violations,
+        "rule_id_counts": rule_id_counts,
+        "dispositions": dispositions,
+        "total_elapsed_s": total_elapsed,
         "throughput_per_s": (n / total_elapsed) if total_elapsed > 0 else float("inf"),
-        "mean_latency_ms": (sum(per_record_latencies) / len(per_record_latencies) * 1000) if per_record_latencies else 0.0,
-        "p99_latency_ms": (sorted(per_record_latencies)[int(len(per_record_latencies) * 0.99) - 1] * 1000
-                           if per_record_latencies else 0.0),
+        "mean_latency_ms": (sum(per_record_latencies) / len(per_record_latencies) * 1000)
+        if per_record_latencies
+        else 0.0,
+        "p99_latency_ms": (
+            sorted(per_record_latencies)[int(len(per_record_latencies) * 0.99) - 1] * 1000
+            if per_record_latencies
+            else 0.0
+        ),
     }
 
 
@@ -136,12 +150,16 @@ def print_summary(result: dict[str, Any]) -> None:
     print("=" * 60)
     print(f"Records processed:     {result['n']}")
     print(f"Wall-clock time:       {result['total_elapsed_s']:.2f}s")
-    print(f"Throughput:            {result['throughput_per_s']:.1f} records/s "
-          f"(guardrail-check layer only -- excludes any LLM round trip)")
+    print(
+        f"Throughput:            {result['throughput_per_s']:.1f} records/s "
+        f"(guardrail-check layer only -- excludes any LLM round trip)"
+    )
     print(f"Mean per-record guardrail-check latency: {result['mean_latency_ms']:.3f}ms")
     print(f"p99 per-record guardrail-check latency:  {result['p99_latency_ms']:.3f}ms")
-    print(f"Guardrail violations:  {result['violations']}/{result['n']} "
-          f"({result['violations']/result['n']*100 if result['n'] else 0:.2f}%)")
+    print(
+        f"Guardrail violations:  {result['violations']}/{result['n']} "
+        f"({result['violations'] / result['n'] * 100 if result['n'] else 0:.2f}%)"
+    )
     if result["rule_id_counts"]:
         print("By rule:")
         for rule_id, count in result["rule_id_counts"].most_common():
@@ -155,19 +173,31 @@ def print_summary(result: dict[str, Any]) -> None:
 # CLI
 # --------------------------------------------------------------------------- #
 
+
 async def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--wave", type=int, help="stream this wave's kept records (reads MongoDB)")
     ap.add_argument("--all-waves", action="store_true", help="stream every wave in the database")
     ap.add_argument("--export", type=Path, help="stream records from a local export/*.jsonl file instead")
     ap.add_argument("--limit", type=int, default=None, help="stop after this many records")
-    ap.add_argument("--shuffle", action="store_true", help="randomize order first, to simulate arrival "
-                                                             "not matching generation order")
-    ap.add_argument("--delay", type=float, default=0.0, help="artificial per-record delay in seconds, "
-                                                              "to simulate a slower real-world arrival rate "
-                                                              "(default 0 -- process as fast as possible)")
-    ap.add_argument("--quiet", action="store_true", help="suppress the per-flagged-record lines, "
-                                                          "only show the live status line and final summary")
+    ap.add_argument(
+        "--shuffle",
+        action="store_true",
+        help="randomize order first, to simulate arrival not matching generation order",
+    )
+    ap.add_argument(
+        "--delay",
+        type=float,
+        default=0.0,
+        help="artificial per-record delay in seconds, "
+        "to simulate a slower real-world arrival rate "
+        "(default 0 -- process as fast as possible)",
+    )
+    ap.add_argument(
+        "--quiet",
+        action="store_true",
+        help="suppress the per-flagged-record lines, only show the live status line and final summary",
+    )
     args = ap.parse_args()
 
     if not any([args.wave, args.all_waves, args.export]):
@@ -181,7 +211,7 @@ async def main() -> int:
     if args.shuffle:
         random.shuffle(rows)
     if args.limit:
-        rows = rows[:args.limit]
+        rows = rows[: args.limit]
 
     if not rows:
         print("No kept records to stream.")

@@ -47,10 +47,10 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 from cold_chain import guardrails as gr  # noqa: E402
 
-
 # --------------------------------------------------------------------------- #
 # loading records
 # --------------------------------------------------------------------------- #
+
 
 async def load_from_mongo(wave: int | None) -> list[dict[str, Any]]:
     from cold_chain.config import get_settings
@@ -81,6 +81,7 @@ def load_from_export(path: Path) -> list[dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 # the audit itself
 # --------------------------------------------------------------------------- #
+
 
 def audit_records(rows: list[dict[str, Any]]) -> dict[str, Any]:
     n = len(rows)
@@ -125,12 +126,17 @@ def audit_records(rows: list[dict[str, Any]]) -> dict[str, Any]:
             by_artifact[artifact_type]["violations"] += 1
             for h in hits:
                 rule_id_counts[h.rule_id] += 1
-            violations.append({
-                "state_id": r.get("state_id"), "cell": cell, "jurisdiction": jurisdiction,
-                "artifact_type": artifact_type, "disposition": disposition,
-                "rule_ids": [h.rule_id for h in hits],
-                "details": [h.detail for h in hits],
-            })
+            violations.append(
+                {
+                    "state_id": r.get("state_id"),
+                    "cell": cell,
+                    "jurisdiction": jurisdiction,
+                    "artifact_type": artifact_type,
+                    "disposition": disposition,
+                    "rule_ids": [h.rule_id for h in hits],
+                    "details": [h.detail for h in hits],
+                }
+            )
 
     return {
         "n": n,
@@ -153,11 +159,12 @@ def audit_records(rows: list[dict[str, Any]]) -> dict[str, Any]:
 # rendering
 # --------------------------------------------------------------------------- #
 
+
 def _rate_table(breakdown: dict[str, dict[str, Any]]) -> str:
     lines = ["| Key | N | Violations | Rate |", "|---|---|---|---|"]
     for key, d in sorted(breakdown.items()):
         rate = (d["violations"] / d["n"]) if d["n"] else 0.0
-        lines.append(f"| `{key}` | {d['n']} | {d['violations']} | {rate*100:.1f}% |")
+        lines.append(f"| `{key}` | {d['n']} | {d['violations']} | {rate * 100:.1f}% |")
     return "\n".join(lines)
 
 
@@ -166,10 +173,12 @@ def render_report(audit: dict[str, Any], scope: str) -> str:
     lines.append(f"# Corpus guardrail audit -- {scope}")
     lines.append("")
     lines.append(f"Kept records scanned: **{audit['n']}**")
-    lines.append(f"Overall guardrail violation rate: **{audit['violation_rate']*100:.2f}%** "
-                 f"({len(audit['violations'])} record(s))")
-    lines.append(f"`schema_valid` rate: {audit['schema_valid_rate']*100:.2f}%")
-    lines.append(f"`round_trip_ok` rate: {audit['round_trip_ok_rate']*100:.2f}%")
+    lines.append(
+        f"Overall guardrail violation rate: **{audit['violation_rate'] * 100:.2f}%** "
+        f"({len(audit['violations'])} record(s))"
+    )
+    lines.append(f"`schema_valid` rate: {audit['schema_valid_rate'] * 100:.2f}%")
+    lines.append(f"`round_trip_ok` rate: {audit['round_trip_ok_rate'] * 100:.2f}%")
     if audit["mean_confidence"] is not None:
         lines.append(f"Mean round-trip confidence: {audit['mean_confidence']:.3f}")
     lines.append("")
@@ -177,10 +186,12 @@ def render_report(audit: dict[str, Any], scope: str) -> str:
     lines.append("## GCC-EDGE-015 invariant: expedite_sale never autonomously emitted")
     lines.append("")
     if audit["expedite_sale_hits"]:
-        lines.append(f"**VIOLATED** -- {len(audit['expedite_sale_hits'])} kept record(s) carry "
-                      "disposition `expedite_sale`. This should be structurally impossible "
-                      "(`rules_engine.py` never emits it); if this is non-zero, either an older "
-                      "wave predates the fix or something regressed. State IDs:")
+        lines.append(
+            f"**VIOLATED** -- {len(audit['expedite_sale_hits'])} kept record(s) carry "
+            "disposition `expedite_sale`. This should be structurally impossible "
+            "(`rules_engine.py` never emits it); if this is non-zero, either an older "
+            "wave predates the fix or something regressed. State IDs:"
+        )
         for r in audit["expedite_sale_hits"][:20]:
             lines.append(f"- `{r.get('state_id')}` ({r.get('cell')})")
     else:
@@ -219,11 +230,13 @@ def render_report(audit: dict[str, Any], scope: str) -> str:
     lines.append("|---|---|---|")
     total = sum(audit["disposition_counts"].values()) or 1
     for disp, count in audit["disposition_counts"].most_common():
-        lines.append(f"| `{disp}` | {count} | {count/total*100:.1f}% |")
+        lines.append(f"| `{disp}` | {count} | {count / total * 100:.1f}% |")
     lines.append("")
 
-    lines.append("## Screener verdict distribution (kept records only -- non-CONSISTENT "
-                  "would already have been dropped, so this should be ~100% CONSISTENT)")
+    lines.append(
+        "## Screener verdict distribution (kept records only -- non-CONSISTENT "
+        "would already have been dropped, so this should be ~100% CONSISTENT)"
+    )
     lines.append("")
     for verdict, count in audit["screener_counts"].most_common():
         lines.append(f"- `{verdict}`: {count}")
@@ -235,8 +248,10 @@ def render_report(audit: dict[str, Any], scope: str) -> str:
         lines.append("| State ID | Cell | Jurisdiction | Disposition | Rules |")
         lines.append("|---|---|---|---|---|")
         for v in audit["violations"][:20]:
-            lines.append(f"| `{v['state_id']}` | `{v['cell']}` | {v['jurisdiction']} | "
-                          f"{v['disposition']} | {', '.join(v['rule_ids'])} |")
+            lines.append(
+                f"| `{v['state_id']}` | `{v['cell']}` | {v['jurisdiction']} | "
+                f"{v['disposition']} | {', '.join(v['rule_ids'])} |"
+            )
         lines.append("")
 
     return "\n".join(lines) + "\n"
@@ -244,8 +259,18 @@ def render_report(audit: dict[str, Any], scope: str) -> str:
 
 def write_csv(audit: dict[str, Any], path: Path) -> None:
     with path.open("w", encoding="utf-8", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=["state_id", "cell", "jurisdiction", "artifact_type",
-                                                 "disposition", "rule_ids", "details"])
+        writer = csv.DictWriter(
+            fh,
+            fieldnames=[
+                "state_id",
+                "cell",
+                "jurisdiction",
+                "artifact_type",
+                "disposition",
+                "rule_ids",
+                "details",
+            ],
+        )
         writer.writeheader()
         for v in audit["violations"]:
             writer.writerow({**v, "rule_ids": ";".join(v["rule_ids"]), "details": " | ".join(v["details"])})
@@ -254,6 +279,7 @@ def write_csv(audit: dict[str, Any], path: Path) -> None:
 # --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
+
 
 async def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -284,8 +310,10 @@ async def main() -> int:
         write_csv(audit, args.csv)
         print(f"Wrote {args.csv} ({len(audit['violations'])} violation row(s))")
 
-    print(f"\nOverall violation rate: {audit['violation_rate']*100:.2f}%  "
-          f"(threshold in gates.GATE_A['guardrail_violation_rate'] is <=1.00%)")
+    print(
+        f"\nOverall violation rate: {audit['violation_rate'] * 100:.2f}%  "
+        f"(threshold in gates.GATE_A['guardrail_violation_rate'] is <=1.00%)"
+    )
     return 0 if audit["violation_rate"] <= 0.01 else 1
 
 

@@ -47,8 +47,11 @@ def test_summarize_reviews_empty():
 
 def test_drop_reasons_excludes_kept():
     rows = [
-        {"outcome": "kept"}, {"outcome": "kept"},
-        {"outcome": "dropped_screener"}, {"outcome": "dropped_screener"}, {"outcome": "dropped_guardrail"},
+        {"outcome": "kept"},
+        {"outcome": "kept"},
+        {"outcome": "dropped_screener"},
+        {"outcome": "dropped_screener"},
+        {"outcome": "dropped_guardrail"},
     ]
     reasons = _drop_reasons(rows)
     assert reasons["dropped_screener"] == 2
@@ -114,18 +117,42 @@ import audit_corpus_guardrails as audit_mod  # noqa: E402
 
 def _fake_rows() -> list[dict]:
     return [
-        {"state_id": "s1", "cell": "finfish_seafood|in_spec", "jurisdiction": "AE",
-         "artifact_type": "chat_message", "disposition": "accept", "schema_valid": True,
-         "round_trip_ok": True, "screener_verdict": "CONSISTENT", "confidence": 0.9,
-         "rendered_text": "Reefer held 1-3C, no excursions."},
-        {"state_id": "s2", "cell": "finfish_seafood|door_open", "jurisdiction": "SA",
-         "artifact_type": "logger_csv", "disposition": "hold_for_qa", "schema_valid": True,
-         "round_trip_ok": True, "screener_verdict": "CONSISTENT", "confidence": 0.8,
-         "rendered_text": "device=ASSET-1 product_code=finfish_seafood\n1,2"},
-        {"state_id": "s3", "cell": "frozen_goods|compressor_fail", "jurisdiction": "QA",
-         "artifact_type": "voice_note", "disposition": "expedite_sale", "schema_valid": True,
-         "round_trip_ok": True, "screener_verdict": "CONSISTENT", "confidence": 0.5,
-         "rendered_text": "we recommend expedite sale of this batch"},
+        {
+            "state_id": "s1",
+            "cell": "finfish_seafood|in_spec",
+            "jurisdiction": "AE",
+            "artifact_type": "chat_message",
+            "disposition": "accept",
+            "schema_valid": True,
+            "round_trip_ok": True,
+            "screener_verdict": "CONSISTENT",
+            "confidence": 0.9,
+            "rendered_text": "Reefer held 1-3C, no excursions.",
+        },
+        {
+            "state_id": "s2",
+            "cell": "finfish_seafood|door_open",
+            "jurisdiction": "SA",
+            "artifact_type": "logger_csv",
+            "disposition": "hold_for_qa",
+            "schema_valid": True,
+            "round_trip_ok": True,
+            "screener_verdict": "CONSISTENT",
+            "confidence": 0.8,
+            "rendered_text": "device=ASSET-1 product_code=finfish_seafood\n1,2",
+        },
+        {
+            "state_id": "s3",
+            "cell": "frozen_goods|compressor_fail",
+            "jurisdiction": "QA",
+            "artifact_type": "voice_note",
+            "disposition": "expedite_sale",
+            "schema_valid": True,
+            "round_trip_ok": True,
+            "screener_verdict": "CONSISTENT",
+            "confidence": 0.5,
+            "rendered_text": "we recommend expedite sale of this batch",
+        },
     ]
 
 
@@ -158,8 +185,7 @@ def test_render_report_includes_invariant_violation():
 def test_load_from_export_defaults_to_kept_only(tmp_path):
     path = tmp_path / "export.jsonl"
     path.write_text(
-        '{"outcome": "kept", "cell": "a"}\n'
-        '{"outcome": "dropped_screener", "cell": "b"}\n',
+        '{"outcome": "kept", "cell": "a"}\n{"outcome": "dropped_screener", "cell": "b"}\n',
         encoding="utf-8",
     )
     rows = audit_mod.load_from_export(path)

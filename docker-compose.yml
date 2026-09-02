@@ -1,0 +1,10 @@
+services:
+  mongo:
+    image: mongo:7.0.14
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

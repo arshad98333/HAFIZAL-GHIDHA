@@ -10,8 +10,14 @@ def test_get_settings_requires_mongodb_uri(monkeypatch, tmp_path):
     from cold_chain.config import Settings
 
     with pytest.raises(ValidationError):
-        Settings(_env_file=None, azure_endpoint="https://x", foundry_project_endpoint="https://x",
-                 foundry_compute_cluster="c", foundry_base_model="m", training_region="r")
+        Settings(
+            _env_file=None,
+            azure_endpoint="https://x",
+            foundry_project_endpoint="https://x",
+            foundry_compute_cluster="c",
+            foundry_base_model="m",
+            training_region="r",
+        )
 
 
 def test_settings_no_longer_pins_training_region():
@@ -20,9 +26,12 @@ def test_settings_no_longer_pins_training_region():
     # Any region string is accepted -- no validator forces a specific value,
     # unlike the earlier UAE-North-pinned design.
     s = Settings(
-        mongodb_uri="mongodb://localhost", azure_endpoint="https://x",
-        foundry_project_endpoint="https://x", foundry_compute_cluster="c",
-        foundry_base_model="m", training_region="anywhere-at-all",
+        mongodb_uri="mongodb://localhost",
+        azure_endpoint="https://x",
+        foundry_project_endpoint="https://x",
+        foundry_compute_cluster="c",
+        foundry_base_model="m",
+        training_region="anywhere-at-all",
     )
     assert s.training_region == "anywhere-at-all"
 
@@ -48,10 +57,54 @@ def test_default_wave_size_and_cell_target():
     from cold_chain.config import Settings
 
     s = Settings(
-        mongodb_uri="mongodb://localhost", azure_endpoint="https://x",
-        foundry_project_endpoint="https://x", foundry_compute_cluster="c",
-        foundry_base_model="m", training_region="r",
+        mongodb_uri="mongodb://localhost",
+        azure_endpoint="https://x",
+        foundry_project_endpoint="https://x",
+        foundry_compute_cluster="c",
+        foundry_base_model="m",
+        training_region="r",
     )
     assert s.wave_size == 663
     assert s.cell_target == 265
     assert s.wave_size * 8 == 5304
+
+
+def test_settings_masks_secrets_in_repr():
+    from cold_chain.config import Settings
+
+    s = Settings(
+        mongodb_uri="mongodb+srv://user:secretpass@cluster.example/db",
+        azure_endpoint="https://x",
+        foundry_project_endpoint="https://x",
+        foundry_compute_cluster="c",
+        foundry_base_model="m",
+        training_region="r",
+        student_inference_key="super-secret",
+        content_safety_key="also-secret",
+    )
+    text = repr(s)
+    assert "secretpass" not in text
+    assert "super-secret" not in text
+    assert "also-secret" not in text
+    assert "***" in text
+
+
+def test_missing_required_env_lists_all_fields(monkeypatch, tmp_path):
+    monkeypatch.chdir(tmp_path)
+    for key in (
+        "MONGODB_URI",
+        "AZURE_OPENAI_ENDPOINT",
+        "FOUNDRY_PROJECT_ENDPOINT",
+        "FOUNDRY_COMPUTE_CLUSTER",
+        "FOUNDRY_BASE_MODEL",
+        "TRAINING_REGION",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    from cold_chain.config import Settings, missing_required_env_message
+
+    with pytest.raises(ValidationError) as exc_info:
+        Settings(_env_file=None)
+    msg = missing_required_env_message(exc_info.value)
+    assert "MONGODB_URI" in msg
+    assert "AZURE_OPENAI_ENDPOINT" in msg
+    assert "TRAINING_REGION" in msg

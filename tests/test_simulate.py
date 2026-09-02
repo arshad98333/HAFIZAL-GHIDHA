@@ -7,8 +7,13 @@ from cold_chain.rules_engine import SPECS
 
 
 def _req(product="finfish_seafood", fault_mode="in_spec", jurisdiction="AE", **kw):
-    defaults = dict(language="en", artifact_type="chat_message", is_adversarial=False,
-                     is_abstention=False, rng_seed=42)
+    defaults = dict(
+        language="en",
+        artifact_type="chat_message",
+        is_adversarial=False,
+        is_abstention=False,
+        rng_seed=42,
+    )
     defaults.update(kw)
     return sim.GenerationRequest(product=product, fault_mode=fault_mode, jurisdiction=jurisdiction, **defaults)
 

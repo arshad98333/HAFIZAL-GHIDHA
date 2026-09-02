@@ -7,18 +7,31 @@ a wave.
 
 from __future__ import annotations
 
+import re
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_REQUIRED_FIELD_TO_ALIAS = {
+    "mongodb_uri": "MONGODB_URI",
+    "azure_endpoint": "AZURE_OPENAI_ENDPOINT",
+    "foundry_project_endpoint": "FOUNDRY_PROJECT_ENDPOINT",
+    "foundry_compute_cluster": "FOUNDRY_COMPUTE_CLUSTER",
+    "foundry_base_model": "FOUNDRY_BASE_MODEL",
+    "training_region": "TRAINING_REGION",
+}
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
         # Lets callers construct Settings(training_region=...) by the Python
         # field name, not just the env-var alias -- mainly so tests can build
         # a Settings instance directly without an environment round trip.
@@ -97,6 +110,36 @@ class Settings(BaseSettings):
     cell_target: int = Field(265, alias="CELL_TARGET")
     log_level: str = Field("INFO", alias="LOG_LEVEL")
     environment: str = Field("production", alias="ENVIRONMENT")
+
+    def model_dump_safe(self) -> dict[str, Any]:
+        """Settings for logging — secrets masked."""
+        data: dict[str, Any] = self.model_dump()
+        if data.get("mongodb_uri"):
+            data["mongodb_uri"] = _mask_mongodb_uri(data["mongodb_uri"])
+        if data.get("student_inference_key"):
+            data["student_inference_key"] = "***"
+        if data.get("content_safety_key"):
+            data["content_safety_key"] = "***"
+        return data
+
+    def __repr__(self) -> str:
+        return f"Settings({self.model_dump_safe()!r})"
+
+
+def _mask_mongodb_uri(uri: str) -> str:
+    return re.sub(r"://([^:]+):([^@]+)@", r"://\1:***@", uri)
+
+
+def missing_required_env_message(exc: ValidationError) -> str:
+    """Human-readable list of missing required environment variables."""
+    names: list[str] = []
+    for err in exc.errors():
+        loc = err.get("loc", ())
+        if loc:
+            field = str(loc[0])
+            names.append(_REQUIRED_FIELD_TO_ALIAS.get(field, field.upper()))
+    unique = sorted(set(names))
+    return "Missing required environment variables: " + ", ".join(unique)
 
 
 @lru_cache(maxsize=1)

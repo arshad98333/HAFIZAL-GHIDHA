@@ -41,13 +41,13 @@ Disposition = Literal["accept", "hold_for_qa", "reject", "expedite_sale", "insuf
 @dataclass(frozen=True)
 class ProductSpec:
     product: str
-    regime: str              # chilled | frozen | ambient
+    regime: str  # chilled | frozen | ambient
     temp_min_c: float | None
     temp_max_c: float
-    max_excursion_min: int   # cumulative minutes outside band before hold
+    max_excursion_min: int  # cumulative minutes outside band before hold
     reject_excursion_min: int
     shelf_life_days: int
-    clause: str              # regulatory citation (guardrails temperature_bands basis)
+    clause: str  # regulatory citation (guardrails temperature_bands basis)
     refreeze_flag_c: float | None = None  # frozen regime only; GCC-EDGE-013
 
 
@@ -64,16 +64,44 @@ def _build_specs() -> dict[str, ProductSpec]:
     frozen = _band("frozen")
     return {
         "finfish_seafood": ProductSpec(
-            "finfish_seafood", "chilled", seafood.min_c, seafood.max_c, 60, 180, 5, seafood.basis,
+            "finfish_seafood",
+            "chilled",
+            seafood.min_c,
+            seafood.max_c,
+            60,
+            180,
+            5,
+            seafood.basis,
         ),
         "table_eggs": ProductSpec(
-            "table_eggs", "chilled", chilled.min_c, chilled.max_c, 240, 720, 28, chilled.basis,
+            "table_eggs",
+            "chilled",
+            chilled.min_c,
+            chilled.max_c,
+            240,
+            720,
+            28,
+            chilled.basis,
         ),
         "chilled_dairy": ProductSpec(
-            "chilled_dairy", "chilled", chilled.min_c, chilled.max_c, 90, 240, 10, chilled.basis,
+            "chilled_dairy",
+            "chilled",
+            chilled.min_c,
+            chilled.max_c,
+            90,
+            240,
+            10,
+            chilled.basis,
         ),
         "frozen_goods": ProductSpec(
-            "frozen_goods", "frozen", None, frozen.max_c, 30, 120, 180, frozen.basis,
+            "frozen_goods",
+            "frozen",
+            None,
+            frozen.max_c,
+            30,
+            120,
+            180,
+            frozen.basis,
             refreeze_flag_c=frozen.refreeze_flag_c,
         ),
     }
@@ -85,12 +113,12 @@ SPECS: dict[str, ProductSpec] = _build_specs()
 @dataclass
 class WorldState:
     product: str
-    readings_c: list[float]          # one per interval; may include sentinel values (GCC-EDGE-001)
+    readings_c: list[float]  # one per interval; may include sentinel values (GCC-EDGE-001)
     interval_min: int
     ambient_c: float | None = None
     days_since_production: int | None = None
-    sensor_fault: bool = False       # ground-truth flag from the simulator
-    peak_season: bool = False        # Ramadan / Hajj demand shock
+    sensor_fault: bool = False  # ground-truth flag from the simulator
+    peak_season: bool = False  # Ramadan / Hajj demand shock
     missing_fields: tuple[str, ...] = ()
 
 
@@ -106,10 +134,7 @@ class Label:
 
 
 def _excursion_minutes_for(state: WorldState, spec: ProductSpec, readings: list[float]) -> int:
-    out = sum(
-        1 for t in readings
-        if (spec.temp_min_c is not None and t < spec.temp_min_c) or t > spec.temp_max_c
-    )
+    out = sum(1 for t in readings if (spec.temp_min_c is not None and t < spec.temp_min_c) or t > spec.temp_max_c)
     return out * state.interval_min
 
 

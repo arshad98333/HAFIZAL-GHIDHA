@@ -36,14 +36,21 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from . import agentic_eval, curriculum, gates, guardrails
+from . import agentic_eval, curriculum, gates, guardrails, simulate
 from . import knowledge_base as kb
 from . import logbook as lb
-from . import simulate
 from .clients import AzureClient, ContentSafetyClient, StudentClient
 from .config import Settings, get_settings
-from .rules_engine import engine_sha, label as rule_label
-from .telemetry import attach_mongo_sink, configure_logging, get_logger, get_run_id, log_extra, set_wave
+from .rules_engine import engine_sha
+from .rules_engine import label as rule_label
+from .telemetry import (
+    attach_mongo_sink,
+    configure_logging,
+    get_logger,
+    get_run_id,
+    log_extra,
+    set_wave,
+)
 
 log = get_logger(__name__)
 
@@ -63,6 +70,7 @@ class WaveHalted(RuntimeError):
 # --------------------------------------------------------------------------- #
 # generation
 # --------------------------------------------------------------------------- #
+
 
 def _round_robin(counts: dict[str, int]) -> list[str]:
     """Expands {"AE": 45, "SA": 45, ...} into a 180-item list, interleaved
@@ -99,21 +107,23 @@ def _expand_allocation(alloc: dict[str, Any], wave: int) -> list[simulate.Genera
     idx = list(range(n))
     rng.shuffle(idx)
     adversarial_idx = set(idx[: alloc["adversarial"]])
-    abstention_idx = set(idx[alloc["adversarial"]: alloc["adversarial"] + alloc["abstention"]])
+    abstention_idx = set(idx[alloc["adversarial"] : alloc["adversarial"] + alloc["abstention"]])
 
     reqs = []
     for i in range(n):
         seed = int(hashlib.sha256(f"{wave}:{cell}:{i}".encode()).hexdigest()[:12], 16)
-        reqs.append(simulate.GenerationRequest(
-            product=alloc["product"],
-            fault_mode=alloc["fault_mode"],
-            language=langs[i],
-            artifact_type=artifacts[i],
-            jurisdiction=jurisdictions[i],
-            is_adversarial=i in adversarial_idx,
-            is_abstention=i in abstention_idx,
-            rng_seed=seed,
-        ))
+        reqs.append(
+            simulate.GenerationRequest(
+                product=alloc["product"],
+                fault_mode=alloc["fault_mode"],
+                language=langs[i],
+                artifact_type=artifacts[i],
+                jurisdiction=jurisdictions[i],
+                is_adversarial=i in adversarial_idx,
+                is_abstention=i in abstention_idx,
+                rng_seed=seed,
+            )
+        )
     return reqs
 
 
@@ -154,8 +164,13 @@ def _round_trip_check(state, extracted: dict[str, Any] | None) -> tuple[bool, fl
 
 
 async def _generate_one(
-    req: simulate.GenerationRequest, wave: int, azure: AzureClient, safety: ContentSafetyClient,
-    book: lb.Logbook, engine_sha_val: str, settings: Settings,
+    req: simulate.GenerationRequest,
+    wave: int,
+    azure: AzureClient,
+    safety: ContentSafetyClient,
+    book: lb.Logbook,
+    engine_sha_val: str,
+    settings: Settings,
 ) -> None:
     cell = lb.cell_key(req.product, req.fault_mode)
     envelope = lb.Envelope(
@@ -183,8 +198,11 @@ async def _generate_one(
         )
 
         if not await safety.is_safe(rendered):
-            await book.write_generation(envelope, "dropped_safety",
-                                         extra={"disposition": disposition, "rendered_text": rendered[:4000]})
+            await book.write_generation(
+                envelope,
+                "dropped_safety",
+                extra={"disposition": disposition, "rendered_text": rendered[:4000]},
+            )
             return
 
         # confirmed against the live endpoint: 10 tokens truncates mid-word ("CONS" instead
@@ -192,11 +210,19 @@ async def _generate_one(
         # reasoning-budget issue this time, just not enough room for the longest verdict.
         verdict_raw = await azure.complete(simulate.screener_prompt(rendered), max_tokens=30, temperature=0.0)
         verdict = verdict_raw.strip().upper()
-        envelope.screener_verdict = verdict if verdict in ("CONSISTENT", "INCONSISTENT", "LEAKS_LABEL") else "UNPARSEABLE"
+        envelope.screener_verdict = (
+            verdict if verdict in ("CONSISTENT", "INCONSISTENT", "LEAKS_LABEL") else "UNPARSEABLE"
+        )
         if envelope.screener_verdict != "CONSISTENT":
-            await book.write_generation(envelope, "dropped_screener",
-                                         extra={"disposition": disposition, "rendered_text": rendered[:4000],
-                                                "screener_verdict": envelope.screener_verdict})
+            await book.write_generation(
+                envelope,
+                "dropped_screener",
+                extra={
+                    "disposition": disposition,
+                    "rendered_text": rendered[:4000],
+                    "screener_verdict": envelope.screener_verdict,
+                },
+            )
             return
 
         # guardrails.check_artifact_text: an independent, dependency-free regex net
@@ -206,47 +232,83 @@ async def _generate_one(
         guardrail_hits = guardrails.check_artifact_text(rendered, req.artifact_type)
         if guardrail_hits:
             await book.write_generation(
-                envelope, "dropped_guardrail",
-                extra={"disposition": disposition, "rendered_text": rendered[:4000],
-                       "screener_verdict": envelope.screener_verdict,
-                       "guardrail_violations": [{"rule_id": v.rule_id, "detail": v.detail} for v in guardrail_hits]},
+                envelope,
+                "dropped_guardrail",
+                extra={
+                    "disposition": disposition,
+                    "rendered_text": rendered[:4000],
+                    "screener_verdict": envelope.screener_verdict,
+                    "guardrail_violations": [{"rule_id": v.rule_id, "detail": v.detail} for v in guardrail_hits],
+                },
             )
             return
 
-        extracted_raw = await azure.complete(simulate.extraction_prompt(rendered),
-                                              max_tokens=simulate.extraction_max_tokens(req.artifact_type),
-                                              temperature=0.0)
+        extracted_raw = await azure.complete(
+            simulate.extraction_prompt(rendered),
+            max_tokens=simulate.extraction_max_tokens(req.artifact_type),
+            temperature=0.0,
+        )
         schema_valid, extracted = _validate_extraction(extracted_raw)
         if not schema_valid:
-            await book.write_generation(envelope, "dropped_schema",
-                                         extra={"disposition": disposition, "rendered_text": rendered[:4000],
-                                                "screener_verdict": envelope.screener_verdict, "schema_valid": False})
+            await book.write_generation(
+                envelope,
+                "dropped_schema",
+                extra={
+                    "disposition": disposition,
+                    "rendered_text": rendered[:4000],
+                    "screener_verdict": envelope.screener_verdict,
+                    "schema_valid": False,
+                },
+            )
             return
 
         round_trip, confidence = _round_trip_check(state, extracted)
         envelope.round_trip_ok = round_trip
         if not round_trip:
-            await book.write_generation(envelope, "dropped_roundtrip",
-                                         extra={"disposition": disposition, "rendered_text": rendered[:4000],
-                                                "screener_verdict": envelope.screener_verdict, "schema_valid": True,
-                                                "confidence": confidence})
+            await book.write_generation(
+                envelope,
+                "dropped_roundtrip",
+                extra={
+                    "disposition": disposition,
+                    "rendered_text": rendered[:4000],
+                    "screener_verdict": envelope.screener_verdict,
+                    "schema_valid": True,
+                    "confidence": confidence,
+                },
+            )
             return
 
         if confidence < settings.min_round_trip_confidence:
-            await book.write_generation(envelope, "dropped_low_confidence",
-                                         extra={"disposition": disposition, "rendered_text": rendered[:4000],
-                                                "screener_verdict": envelope.screener_verdict, "schema_valid": True,
-                                                "confidence": confidence})
+            await book.write_generation(
+                envelope,
+                "dropped_low_confidence",
+                extra={
+                    "disposition": disposition,
+                    "rendered_text": rendered[:4000],
+                    "screener_verdict": envelope.screener_verdict,
+                    "schema_valid": True,
+                    "confidence": confidence,
+                },
+            )
             return
 
         legal = kb.citation(req.jurisdiction)
-        await book.write_generation(envelope, "kept",
-                                     extra={"disposition": disposition, "rendered_text": rendered[:4000],
-                                            "screener_verdict": envelope.screener_verdict, "schema_valid": True,
-                                            "confidence": confidence,
-                                            "legal_citation": {"jurisdiction": legal.jurisdiction,
-                                                                "instrument": legal.instrument,
-                                                                "authority": legal.authority}})
+        await book.write_generation(
+            envelope,
+            "kept",
+            extra={
+                "disposition": disposition,
+                "rendered_text": rendered[:4000],
+                "screener_verdict": envelope.screener_verdict,
+                "schema_valid": True,
+                "confidence": confidence,
+                "legal_citation": {
+                    "jurisdiction": legal.jurisdiction,
+                    "instrument": legal.instrument,
+                    "authority": legal.authority,
+                },
+            },
+        )
     except Exception as exc:  # noqa: BLE001 — one bad item must not sink the wave
         log_extra(log, 40, "generation item failed", cell=cell, error=str(exc))
         await book.write_generation(envelope, "dropped_error", note=str(exc)[:500])
@@ -264,9 +326,16 @@ def _validate_extraction(raw: str) -> tuple[bool, dict[str, Any] | None]:
         return False, None
 
 
-async def stage_generate(wave: int, plan: dict[str, Any], book: lb.Logbook,
-                          azure: AzureClient, safety: ContentSafetyClient, settings: Settings,
-                          rate_per_minute: int | None = None, max_records: int | None = None) -> None:
+async def stage_generate(
+    wave: int,
+    plan: dict[str, Any],
+    book: lb.Logbook,
+    azure: AzureClient,
+    safety: ContentSafetyClient,
+    settings: Settings,
+    rate_per_minute: int | None = None,
+    max_records: int | None = None,
+) -> None:
     """``rate_per_minute`` paces how often a new item is *dispatched*, not a
     concurrency cap -- confirmed against the live endpoint: even with
     LOCAL_CONCURRENCY down at 8, dispatching all items via one asyncio.gather
@@ -278,8 +347,14 @@ async def stage_generate(wave: int, plan: dict[str, Any], book: lb.Logbook,
     all_reqs = [req for alloc in plan["allocations"] for req in _expand_allocation(alloc, wave)]
     if max_records is not None:
         all_reqs = all_reqs[:max_records]
-    log_extra(log, 20, "generation start", rule_engine_sha=engine_sha_val, total=len(all_reqs),
-              rate_per_minute=rate_per_minute)
+    log_extra(
+        log,
+        20,
+        "generation start",
+        rule_engine_sha=engine_sha_val,
+        total=len(all_reqs),
+        rate_per_minute=rate_per_minute,
+    )
 
     sem = asyncio.Semaphore(LOCAL_CONCURRENCY)
 
@@ -306,8 +381,10 @@ async def stage_generate(wave: int, plan: dict[str, Any], book: lb.Logbook,
 # Gate A
 # --------------------------------------------------------------------------- #
 
-async def _gate_a_metrics(wave: int, plan: dict[str, Any], book: lb.Logbook, azure: AzureClient,
-                           settings: Settings) -> dict[str, float]:
+
+async def _gate_a_metrics(
+    wave: int, plan: dict[str, Any], book: lb.Logbook, azure: AzureClient, settings: Settings
+) -> dict[str, float]:
     rows = await book.read_generation(wave)
     kept = [r for r in rows if r["outcome"] == "kept"]
     attempted = len(rows) or 1
@@ -339,8 +416,12 @@ async def _gate_a_metrics(wave: int, plan: dict[str, Any], book: lb.Logbook, azu
             embeddings = await azure.embed(texts)
             metrics["near_duplicate_rate"] = await gates.near_duplicate_rate_async(texts, lambda _t: embeddings)
         except Exception as exc:  # noqa: BLE001
-            log_extra(log, 40, "embeddings call failed; near_duplicate_rate not measured this run",
-                      error=str(exc))
+            log_extra(
+                log,
+                40,
+                "embeddings call failed; near_duplicate_rate not measured this run",
+                error=str(exc),
+            )
         metrics["leakage_probe_acc"] = await gates.leakage_probe_async(texts, labels)
     else:
         metrics["near_duplicate_rate"] = 1.0
@@ -367,16 +448,22 @@ async def _gate_a_metrics(wave: int, plan: dict[str, Any], book: lb.Logbook, azu
             metrics["language_authenticity"] = review["language_authenticity"]
         if review["annotator_kappa"] is not None:
             metrics["annotator_kappa"] = review["annotator_kappa"]
-        log_extra(log, 20, "Gate A qualitative review: agentic board", wave=wave,
-                  language_authenticity=review["language_authenticity"],
-                  agreement=review["language_authenticity_agreement"],
-                  escalated=review["language_authenticity_escalated"])
+        log_extra(
+            log,
+            20,
+            "Gate A qualitative review: agentic board",
+            wave=wave,
+            language_authenticity=review["language_authenticity"],
+            agreement=review["language_authenticity_agreement"],
+            escalated=review["language_authenticity_escalated"],
+        )
 
     return metrics
 
 
-async def stage_gate_a(wave: int, plan: dict[str, Any], book: lb.Logbook, azure: AzureClient,
-                        settings: Settings) -> dict[str, Any]:
+async def stage_gate_a(
+    wave: int, plan: dict[str, Any], book: lb.Logbook, azure: AzureClient, settings: Settings
+) -> dict[str, Any]:
     metrics = await _gate_a_metrics(wave, plan, book, azure, settings)
     result = gates.evaluate(metrics, gates.GATE_A)
     await book.write_json(wave, "gate_a.json", {"metrics": metrics, **result})
@@ -390,6 +477,7 @@ async def stage_gate_a(wave: int, plan: dict[str, Any], book: lb.Logbook, azure:
 # --------------------------------------------------------------------------- #
 # training submission (managed compute)
 # --------------------------------------------------------------------------- #
+
 
 async def stage_train(wave: int, settings: Settings, book: lb.Logbook, dataset_hash: str) -> dict[str, Any]:
     """Submits the SFT job. The actual training script and the AutoResearch
@@ -441,6 +529,7 @@ async def stage_train(wave: int, settings: Settings, book: lb.Logbook, dataset_h
 # Gate B (human-supplied results — agents never execute the sealed eval)
 # --------------------------------------------------------------------------- #
 
+
 async def stage_gate_b(wave: int, results_path: Path, book: lb.Logbook) -> tuple[dict[str, Any], gates.SliceResult]:
     payload_in = json.loads(results_path.read_text(encoding="utf-8"))
     metrics: dict[str, float] = payload_in["metrics"]
@@ -481,6 +570,7 @@ async def stage_gate_b(wave: int, results_path: Path, book: lb.Logbook) -> tuple
 # Gate B, agentic path — the Azure judge model as the automated gatekeeper. Default.
 # --------------------------------------------------------------------------- #
 
+
 def _is_holdout(state_id: str) -> bool:
     """Deterministic ~HOLDOUT_FRACTION split, never trained on. The training
     script is expected to exclude any record where this is true — that
@@ -498,25 +588,28 @@ def _macro_f1(y_true: list[str], y_pred: list[str]) -> float:
     return float(f1_score(y_true, y_pred, labels=labels, average="macro", zero_division=0))
 
 
-async def _build_holdout_items(waves: list[int], book: lb.Logbook, student: StudentClient,
-                                sem: asyncio.Semaphore) -> list[agentic_eval.HoldoutItem]:
+async def _build_holdout_items(
+    waves: list[int], book: lb.Logbook, student: StudentClient, sem: asyncio.Semaphore
+) -> list[agentic_eval.HoldoutItem]:
     items: list[agentic_eval.HoldoutItem] = []
 
     async def _one(row: dict[str, Any]) -> None:
         async with sem:
             parsed, raw = await student.predict(row.get("rendered_text", ""))
-            items.append(agentic_eval.HoldoutItem(
-                cell=row["cell"],
-                wave=row["wave"],
-                language=row["language"],
-                jurisdiction=row.get("jurisdiction", ""),
-                is_adversarial=row.get("is_adversarial", False),
-                is_abstention=row.get("is_abstention", False),
-                artifact_text=row.get("rendered_text", ""),
-                ground_truth_disposition=row.get("disposition", ""),
-                model_output=parsed,
-                model_output_raw=raw,
-            ))
+            items.append(
+                agentic_eval.HoldoutItem(
+                    cell=row["cell"],
+                    wave=row["wave"],
+                    language=row["language"],
+                    jurisdiction=row.get("jurisdiction", ""),
+                    is_adversarial=row.get("is_adversarial", False),
+                    is_abstention=row.get("is_abstention", False),
+                    artifact_text=row.get("rendered_text", ""),
+                    ground_truth_disposition=row.get("disposition", ""),
+                    model_output=parsed,
+                    model_output_raw=raw,
+                )
+            )
 
     tasks = []
     for w in waves:
@@ -560,8 +653,9 @@ def _cross_jurisdiction_delta(items: list[agentic_eval.HoldoutItem]) -> float:
     return (max(f1s) - min(f1s)) if len(f1s) >= 2 else 0.0
 
 
-async def stage_gate_b_auto(wave: int, book: lb.Logbook, azure: AzureClient, student: StudentClient,
-                             settings: Settings) -> tuple[dict[str, Any], gates.SliceResult]:
+async def stage_gate_b_auto(
+    wave: int, book: lb.Logbook, azure: AzureClient, student: StudentClient, settings: Settings
+) -> tuple[dict[str, Any], gates.SliceResult]:
     if not student.enabled:
         raise WaveHalted(
             "no student inference endpoint configured (STUDENT_INFERENCE_ENDPOINT / "
@@ -625,41 +719,48 @@ async def stage_gate_b_auto(wave: int, book: lb.Logbook, azure: AzureClient, stu
     return payload, slices
 
 
-async def stage_close(wave: int, plan: dict[str, Any], slices: gates.SliceResult, book: lb.Logbook,
-                       notes: str = "") -> None:
+async def stage_close(
+    wave: int, plan: dict[str, Any], slices: gates.SliceResult, book: lb.Logbook, notes: str = ""
+) -> None:
     rows = await book.read_generation(wave)
     kept = sum(1 for r in rows if r["outcome"] == "kept")
     survival = await book.survival_rates(wave)
-    await book.append_ledger(lb.WaveRecord(
-        wave=wave,
-        requested=plan["total"],
-        kept=kept,
-        gate_a_passed=True,
-        gate_b_passed=True,
-        worst_cell_f1=slices.worst_cell_f1,
-        worst_cell=slices.worst_cell,
-        cells_passing=slices.cells_passing,
-        mean_f1=slices.mean_f1,
-        cell_f1=slices.cell_f1,
-        survival=survival,
-        top_confusions=slices.top_confusions,
-        notes=notes,
-    ))
+    await book.append_ledger(
+        lb.WaveRecord(
+            wave=wave,
+            requested=plan["total"],
+            kept=kept,
+            gate_a_passed=True,
+            gate_b_passed=True,
+            worst_cell_f1=slices.worst_cell_f1,
+            worst_cell=slices.worst_cell,
+            cells_passing=slices.cells_passing,
+            mean_f1=slices.mean_f1,
+            cell_f1=slices.cell_f1,
+            survival=survival,
+            top_confusions=slices.top_confusions,
+            notes=notes,
+        )
+    )
     log_extra(log, 20, "ledger appended", wave=wave, next_wave=wave + 1)
 
 
 def _gate_markdown(title: str, result: dict[str, Any]) -> str:
-    lines = [f"### {title}: {'PASS' if result['passed'] else 'FAIL'}", "",
-             "| Check | Value | Bound | |", "|---|---|---|---|"]
+    lines = [
+        f"### {title}: {'PASS' if result['passed'] else 'FAIL'}",
+        "",
+        "| Check | Value | Bound | |",
+        "|---|---|---|---|",
+    ]
     for name, c in result["checks"].items():
-        lines.append(f"| {name} | {c['value']} | {c.get('op', '')} {c['bound']} | "
-                     f"{'ok' if c['passed'] else 'FAIL'} |")
+        lines.append(f"| {name} | {c['value']} | {c.get('op', '')} {c['bound']} | {'ok' if c['passed'] else 'FAIL'} |")
     return "\n".join(lines)
 
 
 # --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
+
 
 async def _run(args: argparse.Namespace) -> int:
     settings = get_settings()
@@ -682,8 +783,16 @@ async def _run(args: argparse.Namespace) -> int:
                 if plan is None:
                     raise WaveHalted(f"no plan.json for wave {args.wave}; run `plan` first")
                 async with AzureClient(settings) as azure, ContentSafetyClient(settings) as safety:
-                    await stage_generate(args.wave, plan, book, azure, safety, settings,
-                                          rate_per_minute=args.rate_per_minute, max_records=args.max_records)
+                    await stage_generate(
+                        args.wave,
+                        plan,
+                        book,
+                        azure,
+                        safety,
+                        settings,
+                        rate_per_minute=args.rate_per_minute,
+                        max_records=args.max_records,
+                    )
 
             elif args.cmd == "gate-a":
                 plan = await book.read_json(args.wave, "plan.json")
@@ -740,15 +849,26 @@ def main() -> int:
     ap = argparse.ArgumentParser(prog="python -m cold_chain.runner")
     ap.add_argument("cmd", choices=["plan", "generate", "gate-a", "train", "gate-b"])
     ap.add_argument("--wave", type=int, required=True)
-    ap.add_argument("--results", help="path to human-produced sealed golden-set results JSON "
-                                       "(gate-b only; omit to use the Azure judge agentic gatekeeper)")
+    ap.add_argument(
+        "--results",
+        help="path to human-produced sealed golden-set results JSON "
+        "(gate-b only; omit to use the Azure judge agentic gatekeeper)",
+    )
     ap.add_argument("--notes", help="note appended to the ledger row (gate-b only)")
-    ap.add_argument("--rate-per-minute", type=int, default=None,
-                     help="generate only: cap on new items dispatched per minute, to stay under "
-                          "the account's real throughput instead of guessing a concurrency number")
-    ap.add_argument("--max-records", type=int, default=None,
-                     help="generate only: stop after this many items from the plan, regardless of "
-                          "how many the plan allocated (e.g. cap a wave at 663 total)")
+    ap.add_argument(
+        "--rate-per-minute",
+        type=int,
+        default=None,
+        help="generate only: cap on new items dispatched per minute, to stay under "
+        "the account's real throughput instead of guessing a concurrency number",
+    )
+    ap.add_argument(
+        "--max-records",
+        type=int,
+        default=None,
+        help="generate only: stop after this many items from the plan, regardless of "
+        "how many the plan allocated (e.g. cap a wave at 663 total)",
+    )
     args = ap.parse_args()
     return asyncio.run(_run(args))
 

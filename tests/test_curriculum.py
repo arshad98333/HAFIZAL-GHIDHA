@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import asyncio
 
-import pytest
-
 from cold_chain import curriculum
 from cold_chain import logbook as lb
 
@@ -58,9 +56,14 @@ def test_build_plan_totals_match_wave_size(monkeypatch):
     from cold_chain.config import Settings
 
     settings = Settings(
-        mongodb_uri="mongodb://localhost", azure_endpoint="https://x", foundry_project_endpoint="https://x",
-        foundry_compute_cluster="c", foundry_base_model="m", training_region="r",
-        wave_size=663, cell_target=265,
+        mongodb_uri="mongodb://localhost",
+        azure_endpoint="https://x",
+        foundry_project_endpoint="https://x",
+        foundry_compute_cluster="c",
+        foundry_base_model="m",
+        training_region="r",
+        wave_size=663,
+        cell_target=265,
     )
     book = FakeLogbook()
     plan = run(curriculum.build_plan(1, book, settings))
@@ -88,9 +91,14 @@ def test_build_plan_holdout_wave_flagged():
     from cold_chain.config import Settings
 
     settings = Settings(
-        mongodb_uri="mongodb://localhost", azure_endpoint="https://x", foundry_project_endpoint="https://x",
-        foundry_compute_cluster="c", foundry_base_model="m", training_region="r",
-        wave_size=663, cell_target=265,
+        mongodb_uri="mongodb://localhost",
+        azure_endpoint="https://x",
+        foundry_project_endpoint="https://x",
+        foundry_compute_cluster="c",
+        foundry_base_model="m",
+        training_region="r",
+        wave_size=663,
+        cell_target=265,
     )
     book = FakeLogbook()
     plan = run(curriculum.build_plan(8, book, settings))
@@ -101,9 +109,14 @@ def test_plan_wave_writes_plan_json_without_azure_client():
     from cold_chain.config import Settings
 
     settings = Settings(
-        mongodb_uri="mongodb://localhost", azure_endpoint="https://x", foundry_project_endpoint="https://x",
-        foundry_compute_cluster="c", foundry_base_model="m", training_region="r",
-        wave_size=663, cell_target=265,
+        mongodb_uri="mongodb://localhost",
+        azure_endpoint="https://x",
+        foundry_project_endpoint="https://x",
+        foundry_compute_cluster="c",
+        foundry_base_model="m",
+        training_region="r",
+        wave_size=663,
+        cell_target=265,
     )
     book = FakeLogbook()
     plan = run(curriculum.plan_wave(1, book, azure=None, settings=settings))

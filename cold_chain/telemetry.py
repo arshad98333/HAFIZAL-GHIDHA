@@ -74,6 +74,7 @@ def log_extra(logger: logging.Logger, level: int, msg: str, **fields) -> None:
 # realtime Mongo sink
 # --------------------------------------------------------------------------- #
 
+
 class _MongoQueueHandler(logging.Handler):
     """Never blocks the caller. ``emit`` just enqueues; a background asyncio
     task owns the actual writes. If the queue is full (Mongo is down or slow),
@@ -88,7 +89,7 @@ class _MongoQueueHandler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         try:
             doc: dict[str, Any] = {
-                "ts": datetime.datetime.now(datetime.timezone.utc),
+                "ts": datetime.datetime.now(datetime.UTC),
                 "level": record.levelname,
                 "logger": record.name,
                 "msg": record.getMessage(),
@@ -115,7 +116,7 @@ async def _drain_loop(queue: asyncio.Queue, db: Any, flush_interval_s: float) ->
             batch.append(doc)
             while not queue.empty() and len(batch) < 500:
                 batch.append(queue.get_nowait())
-        except asyncio.TimeoutError:
+        except TimeoutError:
             pass
         except asyncio.CancelledError:
             if batch:

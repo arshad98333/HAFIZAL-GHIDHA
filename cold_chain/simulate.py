@@ -178,16 +178,16 @@ _JURISDICTION_CONTEXT = {
 
 _ARTIFACT_INSTRUCTION = {
     "logger_csv": "Format as a raw reefer datalogger CSV dump: a couple of preamble lines "
-                   "(device/asset ID, product/cargo code — real logger exports carry this because "
-                   "the manifest ties an asset to its cargo) followed by timestamp,temp_c columns. "
-                   "Terse, no narrative beyond the preamble.",
+    "(device/asset ID, product/cargo code — real logger exports carry this because "
+    "the manifest ties an asset to its cargo) followed by timestamp,temp_c columns. "
+    "Terse, no narrative beyond the preamble.",
     "chat_message": "Format as a short informal chat message a driver or QA officer would send, "
-                     "reporting what they observed.",
+    "reporting what they observed.",
     "qc_form_ocr": "Format as OCR'd text from a handwritten QC intake form: field labels followed "
-                    "by handwritten values, include a couple of OCR artifacts (misread digits, "
-                    "stray characters) but keep the numbers recoverable.",
+    "by handwritten values, include a couple of OCR artifacts (misread digits, "
+    "stray characters) but keep the numbers recoverable.",
     "voice_note": "Format as a transcript of a voice note: spoken, informal, may restate a number "
-                   "for emphasis, minor disfluencies allowed.",
+    "for emphasis, minor disfluencies allowed.",
 }
 
 _RENDER_MAX_TOKENS = {
@@ -205,7 +205,7 @@ _RENDER_MAX_TOKENS = {
 }
 
 _EXTRACTION_MAX_TOKENS = {
-    "logger_csv": 1200,   # echoing back up to 96 floats in a JSON array
+    "logger_csv": 1200,  # echoing back up to 96 floats in a JSON array
     "chat_message": 400,
     "qc_form_ocr": 700,
     "voice_note": 400,
@@ -223,8 +223,8 @@ def extraction_max_tokens(artifact_type: str) -> int:
 RENDER_FIELDS = (
     "product (string), readings_c (array of numbers), interval_min (integer), "
     "ambient_c (number), days_since_production (integer), peak_season (JSON boolean "
-    "true/false, never the string \"Yes\"/\"No\"), missing_fields (JSON array of field "
-    "names, e.g. [] if none are missing -- never the string \"none\")"
+    'true/false, never the string "Yes"/"No"), missing_fields (JSON array of field '
+    'names, e.g. [] if none are missing -- never the string "none")'
 )
 
 

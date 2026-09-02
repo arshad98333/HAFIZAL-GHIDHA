@@ -73,9 +73,7 @@ def profile(jurisdiction: str, kb_dir: Path = DEFAULT_DIR) -> dict[str, Any]:
     """The full country profile document for one GCC jurisdiction."""
     code = jurisdiction.upper()
     if code not in COUNTRY_FILES:
-        raise KnowledgeBaseError(
-            f"unknown jurisdiction {jurisdiction!r}; expected one of {sorted(COUNTRY_FILES)}"
-        )
+        raise KnowledgeBaseError(f"unknown jurisdiction {jurisdiction!r}; expected one of {sorted(COUNTRY_FILES)}")
     return _load_json(kb_dir / COUNTRY_FILES[code])
 
 

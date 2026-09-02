@@ -121,6 +121,7 @@ def validate_loaded(dir_: Path = DEFAULT_DIR) -> list[str]:
 # physical constants -- shared source of truth with rules_engine.py
 # --------------------------------------------------------------------------- #
 
+
 @dataclass(frozen=True)
 class TemperatureBand:
     name: str
@@ -224,19 +225,25 @@ def check_artifact_text(text: str, artifact_type: str | None = None) -> list[Vio
     pack's provenance section documents wave_9001 actually hitting."""
     violations: list[Violation] = []
     if _METADATA_LEAK.search(text):
-        violations.append(Violation(
-            "GCC-EDGE-018",
-            "artifact contains raw pipeline metadata (product_code=/cell/rule_engine_sha/"
-            "prompt_template_hash) -- a decision-input leak vector, not observational text",
-        ))
+        violations.append(
+            Violation(
+                "GCC-EDGE-018",
+                "artifact contains raw pipeline metadata (product_code=/cell/rule_engine_sha/"
+                "prompt_template_hash) -- a decision-input leak vector, not observational text",
+            )
+        )
     if _EXPEDITE_WORDING.search(text):
-        violations.append(Violation(
-            "GCC-EDGE-015",
-            "artifact proposes expedite_sale -- never an autonomous action under this pack",
-        ))
+        violations.append(
+            Violation(
+                "GCC-EDGE-015",
+                "artifact proposes expedite_sale -- never an autonomous action under this pack",
+            )
+        )
     if artifact_type == "logger_csv" and _TRUNCATED_CSV_TAIL.search(text.rstrip()):
-        violations.append(Violation(
-            "GCC-EDGE-002",
-            "logger_csv artifact ends mid-timestamp; the final record is incomplete",
-        ))
+        violations.append(
+            Violation(
+                "GCC-EDGE-002",
+                "logger_csv artifact ends mid-timestamp; the final record is incomplete",
+            )
+        )
     return violations

@@ -109,11 +109,15 @@ class AzureClient:
         )
         self._sem = asyncio.Semaphore(settings.azure_max_concurrency)
 
-    async def __aenter__(self) -> "AzureClient":
+    async def __aenter__(self) -> AzureClient:
         return self
 
-    async def __aexit__(self, exc_type: type[BaseException] | None, exc: BaseException | None,
-                         tb: TracebackType | None) -> None:
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         await self._client.close()
 
     @retry(
@@ -122,8 +126,15 @@ class AzureClient:
         wait=wait_exponential_jitter(initial=1, max=45),
         reraise=True,
     )
-    async def complete(self, prompt: str, *, system: str | None = None, max_tokens: int = 800,
-                        temperature: float = 0.2, _ceiling: int = 4096) -> str:
+    async def complete(
+        self,
+        prompt: str,
+        *,
+        system: str | None = None,
+        max_tokens: int = 800,
+        temperature: float = 0.2,
+        _ceiling: int = 4096,
+    ) -> str:
         """gpt-5.4-mini is on a reasoning-tuned tier: a tight output-token
         budget can truncate mid-word (confirmed live: a 10-token screener call
         returned "CONS" instead of "CONSISTENT") or, less often, get fully
@@ -141,10 +152,22 @@ class AzureClient:
             content = _extract_text(resp)
             incomplete = getattr(resp, "status", None) == "incomplete"
             if not content and incomplete and max_tokens * 2 <= _ceiling:
-                log.warning("Azure completion truncated with no usable content; retrying with more headroom",
-                            extra={"extra_fields": {"max_tokens": max_tokens, "retry_max_tokens": max_tokens * 2}})
-                return await self.complete(prompt, system=system, max_tokens=max_tokens * 2,
-                                            temperature=temperature, _ceiling=_ceiling)
+                log.warning(
+                    "Azure completion truncated with no usable content; retrying with more headroom",
+                    extra={
+                        "extra_fields": {
+                            "max_tokens": max_tokens,
+                            "retry_max_tokens": max_tokens * 2,
+                        }
+                    },
+                )
+                return await self.complete(
+                    prompt,
+                    system=system,
+                    max_tokens=max_tokens * 2,
+                    temperature=temperature,
+                    _ceiling=_ceiling,
+                )
             return content or ""
 
     @retry(
@@ -174,7 +197,7 @@ class ContentSafetyClient:
         self._settings = settings
         self._http = httpx.AsyncClient(timeout=30.0) if self._enabled else None
 
-    async def __aenter__(self) -> "ContentSafetyClient":
+    async def __aenter__(self) -> ContentSafetyClient:
         return self
 
     async def __aexit__(self, *exc) -> None:
@@ -213,7 +236,7 @@ class StudentClient:
     def enabled(self) -> bool:
         return self._enabled
 
-    async def __aenter__(self) -> "StudentClient":
+    async def __aenter__(self) -> StudentClient:
         return self
 
     async def __aexit__(self, *exc) -> None:
@@ -238,14 +261,17 @@ class StudentClient:
         async with self._sem:
             resp = await self._http.post(
                 self._settings.student_inference_endpoint,
-                headers={"Authorization": f"Bearer {self._settings.student_inference_key}",
-                         "Content-Type": "application/json"},
+                headers={
+                    "Authorization": f"Bearer {self._settings.student_inference_key}",
+                    "Content-Type": "application/json",
+                },
                 json={"text": artifact_text},
             )
             resp.raise_for_status()
             raw = resp.text
             try:
                 import json as _json
+
                 start, end = raw.index("{"), raw.rindex("}") + 1
                 return _json.loads(raw[start:end]), raw
             except Exception:

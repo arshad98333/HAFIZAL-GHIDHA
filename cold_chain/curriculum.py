@@ -82,11 +82,7 @@ async def score_cells(wave: int, book: lb.Logbook, settings: Settings | None = N
             continue
         count_gap = max(0.0, (settings.cell_target - kept) / settings.cell_target)
         cell_f1 = f1.get(cell, 0.5)
-        scores[cell] = (
-            W_COUNT * count_gap
-            + W_F1 * (1.0 - cell_f1)
-            + W_STALE * _staleness(cov, cell, wave)
-        )
+        scores[cell] = W_COUNT * count_gap + W_F1 * (1.0 - cell_f1) + W_STALE * _staleness(cov, cell, wave)
     return scores
 
 
@@ -116,11 +112,7 @@ async def build_plan(wave: int, book: lb.Logbook, settings: Settings | None = No
             continue
         count_gap = max(0.0, (cell_target - kept) / cell_target)
         cell_f1 = f1.get(cell, 0.5)
-        scores[cell] = (
-            W_COUNT * count_gap
-            + W_F1 * (1.0 - cell_f1)
-            + W_STALE * _staleness(cov, cell, wave)
-        )
+        scores[cell] = W_COUNT * count_gap + W_F1 * (1.0 - cell_f1) + W_STALE * _staleness(cov, cell, wave)
 
     if not scores:
         raise RuntimeError(f"wave {wave}: no eligible cells -- corpus may be complete")
@@ -150,25 +142,26 @@ async def build_plan(wave: int, book: lb.Logbook, settings: Settings | None = No
             continue
         product, fault = cell.split("|")
         kept = cov["cells"].get(cell, {}).get("kept", 0)
-        allocations.append({
-            "product": product,
-            "fault_mode": fault,
-            "count": n,
-            "adversarial": int(round(n * adv_share)),
-            "abstention": int(round(n * abs_share)),
-            "language_split": _balanced_split(n, lb.LANGUAGES),
-            "artifact_split": _balanced_split(n, artifacts),
-            "jurisdiction_split": _balanced_split(n, lb.JURISDICTIONS),
-            "reason": (
-                f"F1 {f1.get(cell, float('nan')):.2f}, "
-                f"{cell_target - kept} short of target, "
-                f"survival {surv.get(cell, float('nan')):.2f} last wave"
-            ),
-        })
+        allocations.append(
+            {
+                "product": product,
+                "fault_mode": fault,
+                "count": n,
+                "adversarial": int(round(n * adv_share)),
+                "abstention": int(round(n * abs_share)),
+                "language_split": _balanced_split(n, lb.LANGUAGES),
+                "artifact_split": _balanced_split(n, artifacts),
+                "jurisdiction_split": _balanced_split(n, lb.JURISDICTIONS),
+                "reason": (
+                    f"F1 {f1.get(cell, float('nan')):.2f}, "
+                    f"{cell_target - kept} short of target, "
+                    f"survival {surv.get(cell, float('nan')):.2f} last wave"
+                ),
+            }
+        )
 
     escalations = [
-        f"{c}: survival {r:.2f} -- rendering suspected, not a data-quantity gap"
-        for c, r in surv.items() if r < 0.75
+        f"{c}: survival {r:.2f} -- rendering suspected, not a data-quantity gap" for c, r in surv.items() if r < 0.75
     ]
 
     return {
@@ -176,7 +169,7 @@ async def build_plan(wave: int, book: lb.Logbook, settings: Settings | None = No
         "total": sum(a["count"] for a in allocations),
         "holdout": bool(focus.get("holdout")),
         "allocations": allocations,
-        "rationale": "",          # filled by the Azure judge model, prose only
+        "rationale": "",  # filled by the Azure judge model, prose only
         "escalations": escalations,
         "guide_sha": _guide_sha(),
     }
@@ -216,18 +209,21 @@ async def annotate_with_azure(plan: dict[str, Any], azure: AzureClient, confusio
     )
     try:
         text = await azure.complete(prompt, max_tokens=1200, temperature=0.3)
-        parsed = json.loads(text[text.index("{"): text.rindex("}") + 1])
+        parsed = json.loads(text[text.index("{") : text.rindex("}") + 1])
         plan["rationale"] = parsed.get("rationale", "")
         plan["escalations"] = list(dict.fromkeys(plan["escalations"] + parsed.get("escalations", [])))
     except Exception as exc:  # noqa: BLE001
-        log.warning("rationale annotation unavailable, allocation unaffected",
-                    extra={"extra_fields": {"error": str(exc)}})
+        log.warning(
+            "rationale annotation unavailable, allocation unaffected",
+            extra={"extra_fields": {"error": str(exc)}},
+        )
         plan["rationale"] = f"[rationale annotation unavailable: {exc}] Allocation stands on the scorer."
     return plan
 
 
-async def plan_wave(wave: int, book: lb.Logbook, azure: AzureClient | None = None,
-                     settings: Settings | None = None) -> dict[str, Any]:
+async def plan_wave(
+    wave: int, book: lb.Logbook, azure: AzureClient | None = None, settings: Settings | None = None
+) -> dict[str, Any]:
     plan = await build_plan(wave, book, settings)
     if azure is not None:
         led = await book.read_ledger()
@@ -239,8 +235,14 @@ async def plan_wave(wave: int, book: lb.Logbook, azure: AzureClient | None = Non
 
 
 def _plan_markdown(plan: dict[str, Any]) -> str:
-    lines = [f"## Wave {plan['wave']} plan", "", plan.get("rationale", ""), "",
-             "| Cell | N | Adv | Abst | Reason |", "|---|---|---|---|---|"]
+    lines = [
+        f"## Wave {plan['wave']} plan",
+        "",
+        plan.get("rationale", ""),
+        "",
+        "| Cell | N | Adv | Abst | Reason |",
+        "|---|---|---|---|---|",
+    ]
     for a in plan["allocations"]:
         lines.append(
             f"| {a['product']} / {a['fault_mode']} | {a['count']} | "

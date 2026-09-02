@@ -13,8 +13,9 @@ from __future__ import annotations
 
 import asyncio
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 from . import logbook as lb
 
@@ -23,15 +24,15 @@ from . import logbook as lb
 # --------------------------------------------------------------------------- #
 
 GATE_A: dict[str, tuple[str, float]] = {
-    "schema_validity":      (">=", 0.995),
-    "round_trip_recovery":  (">=", 0.95),
-    "screener_flag_rate":   ("between", (0.02, 0.08)),
-    "near_duplicate_rate":  ("<=", 0.03),
-    "cell_fill_deviation":  ("<=", 0.10),
-    "max_class_share":      ("<=", 0.45),
-    "leakage_probe_acc":    ("<=", 0.70),
+    "schema_validity": (">=", 0.995),
+    "round_trip_recovery": (">=", 0.95),
+    "screener_flag_rate": ("between", (0.02, 0.08)),
+    "near_duplicate_rate": ("<=", 0.03),
+    "cell_fill_deviation": ("<=", 0.10),
+    "max_class_share": ("<=", 0.45),
+    "leakage_probe_acc": ("<=", 0.70),
     "language_authenticity": (">=", 3.5),
-    "annotator_kappa":      (">=", 0.75),
+    "annotator_kappa": (">=", 0.75),
     # independent, dependency-free regex net on rendered text -- see
     # guardrails.check_artifact_text. Any hit (metadata leakage, expedite_sale
     # wording, a truncated logger_csv tail) is a defect the LLM screener
@@ -44,17 +45,17 @@ GATE_A: dict[str, tuple[str, float]] = {
 # --------------------------------------------------------------------------- #
 
 GATE_B: dict[str, tuple[str, float]] = {
-    "malformed_json_rate":  ("<=", 0.005),
+    "malformed_json_rate": ("<=", 0.005),
     "hallucinated_field_rate": ("<=", 0.01),
     "abstention_precision": (">=", 0.85),
-    "abstention_recall":    (">=", 0.75),
+    "abstention_recall": (">=", 0.75),
     # replaces the retired language-axis "cross_language_delta" (corpus is
     # English-only now, see CURRICULUM.md section 2) -- the equivalent
     # fairness check on the new jurisdiction covariate: max F1 gap between
     # any two of the six GCC states with enough holdout items to measure.
     "cross_jurisdiction_delta": ("<=", 0.05),
-    "adversarial_gap":      ("<=", 0.10),
-    "holdout_delta":        ("<=", 0.05),
+    "adversarial_gap": ("<=", 0.10),
+    "holdout_delta": ("<=", 0.05),
 }
 
 
@@ -86,6 +87,7 @@ def evaluate(metrics: dict[str, float], spec: dict[str, tuple[str, Any]]) -> dic
 # metric computation (sync, CPU-bound — call via asyncio.to_thread)
 # --------------------------------------------------------------------------- #
 
+
 def leakage_probe(texts: list[str], labels: list[str]) -> float:
     """Train a bag-of-words classifier on surface text alone. If it predicts the
     disposition well, the renderer is telegraphing the answer and the whole wave
@@ -107,17 +109,17 @@ async def leakage_probe_async(texts: list[str], labels: list[str]) -> float:
 
 def near_duplicate_rate(texts: list[str], embed: Callable[[list[str]], Any], thresh: float = 0.95) -> float:
     import numpy as np
+
     if len(texts) < 2:
         return 0.0
     V = np.asarray(embed(texts), dtype="float32")
-    V /= (np.linalg.norm(V, axis=1, keepdims=True) + 1e-9)
+    V /= np.linalg.norm(V, axis=1, keepdims=True) + 1e-9
     sim = V @ V.T
     np.fill_diagonal(sim, 0.0)
     return float((sim.max(axis=1) > thresh).mean())
 
 
-async def near_duplicate_rate_async(texts: list[str], embed: Callable[[list[str]], Any],
-                                     thresh: float = 0.95) -> float:
+async def near_duplicate_rate_async(texts: list[str], embed: Callable[[list[str]], Any], thresh: float = 0.95) -> float:
     return await asyncio.to_thread(near_duplicate_rate, texts, embed, thresh)
 
 
@@ -154,6 +156,7 @@ def guardrail_violation_rate(texts: list[str], artifact_types: list[str | None] 
 # Gate B slice metrics
 # --------------------------------------------------------------------------- #
 
+
 @dataclass
 class SliceResult:
     cell_f1: dict[str, float]
@@ -184,9 +187,11 @@ def ratchet_ok(current: SliceResult, previous: SliceResult | None) -> tuple[bool
     if previous is None:
         return True, "first measured wave"
     if current.worst_cell_f1 < previous.worst_cell_f1:
-        return False, f"worst_cell_f1 fell {previous.worst_cell_f1:.3f} -> {current.worst_cell_f1:.3f}"
-    dropped = [c for c, v in previous.cell_f1.items()
-               if v >= 0.80 and current.cell_f1.get(c, 0.0) < 0.80]
+        return (
+            False,
+            f"worst_cell_f1 fell {previous.worst_cell_f1:.3f} -> {current.worst_cell_f1:.3f}",
+        )
+    dropped = [c for c, v in previous.cell_f1.items() if v >= 0.80 and current.cell_f1.get(c, 0.0) < 0.80]
     if dropped:
         return False, f"cells dropped below 0.80: {', '.join(dropped)}"
     return True, f"worst_cell_f1 {previous.worst_cell_f1:.3f} -> {current.worst_cell_f1:.3f}"
