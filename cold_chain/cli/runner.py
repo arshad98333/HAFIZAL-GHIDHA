@@ -93,8 +93,8 @@ def _prompt_template_hash(language: str, artifact_type: str) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()[:12]
 
 
-def _expand_allocation(alloc: dict[str, Any], wave: int) -> list[simulate.GenerationRequest]:
-    n = alloc["count"]
+def _expand_allocation(alloc: dict[str, Any], wave: int, *, attempt_buffer: float = 1.0) -> list[simulate.GenerationRequest]:
+    n = max(1, int(round(alloc["count"] * attempt_buffer)))
     cell = lb.cell_key(alloc["product"], alloc["fault_mode"])
     langs = _round_robin(alloc["language_split"])
     artifacts = _round_robin(alloc["artifact_split"])
@@ -127,6 +127,98 @@ def _expand_allocation(alloc: dict[str, Any], wave: int) -> list[simulate.Genera
             )
         )
     return reqs
+
+
+GENERATION_ATTEMPT_BUFFER = 1.30  # extra attempts on full waves to hit kept targets after drops
+CELL_TOP_UP_ROUNDS = 3
+CELL_TOP_UP_TARGET = 0.95  # top up until kept >= 95% of plan target
+
+
+def _sample_requests_balanced(plan: dict[str, Any], wave: int, max_records: int) -> list[simulate.GenerationRequest]:
+    """Proportional sampling across cells so smoke runs cover the full plan."""
+    pools = [_expand_allocation(alloc, wave) for alloc in plan["allocations"]]
+    flat = [req for pool in pools for req in pool]
+    if max_records >= len(flat):
+        return flat
+    total = len(flat)
+    quotas = [max(1, int(round(max_records * (len(pool) / total)))) for pool in pools]
+    while sum(quotas) > max_records:
+        quotas[quotas.index(max(quotas))] -= 1
+    while sum(quotas) < max_records:
+        quotas[quotas.index(min(quotas))] += 1
+    sampled: list[simulate.GenerationRequest] = []
+    for pool, quota in zip(pools, quotas):
+        rng = random.Random(f"{wave}:sample:{quota}")
+        idx = list(range(len(pool)))
+        rng.shuffle(idx)
+        sampled.extend(pool[i] for i in idx[:quota])
+    random.Random(f"{wave}:sample-shuffle").shuffle(sampled)
+    return sampled
+
+
+def _build_generation_requests(
+    plan: dict[str, Any], wave: int, max_records: int | None
+) -> list[simulate.GenerationRequest]:
+    if max_records is not None:
+        return _sample_requests_balanced(plan, wave, max_records)
+    buffer = GENERATION_ATTEMPT_BUFFER
+    return [req for alloc in plan["allocations"] for req in _expand_allocation(alloc, wave, attempt_buffer=buffer)]
+
+
+async def _dispatch_generation_batch(
+    reqs: list[simulate.GenerationRequest],
+    wave: int,
+    azure: AzureClient,
+    safety: ContentSafetyClient,
+    book: lb.Logbook,
+    engine_sha_val: str,
+    settings: Settings,
+    rate_per_minute: int | None,
+) -> None:
+    sem = asyncio.Semaphore(LOCAL_CONCURRENCY)
+
+    async def guarded(req: simulate.GenerationRequest) -> None:
+        async with sem:
+            await _generate_one(req, wave, azure, safety, book, engine_sha_val, settings)
+
+    interval_s = 60.0 / rate_per_minute if rate_per_minute else 0.0
+    tasks = []
+    for i, req in enumerate(reqs):
+        tasks.append(asyncio.create_task(guarded(req)))
+        if interval_s and i < len(reqs) - 1:
+            await asyncio.sleep(interval_s)
+    await asyncio.gather(*tasks)
+
+
+async def _top_up_underfilled_cells(
+    wave: int,
+    plan: dict[str, Any],
+    book: lb.Logbook,
+    azure: AzureClient,
+    safety: ContentSafetyClient,
+    settings: Settings,
+    engine_sha_val: str,
+    rate_per_minute: int | None,
+) -> None:
+    """Generate extra attempts for cells below kept target (full waves only)."""
+    for round_num in range(CELL_TOP_UP_ROUNDS):
+        rows = await book.read_generation(wave)
+        kept_by_cell: dict[str, int] = Counter(r["cell"] for r in rows if r["outcome"] == "kept")
+        top_up: list[simulate.GenerationRequest] = []
+        for alloc in plan["allocations"]:
+            cell = lb.cell_key(alloc["product"], alloc["fault_mode"])
+            target = alloc["count"]
+            kept = kept_by_cell.get(cell, 0)
+            if kept >= target * CELL_TOP_UP_TARGET:
+                continue
+            deficit = min(target - kept, max(3, int((target - kept) * 1.5)))
+            extra_alloc = {**alloc, "count": deficit}
+            top_up.extend(_expand_allocation(extra_alloc, wave)[:deficit])
+        if not top_up:
+            return
+        log_extra(log, 20, "generation top-up", round=round_num + 1, n=len(top_up))
+        await _dispatch_generation_batch(top_up, wave, azure, safety, book, engine_sha_val, settings, rate_per_minute)
+        await book.flush_generation()
 
 
 READING_TOLERANCE_C = 1.5
@@ -195,7 +287,13 @@ async def _generate_one(
         disposition = rule_label(state).disposition
 
         rendered = await azure.complete(
-            simulate.render_prompt(state, req.language, req.artifact_type, req.jurisdiction),
+            simulate.render_prompt(
+                state,
+                req.language,
+                req.artifact_type,
+                req.jurisdiction,
+                style_seed=req.rng_seed % 4,
+            ),
             max_tokens=simulate.render_max_tokens(req.artifact_type),
         )
 
@@ -346,9 +444,7 @@ async def stage_generate(
     per-second rate limit. Spacing out *starts* keeps in-flight calls low
     without needing to know the account's exact quota."""
     engine_sha_val = engine_sha()
-    all_reqs = [req for alloc in plan["allocations"] for req in _expand_allocation(alloc, wave)]
-    if max_records is not None:
-        all_reqs = all_reqs[:max_records]
+    all_reqs = _build_generation_requests(plan, wave, max_records)
     log_extra(
         log,
         20,
@@ -358,23 +454,16 @@ async def stage_generate(
         rate_per_minute=rate_per_minute,
     )
 
-    sem = asyncio.Semaphore(LOCAL_CONCURRENCY)
-
-    async def guarded(req: simulate.GenerationRequest) -> None:
-        async with sem:
-            await _generate_one(req, wave, azure, safety, book, engine_sha_val, settings)
-
-    interval_s = 60.0 / rate_per_minute if rate_per_minute else 0.0
-    tasks = []
-    for i, req in enumerate(all_reqs):
-        tasks.append(asyncio.create_task(guarded(req)))
-        if interval_s and i < len(all_reqs) - 1:
-            await asyncio.sleep(interval_s)
-        if (i + 1) % 25 == 0:
-            log_extra(log, 20, "generation progress", dispatched=i + 1, total=len(all_reqs))
-
-    await asyncio.gather(*tasks)
+    await _dispatch_generation_batch(
+        all_reqs, wave, azure, safety, book, engine_sha_val, settings, rate_per_minute
+    )
     await book.flush_generation()
+
+    if max_records is None:
+        await _top_up_underfilled_cells(
+            wave, plan, book, azure, safety, settings, engine_sha_val, rate_per_minute
+        )
+
     await book.update_coverage(wave)
     log_extra(log, 20, "generation complete", n=len(all_reqs))
 
@@ -392,6 +481,7 @@ async def _gate_a_metrics(
     attempted = len(rows) or 1
 
     kept_by_cell: dict[str, int] = Counter(r["cell"] for r in kept)
+    attempted_by_cell: dict[str, int] = Counter(r["cell"] for r in rows)
     texts = [r.get("rendered_text", "") for r in kept]
     labels = [r.get("disposition", "") for r in kept]
     artifact_types = [r.get("artifact_type") for r in kept]
@@ -399,24 +489,18 @@ async def _gate_a_metrics(
     metrics: dict[str, float] = {
         "schema_validity": sum(1 for r in rows if r.get("schema_valid")) / attempted,
         "round_trip_recovery": (sum(1 for r in kept if r.get("round_trip_ok")) / len(kept)) if kept else 0.0,
-        "screener_flag_rate": sum(1 for r in rows if r.get("screener_verdict") not in (None, "CONSISTENT")) / attempted,
-        "cell_fill_deviation": gates.cell_fill_deviation(plan, kept_by_cell),
+        "screener_flag_rate": gates.screener_flag_rate(rows),
+        "cell_fill_deviation": gates.cell_fill_deviation_survival_adjusted(plan, kept_by_cell, attempted_by_cell),
         "max_class_share": gates.max_class_share(labels),
         "guardrail_violation_rate": gates.guardrail_violation_rate(texts, artifact_types),
     }
 
     if texts:
-        # near_duplicate_rate depends on the embeddings endpoint, which is a
-        # separate deployment from chat/completions and can be down or
-        # misconfigured independently of it (confirmed live: an embeddings
-        # 400 previously crashed this entire command before any other Gate A
-        # metric was even computed). One dependency failing here must degrade
-        # to "not measured" for that one check -- gates.evaluate() already
-        # treats a missing key as a failed check -- rather than taking down
-        # every other metric in the same run.
         try:
             embeddings = await azure.embed(texts)
-            metrics["near_duplicate_rate"] = await gates.near_duplicate_rate_async(texts, lambda _t: embeddings)
+            metrics["near_duplicate_rate"] = await gates.near_duplicate_rate_stratified_async(
+                texts, artifact_types, lambda _t: embeddings
+            )
         except Exception as exc:  # noqa: BLE001
             log_extra(
                 log,
@@ -481,13 +565,54 @@ async def stage_gate_a(
 # --------------------------------------------------------------------------- #
 
 
-async def stage_train(wave: int, settings: Settings, book: lb.Logbook, dataset_hash: str) -> dict[str, Any]:
-    """Submits the SFT job via the training adapter."""
+async def stage_train(
+    wave: int,
+    settings: Settings,
+    book: lb.Logbook,
+    dataset_hash: str,
+    *,
+    dry_run: bool = False,
+) -> dict[str, Any]:
+    """Submits the SFT job via the training adapter (or dry-run preflight)."""
     submitter = FoundryTrainingSubmitter(settings)
-    result = await submitter.submit(wave, dataset_hash=dataset_hash)
+    export_path = str(Path(__file__).resolve().parent.parent.parent / "exports" / f"generation_log_wave{wave:02d}.jsonl")
+    result = await submitter.submit(wave, dataset_hash=dataset_hash, export_path=export_path, dry_run=dry_run)
     await book.write_json(wave, "train_submission.json", result)
-    log_extra(log, 20, "training job submitted", **result)
+    log_extra(log, 20, "training job submitted" if not dry_run else "training dry-run", **result)
     return result
+
+
+async def stage_preflight(
+    wave: int, settings: Settings, book: lb.Logbook
+) -> dict[str, Any]:
+    """Readiness check for train and Gate B without side effects."""
+    from cold_chain.adapters.training import preflight_check
+
+    gate_a = await book.read_json(wave, "gate_a.json")
+    rows = await book.read_generation(wave)
+    kept = [r for r in rows if r.get("outcome") == "kept"]
+    export_path = Path(__file__).resolve().parent.parent.parent / "exports" / f"generation_log_wave{wave:02d}.jsonl"
+
+    holdout_n = sum(
+        1
+        for r in kept
+        if int(hashlib.sha256(r["state_id"].encode()).hexdigest()[:8], 16) % 100 < int(HOLDOUT_FRACTION * 100)
+    )
+
+    training = preflight_check(settings, wave, export_path=export_path)
+    training["gate_a_passed"] = bool(gate_a and gate_a.get("passed"))
+    training["kept_count"] = len(kept)
+
+    gate_b = {
+        "student_endpoint_configured": bool(settings.student_inference_endpoint),
+        "holdout_items": holdout_n,
+        "auto_path_ready": bool(settings.student_inference_endpoint) and holdout_n >= 10,
+        "human_path_ready": holdout_n >= 10,
+        "note": "Use gate-b --results <path> when no student endpoint is deployed",
+    }
+    payload = {"wave": wave, "training": training, "gate_b": gate_b}
+    await book.write_json(wave, "preflight.json", payload)
+    return payload
 
 
 # --------------------------------------------------------------------------- #
@@ -808,10 +933,17 @@ async def _run(args: argparse.Namespace) -> int:
 
             elif args.cmd == "train":
                 gate_a = await book.read_json(args.wave, "gate_a.json")
-                if not gate_a or not gate_a.get("passed"):
+                if not args.dry_run and (not gate_a or not gate_a.get("passed")):
                     raise WaveHalted(f"Gate A has not passed for wave {args.wave}; refusing to submit training")
-                dataset_hash = hashlib.sha256(json.dumps(gate_a["metrics"], sort_keys=True).encode()).hexdigest()[:12]
-                await stage_train(args.wave, settings, book, dataset_hash)
+                dataset_hash = hashlib.sha256(
+                    json.dumps((gate_a or {}).get("metrics", {}), sort_keys=True).encode()
+                ).hexdigest()[:12]
+                result = await stage_train(args.wave, settings, book, dataset_hash, dry_run=args.dry_run)
+                print(json.dumps(result, indent=2))
+
+            elif args.cmd == "preflight":
+                result = await stage_preflight(args.wave, settings, book)
+                print(json.dumps(result, indent=2))
 
             elif args.cmd == "gate-b":
                 if args.results:
@@ -856,7 +988,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(prog="python -m cold_chain.runner")
     ap.add_argument(
         "cmd",
-        choices=["health", "ready", "plan", "generate", "gate-a", "train", "gate-b"],
+        choices=["health", "ready", "plan", "generate", "gate-a", "train", "preflight", "gate-b"],
     )
     ap.add_argument("--wave", type=int, default=None)
     ap.add_argument(
@@ -876,6 +1008,11 @@ def main() -> int:
         type=int,
         default=None,
         help="generate only: stop after this many items from the plan",
+    )
+    ap.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="train only: validate preflight without submitting a job",
     )
     args = ap.parse_args()
 

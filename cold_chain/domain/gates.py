@@ -119,8 +119,53 @@ def near_duplicate_rate(texts: list[str], embed: Callable[[list[str]], Any], thr
     return float((sim.max(axis=1) > thresh).mean())
 
 
+def near_duplicate_rate_stratified(
+    texts: list[str],
+    artifact_types: list[str | None],
+    embed: Callable[[list[str]], Any],
+    *,
+    default_thresh: float = 0.95,
+    structured_thresh: float = 0.98,
+) -> float:
+    """Per-artifact-type duplicate rate, then mean. logger_csv uses a higher
+    threshold because structured CSV rows legitimately share boilerplate."""
+    from collections import defaultdict
+
+    buckets: dict[str, list[str]] = defaultdict(list)
+    for text, atype in zip(texts, artifact_types):
+        buckets[atype or "unknown"].append(text)
+    rates: list[float] = []
+    for atype, bucket in buckets.items():
+        if len(bucket) < 2:
+            continue
+        thresh = structured_thresh if atype == "logger_csv" else default_thresh
+        rates.append(near_duplicate_rate(bucket, embed, thresh))
+    return float(sum(rates) / len(rates)) if rates else 0.0
+
+
 async def near_duplicate_rate_async(texts: list[str], embed: Callable[[list[str]], Any], thresh: float = 0.95) -> float:
     return await asyncio.to_thread(near_duplicate_rate, texts, embed, thresh)
+
+
+async def near_duplicate_rate_stratified_async(
+    texts: list[str],
+    artifact_types: list[str | None],
+    embed: Callable[[list[str]], Any],
+    **kwargs: float,
+) -> float:
+    return await asyncio.to_thread(near_duplicate_rate_stratified, texts, artifact_types, embed, **kwargs)
+
+
+def screener_flag_rate(rows: list[dict[str, Any]]) -> float:
+    """Fraction of attempted records flagged by screener, guardrails, or safety."""
+    attempted = len(rows) or 1
+    flagged = sum(
+        1
+        for r in rows
+        if r.get("screener_verdict") not in (None, "CONSISTENT")
+        or r.get("outcome") in ("dropped_guardrail", "dropped_safety", "dropped_screener")
+    )
+    return flagged / attempted
 
 
 def cell_fill_deviation(plan: dict[str, Any], kept_by_cell: dict[str, int]) -> float:
@@ -129,6 +174,28 @@ def cell_fill_deviation(plan: dict[str, Any], kept_by_cell: dict[str, int]) -> f
         cell = cat.cell_key(a["product"], a["fault_mode"])
         target = a["count"]
         devs.append(abs(kept_by_cell.get(cell, 0) - target) / max(target, 1))
+    return float(sum(devs) / len(devs)) if devs else 0.0
+
+
+def cell_fill_deviation_survival_adjusted(
+    plan: dict[str, Any],
+    kept_by_cell: dict[str, int],
+    attempted_by_cell: dict[str, int],
+) -> float:
+    """Compare kept counts to targets scaled by per-cell survival (kept/attempted).
+    Reduces false inflation when drops are uniform but non-zero."""
+    devs = []
+    for a in plan["allocations"]:
+        cell = cat.cell_key(a["product"], a["fault_mode"])
+        target = a["count"]
+        kept = kept_by_cell.get(cell, 0)
+        attempted = attempted_by_cell.get(cell, 0)
+        if attempted == 0:
+            devs.append(1.0)
+            continue
+        survival = kept / attempted
+        expected_kept = target * survival if survival > 0 else 0
+        devs.append(abs(kept - expected_kept) / max(target, 1))
     return float(sum(devs) / len(devs)) if devs else 0.0
 
 

@@ -285,19 +285,33 @@ class AutoGateB:
         self.deliberation.append(record)
         return record
 
+    @staticmethod
+    def _macro_f1_per_cell(items: list[HoldoutItem]) -> dict[str, float]:
+        from collections import defaultdict
+
+        from sklearn.metrics import f1_score
+
+        by_cell: dict[str, list[tuple[str, str]]] = defaultdict(list)
+        for item in items:
+            if item.model_output is None:
+                continue
+            pred = (item.model_output or {}).get("disposition", "")
+            by_cell[item.cell].append((item.ground_truth_disposition, pred))
+        out: dict[str, float] = {}
+        for cell, pairs in by_cell.items():
+            y_true = [p[0] for p in pairs]
+            y_pred = [p[1] for p in pairs]
+            labels = sorted(set(y_true) | set(y_pred))
+            out[cell] = float(f1_score(y_true, y_pred, labels=labels, average="macro", zero_division=0))
+        return out
+
     async def run(self, items: list[HoldoutItem]) -> dict[str, Any]:
-        cell_correct: dict[str, int] = {}
-        cell_total: dict[str, int] = {}
         malformed = 0
         hallucination_scores: list[float] = []
         abstention_hits, abstention_total = 0, 0
+        abstention_pred_hits, abstention_pred_total = 0, 0
 
         for item in items:
-            cell_total[item.cell] = cell_total.get(item.cell, 0) + 1
-            predicted = (item.model_output or {}).get("disposition")
-            if predicted == item.ground_truth_disposition:
-                cell_correct[item.cell] = cell_correct.get(item.cell, 0) + 1
-
             judged = await self._judge_item(item)
             if judged.get("malformed_json"):
                 malformed += 1
@@ -305,10 +319,16 @@ class AutoGateB:
             hallucination_scores.append(judged["hallucination_score"])
             if item.is_abstention:
                 abstention_total += 1
-                abstention_hits += int(judged.get("abstention_correct", False))
+                if judged.get("abstention_correct"):
+                    abstention_hits += 1
+            predicted = (item.model_output or {}).get("disposition", "")
+            if predicted == "insufficient_data":
+                abstention_pred_total += 1
+                if item.is_abstention:
+                    abstention_pred_hits += 1
 
         n = len(items) or 1
-        cell_f1 = {c: cell_correct.get(c, 0) / t for c, t in cell_total.items()}
+        cell_f1 = self._macro_f1_per_cell(items)
 
         return {
             "cell_f1": cell_f1,
@@ -317,7 +337,9 @@ class AutoGateB:
                 "hallucinated_field_rate": (
                     sum(hallucination_scores) / len(hallucination_scores) if hallucination_scores else 0.0
                 ),
-                "abstention_precision": (abstention_hits / abstention_total) if abstention_total else 1.0,
+                "abstention_precision": (
+                    abstention_pred_hits / abstention_pred_total if abstention_pred_total else 1.0
+                ),
                 "abstention_recall": (abstention_hits / abstention_total) if abstention_total else 1.0,
                 # cross_language_delta / adversarial_gap / holdout_delta need the holdout
                 # pool partitioned by language/adversarial/wave-10 flags upstream; the

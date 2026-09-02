@@ -156,7 +156,10 @@ Audit the last Gate A result:
 
 ```bash
 python scripts/local_run.py audit --wave 1
+python scripts/local_run.py kpi --wave 1
 ```
+
+See [`docs/LOCAL_RUNBOOK.md`](docs/LOCAL_RUNBOOK.md) for the full operational guide.
 
 **Option B -- step by step (manual):**
 
@@ -298,6 +301,8 @@ CI builds the Docker image on every push to `main`. Deploy to Azure is a manual 
 | `make health` | Run `python -m cold_chain.runner health` |
 | `make local-setup` | Run tests + health + ready |
 | `make smoke-run WAVE=1 MAX=10` | One-command smoke pipeline |
+| `make kpi WAVE=1` | 12-dimension KPI scorecard (target >= 7/10) |
+| `make preflight WAVE=1` | Training + Gate B readiness check |
 | `make wave-run WAVE=1` | One-command full wave pipeline |
 | `make local-audit WAVE=1` | Summarize Gate A metrics for a wave |
 | `make lock` | Regenerate `requirements.txt` from `requirements.in` |

@@ -228,7 +228,22 @@ RENDER_FIELDS = (
 )
 
 
-def render_prompt(state: WorldState, language: str, artifact_type: str, jurisdiction: str | None = None) -> str:
+_RENDER_STYLE_VARIANTS = (
+    "Use a concise, matter-of-fact tone.",
+    "Write as a busy operator would — short sentences, practical detail.",
+    "Include one concrete logistics detail (truck ID, bay number, or route leg) invented for realism.",
+    "Vary phrasing: avoid starting with 'Hi team' or 'Voice note'; open differently each time.",
+)
+
+
+def render_prompt(
+    state: WorldState,
+    language: str,
+    artifact_type: str,
+    jurisdiction: str | None = None,
+    *,
+    style_seed: int | None = None,
+) -> str:
     """Builds the renderer prompt. Deliberately excludes disposition/label/rule_id —
     those never leave rules_engine.py. ``jurisdiction`` only adds a scene-setting
     sentence (which GCC state the consignment is moving within); it is never
@@ -245,9 +260,12 @@ def render_prompt(state: WorldState, language: str, artifact_type: str, jurisdic
     for f in state.missing_fields:
         visible.pop(f, None)
     jurisdiction_line = f" {_JURISDICTION_CONTEXT[jurisdiction]}" if jurisdiction in _JURISDICTION_CONTEXT else ""
+    variant_idx = (style_seed if style_seed is not None else hash(state.product) % len(_RENDER_STYLE_VARIANTS))
+    style_line = _RENDER_STYLE_VARIANTS[variant_idx % len(_RENDER_STYLE_VARIANTS)]
     return (
         "You are rendering a realistic GCC cold-chain field artifact from structured sensor data. "
-        f"{_LANG_INSTRUCTION[language]} {_ARTIFACT_INSTRUCTION[artifact_type]}{jurisdiction_line}\n\n"
+        f"{_LANG_INSTRUCTION[language]} {_ARTIFACT_INSTRUCTION[artifact_type]}{jurisdiction_line}\n"
+        f"{style_line}\n\n"
         "Do not state any conclusion, decision, or disposition — only report what was observed. "
         "Do not use the words accept/reject/hold/expedite or any synonym for a decision.\n\n"
         f"Underlying data (do not quote as JSON, weave naturally into the artifact):\n{visible}\n"

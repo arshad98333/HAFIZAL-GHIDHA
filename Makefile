@@ -1,4 +1,4 @@
-.PHONY: install dev test test-fast test-integration lint format typecheck check build clean health local-setup smoke-run wave-run local-audit
+.PHONY: install dev test test-fast test-integration lint format typecheck check build clean health local-setup smoke-run wave-run local-audit kpi preflight
 
 PYTHON ?= python3
 VENV ?= .venv
@@ -71,3 +71,9 @@ wave-run:
 
 local-audit:
 	$(PY) scripts/local_run.py audit --wave $(or $(WAVE),1)
+
+kpi:
+	$(PY) scripts/kpi_dashboard.py --wave $(or $(WAVE),1)
+
+preflight:
+	$(PY) -m cold_chain.runner preflight --wave $(or $(WAVE),1)

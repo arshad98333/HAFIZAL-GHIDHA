@@ -18,6 +18,11 @@ Option 2 -- print or run individual steps (same commands you would type by hand)
 Audit the last Gate A result for a wave (reads gate_a.json from MongoDB):
 
     python scripts/local_run.py audit --wave 1
+
+KPI scorecard (all 12 dimensions, target >= 7/10):
+
+    python scripts/local_run.py kpi --wave 1
+    python scripts/local_run.py preflight --wave 1
 """
 
 from __future__ import annotations
@@ -97,6 +102,7 @@ def _step_cmds(wave: int, max_records: int | None, rate_per_minute: int | None) 
         ("generate", generate),
         ("gate-a", [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(wave)]),
         ("export", [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(wave)]),
+        ("preflight", [py, "-m", "cold_chain.runner", "preflight", "--wave", str(wave)]),
         (
             "audit",
             [
@@ -170,6 +176,10 @@ def cmd_step(args: argparse.Namespace) -> int:
     if name in ("train", "gate-b"):
         cmd = [py, "-m", "cold_chain.runner", name, "--wave", str(args.wave)]
         return _run(name, cmd, stop_on_fail=False)
+    if name == "preflight":
+        return _run("preflight", [py, "-m", "cold_chain.runner", "preflight", "--wave", str(args.wave)])
+    if name == "kpi":
+        return _run("kpi", [py, str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(args.wave)], stop_on_fail=False)
 
     print(f"error: unknown step {name!r}", file=sys.stderr)
     return 2
@@ -250,7 +260,7 @@ def main() -> int:
     p_step = sub.add_parser("step", help="run one named step")
     p_step.add_argument(
         "step_name",
-        choices=["setup", "plan", "generate", "gate-a", "export", "audit", "train", "gate-b"],
+        choices=["setup", "plan", "generate", "gate-a", "export", "audit", "preflight", "train", "gate-b", "kpi"],
     )
     p_step.add_argument("--wave", type=int, default=None)
     p_step.add_argument("--max-records", type=int, default=None)
@@ -259,6 +269,13 @@ def main() -> int:
 
     p_audit = sub.add_parser("audit", help="summarize Gate A + record counts for a wave")
     p_audit.add_argument("--wave", type=int, required=True)
+
+    p_kpi = sub.add_parser("kpi", help="12-dimension KPI scorecard (target >= 7/10)")
+    p_kpi.add_argument("--wave", type=int, required=True)
+    p_kpi.add_argument("--json", action="store_true")
+
+    p_preflight = sub.add_parser("preflight", help="training + Gate B readiness check")
+    p_preflight.add_argument("--wave", type=int, required=True)
 
     args = ap.parse_args()
     if args.mode == "all":
@@ -269,6 +286,13 @@ def main() -> int:
         return cmd_step(args)
     if args.mode == "audit":
         return cmd_audit(args)
+    if args.mode == "kpi":
+        cmd = [_py(), str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(args.wave)]
+        if args.json:
+            cmd.append("--json")
+        return _run("kpi", cmd, stop_on_fail=False)
+    if args.mode == "preflight":
+        return _run("preflight", [_py(), "-m", "cold_chain.runner", "preflight", "--wave", str(args.wave)])
     return 2
 
 
