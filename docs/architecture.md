@@ -1,5 +1,7 @@
 # Architecture
 
+Diagrams: [`architecture_diagrams/package_layers.svg`](../architecture_diagrams/package_layers.svg), [`pipeline_stages.svg`](../architecture_diagrams/pipeline_stages.svg), [`local_dev_flow.svg`](../architecture_diagrams/local_dev_flow.svg).
+
 ## System shape
 
 This is a **batch CLI pipeline** deployed as an **Azure Container Apps Job**. There is no long-running HTTP server. Each stage is a separate, resumable invocation:

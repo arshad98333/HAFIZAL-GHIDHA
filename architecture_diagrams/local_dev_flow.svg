@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" font-family="Segoe UI, system-ui, sans-serif">
+  <rect width="720" height="480" fill="#f8f9fb"/>
+  <text x="360" y="32" text-anchor="middle" font-size="18" font-weight="600" fill="#1a1a2e">Local development flow</text>
+
+  <g font-size="12">
+    <rect x="260" y="52" width="200" height="36" rx="6" fill="#e3f2fd" stroke="#1976d2"/>
+    <text x="360" y="75" text-anchor="middle">git clone + make install</text>
+
+    <rect x="260" y="108" width="200" height="36" rx="6" fill="#e8f5e9" stroke="#388e3c"/>
+    <text x="360" y="131" text-anchor="middle">make test-fast (offline)</text>
+
+    <rect x="260" y="164" width="200" height="36" rx="6" fill="#fff8e1" stroke="#f9a825"/>
+    <text x="360" y="187" text-anchor="middle">cp .env.example .env</text>
+
+    <rect x="260" y="220" width="200" height="36" rx="6" fill="#fce4ec" stroke="#c2185b"/>
+    <text x="360" y="243" text-anchor="middle">az login (Azure AAD)</text>
+
+    <rect x="260" y="276" width="200" height="36" rx="6" fill="#e1bee7" stroke="#7b1fa2"/>
+    <text x="360" y="299" text-anchor="middle">runner health</text>
+
+    <rect x="260" y="332" width="200" height="36" rx="6" fill="#b2dfdb" stroke="#00796b"/>
+    <text x="360" y="355" text-anchor="middle">plan / generate / gate-a</text>
+
+    <rect x="260" y="388" width="200" height="36" rx="6" fill="#d7ccc8" stroke="#5d4037"/>
+    <text x="360" y="411" text-anchor="middle">export_wave.py</text>
+  </g>
+
+  <path d="M360 88 L360 108" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M360 144 L360 164" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M360 200 L360 220" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M360 256 L360 276" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M360 312 L360 332" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M360 368 L360 388" stroke="#666" stroke-width="1.5" marker-end="url(#arr)"/>
+  <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#666"/></marker></defs>
+
+  <text x="500" y="131" font-size="10" fill="#555">No MongoDB or Azure needed</text>
+  <text x="500" y="187" font-size="10" fill="#555">MongoDB Atlas URI required</text>
+  <text x="500" y="243" font-size="10" fill="#555">For generate stage API calls</text>
+  <text x="500" y="299" font-size="10" fill="#555">Config validation only</text>
+  <text x="500" y="355" font-size="10" fill="#555">--max-records 10 for smoke</text>
+</svg>

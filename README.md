@@ -6,138 +6,270 @@
 
 ## What this is
 
-This project trains an AI model to check food shipment records — temperature logs, chat messages, QC forms, voice notes — and decide whether a shipment should be **accepted, held for review, rejected, or needs more data**. The decisions the AI is trained on aren't guesses: they come from a fixed rule engine built on the actual food safety laws of six Gulf countries (UAE, Saudi Arabia, Qatar, Kuwait, Oman, Bahrain), including GSO (Gulf Standardization Organization) standards.
+This project trains an AI model to review cold-chain food shipment records (temperature logs, chat messages, QC forms, voice notes) and decide whether a shipment should be **accepted, held for review, rejected, or needs more data**. Training labels come from a deterministic rules engine grounded in GCC food-safety law (UAE, Saudi Arabia, Qatar, Kuwait, Oman, Bahrain) and GSO standards. No LLM ever produces a label.
 
-In short: real food-safety rules, turned into training data, so an AI can learn to make the same call a compliance officer would.
+For an executive summary, see [`One_Engine_Six_Jurisdictions.pdf`](One_Engine_Six_Jurisdictions.pdf).
 
-**For a full executive summary, read [`One_Engine_Six_Jurisdictions.pdf`](One_Engine_Six_Jurisdictions.pdf).**
+## Requirements
 
-## How it works
-
-**The full picture.** Seven specialized steps generate a shipment record, check it against the rules, and write everything to one traceable log a person can read back at any time.
-
-![Full system architecture](architecture_diagrams/full_system_architecture_csuite_v2.png)
-
-**How a decision gets made.** No AI judgment call decides whether a shipment passes — a fixed checklist does, in order, every time.
-
-![Decision engine](architecture_diagrams/rules_engine_architecture_gcc_v3.png)
-
-**Safety limits, in practice.** Every temperature reading is checked against the safe range for that product type — frozen, fresh, chilled, or ambient — under GSO and national standards.
-
-![Temperature bands](architecture_diagrams/gso_temperature_bands_arrows.png)
-
-**Content screening.** Before any generated record is kept, it's checked against a universal safety checklist plus each country's own added rules. One rule never bends: nothing that pressures a sale over a safety concern is ever allowed through.
-
-![Guardrail layer](architecture_diagrams/guardrail_architecture_csuite_retry.png)
-
-**Where the data lives.** Every stage of the pipeline reads from and writes to MongoDB Atlas, so nothing is only in local files, and each finished batch is logged before the next one starts.
-
-![MongoDB Atlas data flow](architecture_diagrams/mongodb_atlas_agentic_workflow.png)
-
-**Getting it live.** Pushing to the main branch tests the code, builds it, and deploys it to Azure automatically — no manual steps, no stored passwords.
-
-![Deployment flow](architecture_diagrams/azure_container_apps_cicd_architecture_v2.png)
-
-## What's in this repo
-
-| Folder / file | What it's for |
+| Tool | Version |
 |---|---|
-| `cold_chain/` | The core pipeline code |
-| `gcc_food_law_json/` | The food-law knowledge base — one file per country, each citing its source |
-| `guardrails/` | The safety checklist described above |
-| `scripts/` | Tools to test, export, and audit results |
-| `infra/`, `Dockerfile` | Everything needed to deploy this to Azure |
-| `.github/workflows/` | Automated testing and deployment on every code push |
-| [`DEPLOYMENT.md`](DEPLOYMENT.md) | Full deployment setup guide |
-| [`ROADMAP.md`](ROADMAP.md) | What's built, what's next |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | How to contribute |
-| [`MANUAL_TESTING_GUIDE.md`](MANUAL_TESTING_GUIDE.md) | Step-by-step commands to set up and run a full batch, for engineers |
-| [`One_Engine_Six_Jurisdictions.pdf`](One_Engine_Six_Jurisdictions.pdf) | Executive summary of the project |
-| [`LICENSE`](LICENSE) | MIT |
+| Python | 3.11 or 3.12 |
+| pip | latest |
+| Git | any recent |
+| Make | optional but recommended |
+| Docker | optional (image build and local MongoDB) |
+| Azure CLI | required for `generate` stage (`az login` for AAD auth) |
 
-## How to run this, step by step
+## How to run locally (step by step)
 
-This walks through running it on your own computer from scratch. It assumes nothing installed yet except [Python 3.11 or 3.12](https://www.python.org/downloads/) and [Git](https://git-scm.com/downloads).
+### Step 1: Clone the repository
 
-**1. Get the code**
-
-```
+```bash
 git clone https://github.com/arshad98333/HAFIZAL-GHIDHA.git
 cd HAFIZAL-GHIDHA
 ```
 
-**2. Create a Python environment and install dependencies**
+### Step 2: Create a virtual environment and install dependencies
 
-Windows:
-```
-python -m venv .venv
-.venv\Scripts\activate
-make install
-```
+**Linux / macOS:**
 
-Mac/Linux:
-```
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 make install
 ```
 
-Or without Make: `pip install -r requirements-dev.txt`
+**Windows:**
 
-**Requirements:** Python 3.11 or 3.12, pip, Docker (for image build), Make (optional but recommended).
-
-**3. Set up a database (MongoDB Atlas)**
-
-This pipeline stores its results in MongoDB, not local files.
-
-1. Create a free account and cluster at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas).
-2. In Atlas, go to **Database Access** and add a database user with read/write access to a database named `cold_chain`.
-3. Go to **Network Access** and allow your current IP address.
-4. Copy your connection string (Atlas → Connect → Drivers).
-
-**4. Configure your environment file**
-
+```bat
+python -m venv .venv
+.venv\Scripts\activate
+make install
 ```
+
+Without Make:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+### Step 3: Run offline tests (no credentials needed)
+
+```bash
+make test-fast
+```
+
+This runs 340+ tests against the deterministic core (`rules_engine`, `guardrails`, `knowledge_base`, `curriculum`). No network, no MongoDB, no Azure account required.
+
+Optional full check (lint, typecheck, fast tests):
+
+```bash
+make check
+```
+
+### Step 4: Configure environment variables
+
+```bash
 cp .env.example .env
 ```
 
-Open `.env` in any text editor and fill in:
-- `MONGODB_URI` — the connection string from step 3
-- `AZURE_OPENAI_ENDPOINT` and `AZURE_OPENAI_DEPLOYMENT` — your Azure OpenAI deployment details
+Edit `.env` and set at minimum:
 
-Never commit this file — it holds real credentials.
+| Variable | Required for | Description |
+|---|---|---|
+| `MONGODB_URI` | all stages except `health` | MongoDB Atlas connection string |
+| `MONGODB_DB_NAME` | all stages | Database name (default: `cold_chain`) |
+| `AZURE_OPENAI_ENDPOINT` | `plan`, `generate`, gates | Azure OpenAI Foundry endpoint |
+| `AZURE_OPENAI_DEPLOYMENT` | same | Deployment name (default: `gpt-5.4-mini`) |
+| `FOUNDRY_PROJECT_ENDPOINT` | `train` | Foundry project endpoint |
+| `FOUNDRY_COMPUTE_CLUSTER` | `train` | GPU cluster name |
+| `FOUNDRY_BASE_MODEL` | `train` | Base model checkpoint |
+| `TRAINING_REGION` | `train` | Region tag for training jobs |
 
-**5. Run a small test batch**
+Never commit `.env`. It is listed in `.gitignore`.
 
+### Step 5: Set up MongoDB Atlas
+
+1. Create a free cluster at [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas).
+2. **Database Access:** add a user with `readWrite` on database `cold_chain` only.
+3. **Network Access:** allow your current IP (or `0.0.0.0/0` for dev only).
+4. Copy the connection string into `MONGODB_URI` in `.env`.
+
+**Local alternative (integration tests only):**
+
+```bash
+docker compose up -d mongo
+# set MONGODB_URI=mongodb://localhost:27017 in .env
 ```
-make test-fast
+
+### Step 6: Sign in to Azure (for API calls)
+
+The pipeline uses Azure AD (`DefaultAzureCredential`), not API keys:
+
+```bash
+az login
+```
+
+Grant your identity `Cognitive Services OpenAI User` on the Azure OpenAI resource.
+
+### Step 7: Verify configuration
+
+```bash
+python -m cold_chain.runner health
+```
+
+Expected output:
+
+```json
+{"status": "ok", "environment": "production", "checks": ["config"]}
+```
+
+To confirm MongoDB is reachable:
+
+```bash
+python -m cold_chain.runner ready
+```
+
+### Step 8: Run a smoke wave (10 records)
+
+```bash
 python -m cold_chain.runner plan     --wave 1
 python -m cold_chain.runner generate --wave 1 --max-records 10
 python -m cold_chain.runner gate-a   --wave 1
 ```
 
-Health check (no wave required):
+- `plan` writes `plan.json` to MongoDB for wave 1.
+- `generate` synthesizes records, labels them with `rules_engine`, renders text via Azure OpenAI, and writes to `generation_log`.
+- `gate-a` checks data quality. Exit code `2` means the gate halted (read the failure list).
 
-```
-python -m cold_chain.runner health
-```
+Gate A on a 10-record smoke run often fails by design (thresholds are tuned for 663-record waves). The goal here is confirming commands run end to end.
 
-If `gate-a` prints a list of failed checks and exits, that's the system correctly stopping on a problem — read the list, it tells you exactly what to fix.
+### Step 9: Export and inspect results
 
-**6. Look at what it produced**
-
-```
+```bash
 python scripts/export_wave.py --wave 1
 ```
 
-This writes the kept records to `exports/generation_log_wave01.jsonl` so you can open and read them.
+Output: `exports/generation_log_wave01.jsonl`
 
-That's the smallest working loop. For the full run (all 8 waves, training, and evaluation), see [`MANUAL_TESTING_GUIDE.md`](MANUAL_TESTING_GUIDE.md). Deployment to Azure is covered in [`DEPLOYMENT.md`](DEPLOYMENT.md).
+### Step 10: Full pipeline (optional)
 
-## The safeguards, in plain terms
+```bash
+python -m cold_chain.runner plan     --wave 1
+python -m cold_chain.runner generate --wave 1
+python -m cold_chain.runner gate-a   --wave 1
+python -m cold_chain.runner train    --wave 1
+python -m cold_chain.runner gate-b   --wave 1
+```
 
-No AI model ever decides a label directly — a fixed set of rules does, and that logic is open to review. The verified reference data used for training is kept completely separate from anything an AI agent can touch during testing, so results can't be gamed. Every kept record carries a full paper trail: what created it, what model touched it, and which country's rules applied. And if any safety check fails partway through a batch, the whole batch stops rather than continuing on bad data.
+See [`MANUAL_TESTING_GUIDE.md`](MANUAL_TESTING_GUIDE.md) for the full 8-wave corpus run and [`DEPLOYMENT.md`](DEPLOYMENT.md) for Azure Container Apps deployment.
+
+## Architecture
+
+### Package layers
+
+The pipeline code lives under `cold_chain/` in four layers plus config and ports:
+
+![Package layers](architecture_diagrams/package_layers.svg)
+
+| Layer | Path | Responsibility |
+|---|---|---|
+| **cli** | `cold_chain/cli/runner.py` | Entry point: parse args, wire dependencies, run stages |
+| **domain** | `cold_chain/domain/` | Business rules only; no network or database |
+| **adapters** | `cold_chain/adapters/` | MongoDB logbook, Azure clients, training submitter, fakes |
+| **observability** | `cold_chain/observability/` | Structured JSON logs with `run_id` and `wave` |
+| **config** | `cold_chain/config.py` | Env validation at startup; fails fast on missing vars |
+| **ports** | `cold_chain/ports.py` | Interfaces for logbook, LLM, content safety, training |
+
+Full detail: [`docs/architecture.md`](docs/architecture.md)
+
+### Pipeline stages
+
+Each wave is a sequence of separate, resumable CLI invocations:
+
+![Pipeline stages](architecture_diagrams/pipeline_stages.svg)
+
+```
+plan -> generate -> gate-a -> train -> gate-b
+```
+
+### Local development flow
+
+![Local dev flow](architecture_diagrams/local_dev_flow.svg)
+
+### Domain: how a label is decided
+
+No AI decides whether a shipment passes. `rules_engine.label()` runs a fixed checklist on temperature bands from GSO and national standards:
+
+![Decision engine](architecture_diagrams/rules_engine_architecture_gcc_v3.png)
+
+### Guardrails and temperature bands
+
+![Temperature bands](architecture_diagrams/gso_temperature_bands_arrows.png)
+
+![Guardrail layer](architecture_diagrams/guardrail_architecture_csuite_retry.png)
+
+### Data flow (MongoDB Atlas)
+
+Every stage reads and writes through the logbook adapter. Nothing lives only in local files:
+
+![MongoDB Atlas data flow](architecture_diagrams/mongodb_atlas_agentic_workflow.png)
+
+### Deployment (Azure Container Apps Job)
+
+CI builds the Docker image on every push to `main`. Deploy to Azure is a manual workflow dispatch:
+
+![Deployment flow](architecture_diagrams/azure_container_apps_cicd_architecture_v2.png)
+
+## What's in this repo
+
+| Folder / file | Purpose |
+|---|---|
+| `cold_chain/domain/` | Rules engine, gates, curriculum, simulate, guardrails, knowledge base |
+| `cold_chain/adapters/` | MongoDB logbook, Azure clients, training submitter, test fakes |
+| `cold_chain/cli/` | Wave runner (`plan`, `generate`, `gate-a`, `train`, `gate-b`, `health`, `ready`) |
+| `cold_chain/observability/` | Structured logging |
+| `gcc_food_law_json/` | Food-law knowledge base (one file per GCC country) |
+| `guardrails/` | Safety checklist (base + per-country overlays) |
+| `tests/unit/` | Fast offline tests |
+| `tests/integration/` | MongoDB integration tests (`docker compose up -d mongo`) |
+| `scripts/` | Export, smoke test, audit, reset |
+| `infra/`, `Dockerfile` | Azure Container Apps Job deployment |
+| `.github/workflows/` | CI (`make check`) and CD (GHCR + manual deploy) |
+| `docs/` | Scope, architecture, operations, phase gates |
+| `Makefile` | `install`, `test-fast`, `check`, `lock`, `build`, `health` |
+
+## Makefile commands
+
+| Command | What it does |
+|---|---|
+| `make install` | Install dev dependencies from lockfile |
+| `make test-fast` | Run offline unit tests (no network) |
+| `make test-integration` | Run MongoDB integration tests (needs `docker compose`) |
+| `make check` | Lint + typecheck + fast tests (same as CI) |
+| `make build` | Build Docker image locally |
+| `make health` | Run `python -m cold_chain.runner health` |
+| `make lock` | Regenerate `requirements.txt` from `requirements.in` |
+
+## Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| `Missing required environment variables` on startup | Fill every required field in `.env` (see Step 4 table) |
+| `az login` / AAD errors during `generate` | Run `az login`; confirm OpenAI User role on the resource |
+| MongoDB connection timeout | Check Atlas IP allowlist and `MONGODB_URI` |
+| Gate A fails on a 10-record smoke run | Expected; thresholds target 663-record waves. Try `--max-records 100` or a full wave |
+| `pip install` fails on Python 3.11 | Use the committed lockfile (`requirements-dev.txt`); scientific stack is capped for 3.11 |
+| Import errors after upgrade | Old import paths still work via shims (`cold_chain.rules_engine` etc.) |
+
+## Safeguards
+
+- Labels come from `rules_engine.py` only, never from an LLM.
+- Golden-set database has no grant to the pipeline MongoDB user (Atlas RBAC).
+- Every kept record carries a provenance envelope (wave, cell, rules version, model hashes).
+- Gate A or Gate B failure halts the pipeline (exit code 2) rather than continuing on bad data.
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT. See [`LICENSE`](LICENSE).
