@@ -1,10 +1,12 @@
 # Deploy Web Stack to Azure (API Container App + Static Web App)
 #
+# No local Docker required — builds the API image in Azure Container Registry (az acr build).
+# No GitHub CLI required — owner is read from git remote.
+#
 # Prerequisites:
 #   az login
-#   Docker (for API image build/push)
-#   Node.js 20+ (for frontend build)
-#   .env with MONGODB_URI, AZURE_OPENAI_ENDPOINT, FOUNDRY_* vars
+#   Node.js 20+ (frontend build + SWA deploy)
+#   .env with MONGODB_URI, AZURE_OPENAI_ENDPOINT
 #
 # Usage (PowerShell):
 #   .\scripts\deploy-azure-web.ps1
@@ -13,9 +15,13 @@
 param(
     [string]$ResourceGroup = "gcc-coldchain-rg",
     [string]$Location = "uaenorth",
+    [string]$StaticWebLocation = "westeurope",
     [string]$ApiAppName = "gcc-coldchain-api",
     [string]$StaticWebAppName = "gcc-coldchain-ui",
     [string]$ImageTag = "latest",
+    [ValidateSet("Acr", "Docker", "Ghcr")]
+    [string]$BuildMethod = "Acr",
+    [string]$AcrName = "",
     [switch]$SkipInfra,
     [switch]$SkipApiImage,
     [switch]$SkipFrontend
@@ -33,7 +39,21 @@ function Get-DotEnvValue([string]$Key) {
     return ($line -split "=", 2)[1].Trim().Trim('"').Trim("'")
 }
 
-if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
+function Get-GitHubOwner {
+    try {
+        $remote = (git -C $Root config --get remote.origin.url 2>$null)
+        if ($remote -match "github\.com[:/]([^/]+)") {
+            return $Matches[1]
+        }
+    } catch {}
+    return "arshad98333"
+}
+
+function Test-Command([string]$Name) {
+    return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
+}
+
+if (-not (Test-Command az)) {
     Write-Error "Azure CLI (az) not found. Install: https://learn.microsoft.com/cli/azure/install-azure-cli"
 }
 
@@ -45,72 +65,173 @@ if (-not $sub) {
 $mongodbUri = Get-DotEnvValue "MONGODB_URI"
 $openAiEndpoint = Get-DotEnvValue "AZURE_OPENAI_ENDPOINT"
 $foundryProject = Get-DotEnvValue "FOUNDRY_PROJECT_ENDPOINT"
+if (-not $foundryProject) { $foundryProject = $openAiEndpoint }
 $foundryCluster = Get-DotEnvValue "FOUNDRY_COMPUTE_CLUSTER"
+if (-not $foundryCluster) { $foundryCluster = "local" }
 $foundryModel = Get-DotEnvValue "FOUNDRY_BASE_MODEL"
+if (-not $foundryModel) { $foundryModel = "base" }
 $trainingRegion = Get-DotEnvValue "TRAINING_REGION"
+if (-not $trainingRegion) { $trainingRegion = $Location }
 
 if (-not $mongodbUri) { Write-Error "MONGODB_URI missing in .env" }
 if (-not $openAiEndpoint) { Write-Error "AZURE_OPENAI_ENDPOINT missing in .env" }
 
-$owner = (gh api user -q .login 2>$null)
-if (-not $owner) { $owner = "arshad98333" }
-$image = "ghcr.io/$($owner.ToLower())/hafizal-ghidha-api:$ImageTag"
+$acrServer = ""
+$acrUsername = ""
+$acrPassword = ""
+$image = ""
 
 if (-not $SkipApiImage) {
-    Write-Host "Building API image: $image"
-    docker build -f Dockerfile.api -t $image .
-    Write-Host "Pushing to GHCR (ensure: gh auth token | docker login ghcr.io -u USER --password-stdin)"
-    docker push $image
+    if ($BuildMethod -eq "Acr") {
+        if (-not $AcrName) {
+            $AcrName = ("gccchain" + ($sub -replace "-", "").Substring(0, 8)).ToLower()
+        }
+        if ($AcrName.Length -lt 5 -or $AcrName.Length -gt 50) {
+            Write-Error "ACR name must be 5-50 alphanumeric characters. Pass -AcrName explicitly."
+        }
+
+        az group create --name $ResourceGroup --location $Location | Out-Null
+
+        $acrExists = $false
+        try {
+            az acr show --name $AcrName --resource-group $ResourceGroup -o none 2>$null
+            if ($LASTEXITCODE -eq 0) { $acrExists = $true }
+        } catch {}
+
+        if (-not $acrExists) {
+            Write-Host "Creating Azure Container Registry: $AcrName"
+            az acr create --name $AcrName --resource-group $ResourceGroup --sku Basic --location $Location --admin-enabled true | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "az acr create failed" }
+        }
+
+        Write-Host "Building API image in Azure (no local Docker): $AcrName.azurecr.io/api:$ImageTag"
+        az acr build --registry $AcrName --image "api:$ImageTag" --file Dockerfile.api .
+        if ($LASTEXITCODE -ne 0) { throw "az acr build failed" }
+
+        $acrServer = "$AcrName.azurecr.io"
+        $acrUsername = az acr credential show --name $AcrName --query username -o tsv
+        $acrPassword = az acr credential show --name $AcrName --query "passwords[0].value" -o tsv
+        $image = "$acrServer/api:$ImageTag"
+    }
+    elseif ($BuildMethod -eq "Docker") {
+        if (-not (Test-Command docker)) {
+            Write-Error "Docker not found. Use default -BuildMethod Acr (cloud build, no Docker) or install Docker Desktop."
+        }
+        $acrServer = ""
+        $image = "gcc-coldchain-api-local:$ImageTag"
+        Write-Host "Building API image locally: $image"
+        docker build -f Dockerfile.api -t $image .
+        if ($LASTEXITCODE -ne 0) { throw "docker build failed" }
+        Write-Error "Local Docker images cannot be pulled by Azure Container Apps. Use -BuildMethod Acr instead."
+    }
+    else {
+        if (-not (Test-Command docker)) {
+            Write-Error "Docker not found. Use -BuildMethod Acr (default, no Docker required)."
+        }
+        $owner = Get-GitHubOwner
+        $image = "ghcr.io/$($owner.ToLower())/hafizal-ghidha-api:$ImageTag"
+        Write-Host "Building API image for GHCR: $image"
+        docker build -f Dockerfile.api -t $image .
+        if ($LASTEXITCODE -ne 0) { throw "docker build failed" }
+        if (Test-Command gh) {
+            $token = gh auth token 2>$null
+            if ($token) {
+                $token | docker login ghcr.io -u $owner --password-stdin | Out-Null
+            }
+        }
+        docker push $image
+        if ($LASTEXITCODE -ne 0) { throw "docker push failed — run: gh auth login" }
+    }
+}
+
+if (-not $image) {
+    Write-Error "No API image resolved. Remove -SkipApiImage or fix build step."
 }
 
 az group create --name $ResourceGroup --location $Location | Out-Null
+
+$deployParams = @(
+    "apiAppName=$ApiAppName",
+    "staticWebAppName=$StaticWebAppName",
+    "staticWebLocation=$StaticWebLocation",
+    "apiImage=$image",
+    "mongodbUri=$mongodbUri",
+    "azureOpenAiEndpoint=$openAiEndpoint",
+    "foundryProjectEndpoint=$foundryProject",
+    "foundryComputeCluster=$foundryCluster",
+    "foundryBaseModel=$foundryModel",
+    "trainingRegion=$trainingRegion"
+)
+if ($acrServer) {
+    $deployParams += "acrServer=$acrServer"
+    $deployParams += "acrUsername=$acrUsername"
+    $deployParams += "acrPassword=$acrPassword"
+}
 
 if (-not $SkipInfra) {
     Write-Host "Deploying infra/web-stack.json..."
     az deployment group create `
         --resource-group $ResourceGroup `
         --template-file infra/web-stack.json `
-        --parameters `
-            apiAppName=$ApiAppName `
-            staticWebAppName=$StaticWebAppName `
-            apiImage=$image `
-            mongodbUri=$mongodbUri `
-            azureOpenAiEndpoint=$openAiEndpoint `
-            foundryProjectEndpoint=$foundryProject `
-            foundryComputeCluster=$foundryCluster `
-            foundryBaseModel=$foundryModel `
-            trainingRegion=$trainingRegion `
+        --parameters @deployParams `
         --output none
+    if ($LASTEXITCODE -ne 0) { throw "ARM deployment failed" }
 } else {
     Write-Host "Updating Container App image..."
+    if ($acrServer) {
+        az containerapp registry set `
+            --name $ApiAppName `
+            --resource-group $ResourceGroup `
+            --server $acrServer `
+            --username $acrUsername `
+            --password $acrPassword | Out-Null
+    }
     az containerapp update --name $ApiAppName --resource-group $ResourceGroup --image $image | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "containerapp update failed" }
 }
 
 $apiFqdn = az containerapp show --name $ApiAppName --resource-group $ResourceGroup --query "properties.configuration.ingress.fqdn" -o tsv
+if (-not $apiFqdn) {
+    Write-Host "Waiting for API ingress..."
+    Start-Sleep -Seconds 15
+    $apiFqdn = az containerapp show --name $ApiAppName --resource-group $ResourceGroup --query "properties.configuration.ingress.fqdn" -o tsv
+}
 $apiUrl = "https://$apiFqdn"
 Write-Host "API URL: $apiUrl"
 
+$swaHost = ""
+
 if (-not $SkipFrontend) {
+    if (-not (Test-Command npm)) {
+        Write-Error "Node.js/npm not found. Install Node 20+: https://nodejs.org/"
+    }
+
     $swaHost = az staticwebapp show --name $StaticWebAppName --resource-group $ResourceGroup --query "defaultHostname" -o tsv
     $deployToken = az staticwebapp secrets list --name $StaticWebAppName --resource-group $ResourceGroup --query "properties.apiKey" -o tsv
 
     Push-Location (Join-Path $Root "frontend")
     $env:VITE_API_BASE_URL = $apiUrl
-    npm ci 2>$null; if ($LASTEXITCODE -ne 0) { npm install }
+    npm ci 2>$null
+    if ($LASTEXITCODE -ne 0) { npm install }
+    if ($LASTEXITCODE -ne 0) { throw "npm install failed" }
     npm run build
+    if ($LASTEXITCODE -ne 0) { throw "npm run build failed" }
     Pop-Location
-
-    if (-not (Get-Command npx -ErrorAction SilentlyContinue)) {
-        Write-Error "npx not found for SWA deploy"
-    }
 
     Write-Host "Deploying frontend to Static Web App: https://$swaHost"
     npx --yes @azure/static-web-apps-cli deploy frontend/dist --deployment-token $deployToken --env production
+    if ($LASTEXITCODE -ne 0) { throw "Static Web App deploy failed" }
 }
 
 Write-Host ""
 Write-Host "=== Deployed ==="
-Write-Host "API:      $apiUrl"
-Write-Host "API docs: $apiUrl/docs"
-Write-Host "UI:       https://$swaHost"
-Write-Host "Simulation: https://$swaHost/simulation"
+Write-Host "API:        $apiUrl"
+Write-Host "API docs:   $apiUrl/docs"
+Write-Host "Simulate:   $apiUrl/simulate (POST)"
+if ($swaHost) {
+    Write-Host "UI:         https://$swaHost"
+    Write-Host "Simulation: https://$swaHost/simulation"
+}
+Write-Host ""
+Write-Host "Verify:"
+Write-Host "  curl $apiUrl/health"
