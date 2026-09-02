@@ -1,6 +1,7 @@
 .PHONY: install dev test test-fast test-integration lint format typecheck check build clean health
 
 PYTHON ?= python3
+VENV ?= .venv
 ifeq ($(wildcard $(VENV)/bin/python),)
   PY := $(PYTHON)
   PIP := $(PYTHON) -m pip
@@ -14,7 +15,6 @@ else
   MYPY := $(VENV)/bin/mypy
   PYTEST := $(VENV)/bin/pytest
 endif
-VENV ?= .venv
 
 install:
 	@test -d $(VENV) || $(PYTHON) -m venv $(VENV) || true

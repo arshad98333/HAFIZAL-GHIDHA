@@ -9,5 +9,5 @@ openai>=1.40
 tenacity>=8.4
 jsonschema>=4.22
 scikit-learn>=1.5
-numpy>=1.26
+numpy>=1.26,<2.5
 python-dotenv>=1.0

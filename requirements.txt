@@ -139,7 +139,7 @@ multidict==6.7.1
     #   yarl
 narwhals==2.25.0
     # via scikit-learn
-numpy==2.5.2
+numpy==2.4.6
     # via
     #   -r requirements.in
     #   scikit-learn
