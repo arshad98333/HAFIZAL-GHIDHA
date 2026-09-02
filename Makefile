@@ -21,6 +21,11 @@ install:
 	$(PIP) install --upgrade pip pip-tools
 	$(PIP) install -r requirements-dev.txt
 
+lock:
+	$(PIP) install pip-tools
+	$(PYTHON) -m piptools compile requirements.in -o requirements.txt --resolver=backtracking
+	$(PYTHON) -m piptools compile requirements-dev.in -o requirements-dev.txt --resolver=backtracking
+
 dev:
 	@echo "Run a stage, e.g.: $(PY) -m cold_chain.runner plan --wave 1"
 
