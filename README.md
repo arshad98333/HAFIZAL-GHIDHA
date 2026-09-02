@@ -69,6 +69,8 @@ pip install -r requirements-dev.txt
 
 On Windows, `make` is usually not installed. Use `pip install -r requirements-dev.txt` instead of `make install`. Optional: install Make via [Chocolatey](https://chocolatey.org/) (`choco install make`) or use WSL for Linux-style commands.
 
+**Important:** use `requirements-dev.txt` for local development and tests. `requirements.txt` is runtime-only (no `pytest`, `ruff`, or `mypy`).
+
 Without Make (any OS):
 
 ```bash
@@ -295,6 +297,7 @@ CI builds the Docker image on every push to `main`. Deploy to Azure is a manual 
 | `python3` / `Python was not found` on Windows | Use `python` (not `python3`). Install from python.org; disable Microsoft Store app execution aliases |
 | `source` is not recognized (PowerShell) | Use `.\.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate` |
 | `make` is not recognized (Windows) | Use `pip install -r requirements-dev.txt` and `python -m pytest ...` (see Step 2 and Step 3) |
+| `No module named pytest` | You installed `requirements.txt` by mistake. Run `pip install -r requirements-dev.txt` |
 | `Missing required environment variables` on startup | Fill every required field in `.env` (see Step 4 table) |
 | `az login` / AAD errors during `generate` | Run `az login`; confirm OpenAI User role on the resource |
 | MongoDB connection timeout | Check Atlas IP allowlist and `MONGODB_URI` |
