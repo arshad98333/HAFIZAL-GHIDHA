@@ -1,26 +1,23 @@
 # Local run helper for Windows PowerShell.
 #
-# Option 1 -- one command (setup + pipeline):
-#   .\scripts\local_run.ps1 all -Wave 1 -MaxRecords 10
-#   .\scripts\local_run.ps1 all -Wave 1
+# RECOMMENDED — single command:
+#   .\scripts\run.ps1 -Wave 1
+#   .\scripts\run.ps1 -Wave 1 -Profile smoke
 #
-# Option 2 -- print step-by-step commands:
-#   .\scripts\local_run.ps1 steps -Wave 1 -MaxRecords 10
-#
-# Option 2 -- run one step:
-#   .\scripts\local_run.ps1 step setup
-#   .\scripts\local_run.ps1 step plan -Wave 1
-#   .\scripts\local_run.ps1 step generate -Wave 1 -MaxRecords 10
+# Or via this wrapper:
+#   .\scripts\local_run.ps1 run -Wave 1 -Profile rescore
 
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet("all", "steps", "step", "audit")]
+    [ValidateSet("run", "all", "steps", "step", "audit", "kpi", "preflight", "rescore")]
     [string]$Mode,
 
     [Parameter(Position = 1)]
     [string]$StepName,
 
     [int]$Wave = 0,
+    [ValidateSet("smoke", "wave", "rescore", "full", "")]
+    [string]$Profile = "",
     [int]$MaxRecords = 0,
     [switch]$SkipTests,
     [switch]$SkipSetup
@@ -29,6 +26,10 @@ param(
 $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
+
+if (Test-Path ".\venv\Scripts\Activate.ps1") {
+    .\venv\Scripts\Activate.ps1
+}
 
 $py = "python"
 if (-not (Get-Command $py -ErrorAction SilentlyContinue)) {
@@ -46,6 +47,9 @@ if ($Mode -eq "step") {
 
 if ($Wave -gt 0) {
     $cmd += @("--wave", "$Wave")
+}
+if ($Profile) {
+    $cmd += @("--profile", $Profile)
 }
 if ($MaxRecords -gt 0) {
     $cmd += @("--max-records", "$MaxRecords")

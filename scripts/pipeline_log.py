@@ -21,7 +21,7 @@ def _now_iso() -> str:
 def load_log(path: Path | None = None) -> dict[str, Any]:
     path = path or LOG_PATH
     if not path.exists():
-        return {"version": 1, "description": "Local pipeline command logs (gate-a, export, kpi, preflight)", "runs": []}
+        return {"version": 1, "description": "Pipeline run logs (profiles: smoke, wave, rescore, full)", "runs": []}
     return json.loads(path.read_text(encoding="utf-8"))
 
 

@@ -1,51 +1,56 @@
-"""Local development orchestrator: one command or step-by-step.
+"""Local development orchestrator — one command for everything.
 
-Option 1 -- run everything in order (setup + pipeline + export + audit):
+THE single entry point (pick a profile):
 
-    python scripts/local_run.py all --wave 1 --max-records 10   # smoke (10 records)
-    python scripts/local_run.py all --wave 1                    # full wave (~663 records)
+    python scripts/local_run.py run --wave 1 --profile rescore   # re-evaluate existing data
+    python scripts/local_run.py run --wave 1 --profile smoke    # first-time 10-record test
+    python scripts/local_run.py run --wave 1 --profile wave     # full ~663-record generation
 
-Option 2 -- print or run individual steps (same commands you would type by hand):
+Makefile (Linux/macOS):
 
-    python scripts/local_run.py steps --wave 1 --max-records 10
-    python scripts/local_run.py step setup
-    python scripts/local_run.py step plan --wave 1
-    python scripts/local_run.py step generate --wave 1 --max-records 10
-    python scripts/local_run.py step gate-a --wave 1
-    python scripts/local_run.py step export --wave 1
-    python scripts/local_run.py step audit --wave 1
+    make run              # same as --profile rescore
+    make run-smoke        # smoke test
+    make run-wave         # full wave
 
-Audit the last Gate A result for a wave (reads gate_a.json from MongoDB):
+Windows PowerShell:
 
-    python scripts/local_run.py audit --wave 1
+    .\\scripts\\run.ps1 -Wave 1
+    .\\scripts\\run.ps1 -Wave 1 -Profile smoke
 
-KPI scorecard (all 12 dimensions, target >= 7/10):
+Every ``run`` appends a structured JSON entry to ``pipeline_logs.json`` in the repo root.
 
-    python scripts/local_run.py kpi --wave 1
-    python scripts/local_run.py preflight --wave 1
-
-Re-score an existing wave (gate-a, export, kpi, preflight) and append to pipeline_logs.json:
-
-    python scripts/local_run.py rescore --wave 1
+Legacy subcommands (``all``, ``step``, ``rescore``, etc.) still work.
 """
 
 from __future__ import annotations
 
 import argparse
 import asyncio
-import json
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parent.parent
+
+PROFILES = ("smoke", "wave", "rescore", "full")
+
+
+@dataclass
+class StepSpec:
+    name: str
+    build_cmd: Callable[[], list[str]]
+    stop_on_fail: bool = True
+    capture_json: bool = False
+    summary_key: str | None = None
 
 
 def _py() -> str:
     return sys.executable
 
 
-def _run(label: str, cmd: list[str], *, stop_on_fail: bool = True) -> int:
+def _run_subprocess(label: str, cmd: list[str], *, stop_on_fail: bool = True) -> int:
     print(f"\n{'=' * 70}\n[{label}]  {' '.join(cmd)}\n{'=' * 70}", flush=True)
     result = subprocess.run(cmd, cwd=ROOT)
     status = "ok" if result.returncode == 0 else f"exit {result.returncode}"
@@ -55,61 +60,58 @@ def _run(label: str, cmd: list[str], *, stop_on_fail: bool = True) -> int:
     return result.returncode
 
 
-def _setup_cmds(*, skip_tests: bool) -> list[tuple[str, list[str]]]:
+def _import_pipeline_log():
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from pipeline_log import append_step, capture_json_stdout, finish_run, start_run
+
+    return append_step, capture_json_stdout, finish_run, start_run
+
+
+def _setup_steps(skip_tests: bool) -> list[StepSpec]:
     py = _py()
-    steps: list[tuple[str, list[str]]] = []
+    steps: list[StepSpec] = []
     if not skip_tests:
         steps.append(
-            (
+            StepSpec(
                 "tests",
-                [
-                    py,
-                    "-m",
-                    "pytest",
-                    "-v",
-                    "-m",
-                    "not integration",
-                    "--ignore=tests/integration",
-                ],
+                lambda: [py, "-m", "pytest", "-v", "-m", "not integration", "--ignore=tests/integration"],
             )
         )
     steps.extend(
         [
-            ("health", [py, "-m", "cold_chain.runner", "health"]),
-            ("ready", [py, "-m", "cold_chain.runner", "ready"]),
+            StepSpec("health", lambda: [py, "-m", "cold_chain.runner", "health"]),
+            StepSpec("ready", lambda: [py, "-m", "cold_chain.runner", "ready"]),
         ]
     )
     return steps
 
 
-def _pipeline_cmd(wave: int, max_records: int | None, rate_per_minute: int | None) -> list[str]:
-    cmd = [ _py(), str(ROOT / "scripts" / "run_pipeline.py"), "--wave", str(wave)]
-    if max_records is not None:
-        cmd += ["--max-records", str(max_records)]
-    if rate_per_minute is not None:
-        cmd += ["--rate-per-minute", str(rate_per_minute)]
-    return cmd
-
-
-def _step_cmds(wave: int, max_records: int | None, rate_per_minute: int | None) -> list[tuple[str, list[str]]]:
+def _wave_steps(wave: int, max_records: int | None, rate_per_minute: int | None) -> list[StepSpec]:
     py = _py()
-    generate = [py, "-m", "cold_chain.runner", "generate", "--wave", str(wave)]
-    if max_records is not None:
-        generate += ["--max-records", str(max_records)]
-    if rate_per_minute is not None:
-        generate += ["--rate-per-minute", str(rate_per_minute)]
+
+    def generate_cmd() -> list[str]:
+        cmd = [py, "-m", "cold_chain.runner", "generate", "--wave", str(wave)]
+        if max_records is not None:
+            cmd += ["--max-records", str(max_records)]
+        if rate_per_minute is not None:
+            cmd += ["--rate-per-minute", str(rate_per_minute)]
+        return cmd
+
     audit_out = ROOT / f"CORPUS_GUARDRAIL_AUDIT_wave{wave:02d}.md"
     audit_csv = ROOT / f"CORPUS_GUARDRAIL_AUDIT_wave{wave:02d}.csv"
+
     return [
-        *_setup_cmds(skip_tests=False),
-        ("plan", [py, "-m", "cold_chain.runner", "plan", "--wave", str(wave)]),
-        ("generate", generate),
-        ("gate-a", [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(wave)]),
-        ("export", [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(wave)]),
-        ("preflight", [py, "-m", "cold_chain.runner", "preflight", "--wave", str(wave)]),
-        (
+        StepSpec("plan", lambda: [py, "-m", "cold_chain.runner", "plan", "--wave", str(wave)]),
+        StepSpec("generate", generate_cmd),
+        StepSpec(
+            "gate-a",
+            lambda: [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(wave)],
+            stop_on_fail=False,
+        ),
+        StepSpec("export", lambda: [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(wave)]),
+        StepSpec(
             "audit",
-            [
+            lambda: [
                 py,
                 str(ROOT / "scripts" / "audit_corpus_guardrails.py"),
                 "--wave",
@@ -119,19 +121,169 @@ def _step_cmds(wave: int, max_records: int | None, rate_per_minute: int | None) 
                 "--csv",
                 str(audit_csv),
             ],
+            stop_on_fail=False,
+        ),
+        StepSpec(
+            "kpi",
+            lambda: [py, str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(wave), "--json"],
+            stop_on_fail=False,
+            capture_json=True,
+            summary_key="kpi",
+        ),
+        StepSpec(
+            "preflight",
+            lambda: [py, "-m", "cold_chain.runner", "preflight", "--wave", str(wave)],
+            stop_on_fail=False,
+            capture_json=True,
+            summary_key="preflight",
+        ),
+        StepSpec(
+            "train-dry-run",
+            lambda: [py, "-m", "cold_chain.runner", "train", "--wave", str(wave), "--dry-run"],
+            stop_on_fail=False,
+            capture_json=True,
+            summary_key="train_dry_run",
         ),
     ]
 
 
+def _rescore_steps(wave: int) -> list[StepSpec]:
+    py = _py()
+    return [
+        StepSpec(
+            "gate-a",
+            lambda: [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(wave)],
+            stop_on_fail=False,
+        ),
+        StepSpec("export", lambda: [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(wave)]),
+        StepSpec(
+            "kpi",
+            lambda: [py, str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(wave), "--json"],
+            stop_on_fail=False,
+            capture_json=True,
+            summary_key="kpi",
+        ),
+        StepSpec(
+            "preflight",
+            lambda: [py, "-m", "cold_chain.runner", "preflight", "--wave", str(wave)],
+            stop_on_fail=False,
+            capture_json=True,
+            summary_key="preflight",
+        ),
+    ]
+
+
+def _profile_steps(
+    profile: str,
+    wave: int,
+    *,
+    max_records: int | None,
+    rate_per_minute: int | None,
+    skip_tests: bool,
+) -> list[StepSpec]:
+    if profile == "rescore":
+        return _rescore_steps(wave)
+    if profile == "smoke":
+        return _setup_steps(skip_tests) + _wave_steps(wave, max_records or 10, rate_per_minute)
+    if profile == "wave":
+        return _setup_steps(skip_tests=True) + _wave_steps(wave, max_records, rate_per_minute)
+    if profile == "full":
+        return _setup_steps(skip_tests) + _wave_steps(wave, max_records, rate_per_minute)
+    raise ValueError(f"unknown profile: {profile}")
+
+
+def _execute_profile(
+    profile: str,
+    wave: int,
+    *,
+    max_records: int | None,
+    rate_per_minute: int | None,
+    skip_tests: bool,
+    log_label: str | None = None,
+) -> int:
+    append_step, capture_json_stdout, finish_run, start_run = _import_pipeline_log()
+    run = start_run(wave, label=log_label or profile)
+    summary: dict[str, Any] = {}
+    exit_code = 0
+
+    for spec in _profile_steps(profile, wave, max_records=max_records, rate_per_minute=rate_per_minute, skip_tests=skip_tests):
+        cmd = spec.build_cmd()
+        if spec.capture_json:
+            rc, parsed, output = capture_json_stdout(cmd)
+            print(output, end="" if output.endswith("\n") else "\n")
+            append_step(run, spec.name, cmd, rc, extra={"result": parsed})
+            if spec.summary_key and parsed:
+                summary[spec.summary_key] = parsed
+        else:
+            rc = _run_subprocess(spec.name, cmd, stop_on_fail=spec.stop_on_fail)
+            append_step(run, spec.name, cmd, rc)
+        if rc != 0:
+            exit_code = rc
+            if spec.stop_on_fail:
+                break
+
+    finish_run(run, summary=summary)
+    print(f"\n{'=' * 70}")
+    print(f"Profile '{profile}' complete for wave {wave}")
+    print(f"Log appended to {ROOT / 'pipeline_logs.json'} (run id: {run['id']})")
+    if exit_code == 2:
+        print("Exit 2 = gate halted or KPI below target (see output above). This is expected on smoke runs.")
+    print(f"{'=' * 70}\n")
+    return exit_code
+
+
+def cmd_run(args: argparse.Namespace) -> int:
+    profile = args.profile
+    skip_tests = args.skip_tests
+    max_records = args.max_records
+    if profile == "smoke" and max_records is None:
+        max_records = 10
+    return _execute_profile(
+        profile,
+        args.wave,
+        max_records=max_records,
+        rate_per_minute=args.rate_per_minute,
+        skip_tests=skip_tests,
+        log_label=profile,
+    )
+
+
+def _pipeline_cmd(wave: int, max_records: int | None, rate_per_minute: int | None) -> list[str]:
+    cmd = [_py(), str(ROOT / "scripts" / "run_pipeline.py"), "--wave", str(wave)]
+    if max_records is not None:
+        cmd += ["--max-records", str(max_records)]
+    if rate_per_minute is not None:
+        cmd += ["--rate-per-minute", str(rate_per_minute)]
+    return cmd
+
+
+def cmd_all(args: argparse.Namespace) -> int:
+    return cmd_run(
+        argparse.Namespace(
+            wave=args.wave,
+            profile="smoke" if args.max_records else "wave",
+            max_records=args.max_records,
+            rate_per_minute=args.rate_per_minute,
+            skip_tests=args.skip_tests,
+        )
+    )
+
+
 def cmd_steps(args: argparse.Namespace) -> int:
-    print("Step-by-step commands (run each line separately):\n")
-    for i, (name, cmd) in enumerate(_step_cmds(args.wave, args.max_records, args.rate_per_minute), 1):
-        print(f"  # {i}. {name}")
-        print(f"  {' '.join(cmd)}\n")
-    print("Notes:")
-    print("  - Run `az login` once before plan/generate if Azure auth is needed.")
-    print("  - gate-a exit code 2 means the gate halted (expected on small smoke runs).")
-    print("  - train/gate-b require Gate A pass and Foundry/student endpoint config.")
+    profile = "smoke" if args.max_records else "wave"
+    specs = _profile_steps(
+        profile,
+        args.wave,
+        max_records=args.max_records or (10 if profile == "smoke" else None),
+        rate_per_minute=args.rate_per_minute,
+        skip_tests=False,
+    )
+    print(f"Steps for profile '{profile}' (wave {args.wave}):\n")
+    for i, spec in enumerate(specs, 1):
+        print(f"  # {i}. {spec.name}")
+        print(f"  {' '.join(spec.build_cmd())}\n")
+    print("Run them all at once:")
+    print(f"  python scripts/local_run.py run --wave {args.wave} --profile {profile}")
     return 0
 
 
@@ -139,8 +291,8 @@ def cmd_step(args: argparse.Namespace) -> int:
     py = _py()
     name = args.step_name
     if name == "setup":
-        for label, cmd in _setup_cmds(skip_tests=args.skip_tests):
-            rc = _run(label, cmd)
+        for spec in _setup_steps(skip_tests=args.skip_tests):
+            rc = _run_subprocess(spec.name, spec.build_cmd())
             if rc != 0:
                 return rc
         return 0
@@ -148,24 +300,28 @@ def cmd_step(args: argparse.Namespace) -> int:
         print("error: --wave is required for pipeline steps", file=sys.stderr)
         return 2
 
-    if name == "plan":
-        return _run("plan", [py, "-m", "cold_chain.runner", "plan", "--wave", str(args.wave)])
+    one_off = {
+        "plan": [py, "-m", "cold_chain.runner", "plan", "--wave", str(args.wave)],
+        "gate-a": [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(args.wave)],
+        "export": [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(args.wave)],
+        "preflight": [py, "-m", "cold_chain.runner", "preflight", "--wave", str(args.wave)],
+        "kpi": [py, str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(args.wave)],
+    }
     if name == "generate":
         cmd = [py, "-m", "cold_chain.runner", "generate", "--wave", str(args.wave)]
         if args.max_records is not None:
             cmd += ["--max-records", str(args.max_records)]
         if args.rate_per_minute is not None:
             cmd += ["--rate-per-minute", str(args.rate_per_minute)]
-        return _run("generate", cmd)
-    if name == "gate-a":
-        return _run("gate-a", [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(args.wave)], stop_on_fail=False)
-    if name == "export":
-        return _run("export", [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(args.wave)])
+        return _run_subprocess(name, cmd)
+    if name in one_off:
+        stop = name != "gate-a"
+        return _run_subprocess(name, one_off[name], stop_on_fail=stop)
     if name == "audit":
         audit_out = ROOT / f"CORPUS_GUARDRAIL_AUDIT_wave{args.wave:02d}.md"
         audit_csv = ROOT / f"CORPUS_GUARDRAIL_AUDIT_wave{args.wave:02d}.csv"
-        return _run(
-            "audit",
+        return _run_subprocess(
+            name,
             [
                 py,
                 str(ROOT / "scripts" / "audit_corpus_guardrails.py"),
@@ -178,28 +334,9 @@ def cmd_step(args: argparse.Namespace) -> int:
             ],
         )
     if name in ("train", "gate-b"):
-        cmd = [py, "-m", "cold_chain.runner", name, "--wave", str(args.wave)]
-        return _run(name, cmd, stop_on_fail=False)
-    if name == "preflight":
-        return _run("preflight", [py, "-m", "cold_chain.runner", "preflight", "--wave", str(args.wave)])
-    if name == "kpi":
-        return _run("kpi", [py, str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(args.wave)], stop_on_fail=False)
-
+        return _run_subprocess(name, [py, "-m", "cold_chain.runner", name, "--wave", str(args.wave)], stop_on_fail=False)
     print(f"error: unknown step {name!r}", file=sys.stderr)
     return 2
-
-
-def cmd_all(args: argparse.Namespace) -> int:
-    if not args.skip_setup:
-        for label, cmd in _setup_cmds(skip_tests=args.skip_tests):
-            rc = _run(label, cmd)
-            if rc != 0:
-                return rc
-    return _run(
-        "pipeline",
-        _pipeline_cmd(args.wave, args.max_records, args.rate_per_minute),
-        stop_on_fail=False,
-    )
 
 
 async def _audit_wave(wave: int) -> int:
@@ -246,58 +383,35 @@ def cmd_audit(args: argparse.Namespace) -> int:
 
 
 def cmd_rescore(args: argparse.Namespace) -> int:
-    """Re-run gate-a, export, kpi, preflight and append results to pipeline_logs.json."""
-    sys.path.insert(0, str(ROOT / "scripts"))
-    from pipeline_log import append_step, capture_json_stdout, finish_run, start_run
-
-    py = _py()
-    wave = args.wave
-    run = start_run(wave, label="rescore")
-    summary: dict = {}
-
-    steps: list[tuple[str, list[str], bool]] = [
-        ("gate-a", [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(wave)], False),
-        ("export", [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(wave)], True),
-        ("kpi", [py, str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(wave), "--json"], False),
-        ("preflight", [py, "-m", "cold_chain.runner", "preflight", "--wave", str(wave)], True),
-    ]
-
-    last_rc = 0
-    for name, cmd, capture_json in steps:
-        if capture_json and name in ("kpi", "preflight"):
-            rc, parsed, output = capture_json_stdout(cmd)
-            print(output, end="" if output.endswith("\n") else "\n")
-            append_step(run, name, cmd, rc, extra={"result": parsed})
-            if name == "kpi" and parsed:
-                summary["kpi"] = parsed
-            if name == "preflight" and parsed:
-                summary["preflight"] = parsed
-        else:
-            rc = _run(name, cmd, stop_on_fail=False)
-            append_step(run, name, cmd, rc)
-        last_rc = rc if name == "kpi" else last_rc
-
-    finish_run(run, summary=summary)
-    log_path = ROOT / "pipeline_logs.json"
-    print(f"\nLog appended to {log_path} (run id: {run['id']})")
-    return last_rc
+    return _execute_profile("rescore", args.wave, max_records=None, rate_per_minute=None, skip_tests=True)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="mode", required=True)
 
-    p_all = sub.add_parser("all", help="run setup + full pipeline in one command")
+    p_run = sub.add_parser("run", help="THE single command — runs a profile and logs to pipeline_logs.json")
+    p_run.add_argument("--wave", type=int, required=True)
+    p_run.add_argument(
+        "--profile",
+        choices=PROFILES,
+        default="rescore",
+        help="smoke=10-record test | wave=full generate | rescore=re-evaluate existing | full=tests+wave",
+    )
+    p_run.add_argument("--max-records", type=int, default=None, help="cap generate (smoke defaults to 10)")
+    p_run.add_argument("--rate-per-minute", type=int, default=None)
+    p_run.add_argument("--skip-tests", action="store_true", help="skip pytest in smoke/full setup")
+
+    p_all = sub.add_parser("all", help="alias for run --profile smoke|wave")
     p_all.add_argument("--wave", type=int, required=True)
-    p_all.add_argument("--max-records", type=int, default=None, help="smoke cap for generate")
+    p_all.add_argument("--max-records", type=int, default=None)
     p_all.add_argument("--rate-per-minute", type=int, default=None)
     p_all.add_argument("--skip-tests", action="store_true")
-    p_all.add_argument("--skip-setup", action="store_true", help="skip tests/health/ready")
+    p_all.add_argument("--skip-setup", action="store_true", help="deprecated; use run --profile wave --skip-tests")
 
-    p_steps = sub.add_parser("steps", help="print step-by-step commands (do not run them)")
+    p_steps = sub.add_parser("steps", help="print step list for a profile")
     p_steps.add_argument("--wave", type=int, required=True)
     p_steps.add_argument("--max-records", type=int, default=None)
-    p_steps.add_argument("--rate-per-minute", type=int, default=None)
 
     p_step = sub.add_parser("step", help="run one named step")
     p_step.add_argument(
@@ -309,23 +423,22 @@ def main() -> int:
     p_step.add_argument("--rate-per-minute", type=int, default=None)
     p_step.add_argument("--skip-tests", action="store_true")
 
-    p_audit = sub.add_parser("audit", help="summarize Gate A + record counts for a wave")
+    p_audit = sub.add_parser("audit", help="summarize Gate A + record counts")
     p_audit.add_argument("--wave", type=int, required=True)
 
-    p_kpi = sub.add_parser("kpi", help="12-dimension KPI scorecard (target >= 7/10)")
+    p_kpi = sub.add_parser("kpi", help="12-dimension KPI scorecard")
     p_kpi.add_argument("--wave", type=int, required=True)
     p_kpi.add_argument("--json", action="store_true")
 
-    p_preflight = sub.add_parser("preflight", help="training + Gate B readiness check")
+    p_preflight = sub.add_parser("preflight", help="training + Gate B readiness")
     p_preflight.add_argument("--wave", type=int, required=True)
 
-    p_rescore = sub.add_parser(
-        "rescore",
-        help="gate-a + export + kpi + preflight; append JSON log to pipeline_logs.json",
-    )
+    p_rescore = sub.add_parser("rescore", help="alias for run --profile rescore")
     p_rescore.add_argument("--wave", type=int, required=True)
 
     args = ap.parse_args()
+    if args.mode == "run":
+        return cmd_run(args)
     if args.mode == "all":
         return cmd_all(args)
     if args.mode == "steps":
@@ -338,9 +451,9 @@ def main() -> int:
         cmd = [_py(), str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(args.wave)]
         if args.json:
             cmd.append("--json")
-        return _run("kpi", cmd, stop_on_fail=False)
+        return _run_subprocess("kpi", cmd, stop_on_fail=False)
     if args.mode == "preflight":
-        return _run("preflight", [_py(), "-m", "cold_chain.runner", "preflight", "--wave", str(args.wave)])
+        return _run_subprocess("preflight", [_py(), "-m", "cold_chain.runner", "preflight", "--wave", str(args.wave)])
     if args.mode == "rescore":
         return cmd_rescore(args)
     return 2

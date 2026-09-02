@@ -1,7 +1,13 @@
-.PHONY: install dev test test-fast test-integration lint format typecheck check build clean health local-setup smoke-run wave-run local-audit kpi preflight
+.PHONY: install dev test test-fast test-integration lint format typecheck check build clean \
+	health run run-smoke run-wave run-rescore run-full \
+	local-setup smoke-run wave-run local-audit kpi preflight rescore
 
 PYTHON ?= python3
 VENV ?= .venv
+WAVE ?= 1
+PROFILE ?= rescore
+MAX ?= 10
+
 ifeq ($(wildcard $(VENV)/bin/python),)
   PY := $(PYTHON)
   PIP := $(PYTHON) -m pip
@@ -16,6 +22,29 @@ else
   PYTEST := $(VENV)/bin/pytest
 endif
 
+# --------------------------------------------------------------------------- #
+# THE single command — everything ties here
+# --------------------------------------------------------------------------- #
+
+run:
+	$(PY) scripts/local_run.py run --wave $(WAVE) --profile $(PROFILE)
+
+run-smoke:
+	$(PY) scripts/local_run.py run --wave $(WAVE) --profile smoke
+
+run-wave:
+	$(PY) scripts/local_run.py run --wave $(WAVE) --profile wave
+
+run-rescore:
+	$(PY) scripts/local_run.py run --wave $(WAVE) --profile rescore
+
+run-full:
+	$(PY) scripts/local_run.py run --wave $(WAVE) --profile full
+
+# --------------------------------------------------------------------------- #
+# Setup & quality
+# --------------------------------------------------------------------------- #
+
 install:
 	@test -d $(VENV) || $(PYTHON) -m venv $(VENV) || true
 	$(PIP) install --upgrade pip pip-tools
@@ -27,7 +56,7 @@ lock:
 	$(PYTHON) -m piptools compile requirements-dev.in -o requirements-dev.txt --resolver=backtracking
 
 dev:
-	@echo "Run a stage, e.g.: $(PY) -m cold_chain.runner plan --wave 1"
+	@echo "Single command: make run WAVE=1 PROFILE=rescore"
 
 test-fast:
 	PYTHONPATH=. $(PYTEST) tests/unit tests/test_*.py -v --ignore=tests/integration -m "not integration"
@@ -60,20 +89,24 @@ clean:
 health:
 	$(PY) -m cold_chain.runner health
 
+# --------------------------------------------------------------------------- #
+# Legacy aliases (delegate to run profiles)
+# --------------------------------------------------------------------------- #
+
 local-setup:
 	$(PY) scripts/local_run.py step setup
 
-smoke-run:
-	$(PY) scripts/local_run.py all --wave $(or $(WAVE),1) --max-records $(or $(MAX),10)
+smoke-run: run-smoke
 
-wave-run:
-	$(PY) scripts/local_run.py all --wave $(or $(WAVE),1)
+wave-run: run-wave
+
+rescore: run-rescore
 
 local-audit:
-	$(PY) scripts/local_run.py audit --wave $(or $(WAVE),1)
+	$(PY) scripts/local_run.py audit --wave $(WAVE)
 
 kpi:
-	$(PY) scripts/kpi_dashboard.py --wave $(or $(WAVE),1)
+	$(PY) scripts/kpi_dashboard.py --wave $(WAVE)
 
 preflight:
-	$(PY) -m cold_chain.runner preflight --wave $(or $(WAVE),1)
+	$(PY) -m cold_chain.runner preflight --wave $(WAVE)
