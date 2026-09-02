@@ -1,8 +1,7 @@
-# Auto-sync when files change in the git repo (optional background watcher).
-# Run in a separate PowerShell window while you develop:
+# Auto-sync repo -> HAFIZAL-GHIDHA-main folder.
+# First loop: git pull main + copy. Then copy only every 30s.
 #
 #   .\scripts\watch-sync-desktop.ps1
-#
 # Press Ctrl+C to stop.
 
 param(
@@ -11,13 +10,25 @@ param(
     [int]$IntervalSeconds = 30
 )
 
+$ErrorActionPreference = "Stop"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $syncScript = Join-Path $scriptDir "sync-desktop-folder.ps1"
 
+if (-not (Test-Path $syncScript)) {
+    Write-Error "Missing $syncScript — run: cd $Source; git pull origin main"
+}
+
 Write-Host "Watching $Source every ${IntervalSeconds}s -> $Dest"
 Write-Host "Press Ctrl+C to stop."
+Write-Host ""
 
+$first = $true
 while ($true) {
-    & $syncScript -Source $Source -Dest $Dest
+    if ($first) {
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $syncScript -Source $Source -Dest $Dest
+        $first = $false
+    } else {
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $syncScript -Source $Source -Dest $Dest -RobocopyOnly
+    }
     Start-Sleep -Seconds $IntervalSeconds
 }
