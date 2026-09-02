@@ -67,7 +67,9 @@ if (Test-Path (Join-Path $Dest "pipeline_logs.json")) { Copy-Item (Join-Path $De
 
 Write-Host "Syncing $Source -> $Dest"
 robocopy $Source $Dest /E /XD .git .venv node_modules __pycache__ .pytest_cache .mypy_cache .ruff_cache /XF *.pyc /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
-if ($LASTEXITCODE -ge 8) { throw "robocopy failed with exit $LASTEXITCODE" }
+# Robocopy uses 0-7 for success (1 = files copied). Only 8+ is failure.
+$robocopyExit = $LASTEXITCODE
+if ($robocopyExit -ge 8) { throw "robocopy failed with exit $robocopyExit" }
 
 if (Test-Path $envBackup) { Copy-Item $envBackup (Join-Path $Dest ".env") -Force }
 if (Test-Path $logsBackup) { Copy-Item $logsBackup (Join-Path $Dest "pipeline_logs.json") -Force }
@@ -114,3 +116,6 @@ if ($InstallDeps -or $Deploy) {
     Write-Host "  .\scripts\api_server.ps1"
     Write-Host "  .\scripts\ui.ps1"
 }
+
+# Robocopy success codes (1-7) must not propagate to callers as failure.
+exit 0

@@ -81,7 +81,8 @@ if (-not $SkipSync) {
     Write-Host ""
     Write-Host "=== Step 4/4: Sync to desktop -main folder ==="
     & (Join-Path $Root "scripts\sync-desktop-folder.ps1") -Source $Source -Dest $Dest -Branch $Branch -RobocopyOnly
-    if ($LASTEXITCODE -ne 0) { throw 'sync-desktop-folder failed' }
+    # sync-desktop-folder exits 0 on success; robocopy codes 1-7 are not errors.
+    if ($LASTEXITCODE -ge 8) { throw 'sync-desktop-folder failed' }
 } else {
     Write-Host ""
     Write-Host "=== Step 4/4: Skipped sync (-SkipSync) ==="
