@@ -63,7 +63,7 @@ if (Test-Path (Join-Path $Dest ".env")) { Copy-Item (Join-Path $Dest ".env") $en
 if (Test-Path (Join-Path $Dest "pipeline_logs.json")) { Copy-Item (Join-Path $Dest "pipeline_logs.json") $logsBackup -Force }
 
 Write-Host "Syncing $Source -> $Dest"
-robocopy $Source $Dest /E /XD .git .venv __pycache__ .pytest_cache .mypy_cache .ruff_cache /XF *.pyc /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
+robocopy $Source $Dest /E /XD .git .venv node_modules __pycache__ .pytest_cache .mypy_cache .ruff_cache /XF *.pyc /NFL /NDL /NJH /NJS /nc /ns /np | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "robocopy failed with exit $LASTEXITCODE" }
 
 if (Test-Path $envBackup) { Copy-Item $envBackup (Join-Path $Dest ".env") -Force }
@@ -75,7 +75,7 @@ if (-not $RobocopyOnly) {
     Write-Host "Branch: $Branch ($(git -C $Source rev-parse --short HEAD))"
 }
 Write-Host ""
-Write-Host "Next:"
+Write-Host "Next (two terminals):"
 Write-Host "  cd $Dest"
-Write-Host "  .\venv\Scripts\Activate.ps1"
-Write-Host "  python scripts/local_run.py run --wave 1 --profile rescore"
+Write-Host "  .\scripts\api_server.ps1"
+Write-Host "  .\scripts\ui.ps1"
