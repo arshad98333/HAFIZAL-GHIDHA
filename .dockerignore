@@ -1,4 +1,6 @@
-.git/
+frontend/node_modules/
+frontend/dist/
+pipeline_logs.json
 .gitignore
 .env
 .env.*

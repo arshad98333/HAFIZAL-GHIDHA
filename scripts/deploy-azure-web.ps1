@@ -53,6 +53,26 @@ function Test-Command([string]$Name) {
     return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
 }
 
+function Resolve-PlaceholderValue([string]$Value, [string]$Fallback) {
+    if (-not $Value) { return $Fallback }
+    if ($Value -match '^\s*<[^>]+>\s*$') { return $Fallback }
+    return $Value
+}
+
+function Write-ArmParametersFile([string]$Path, [hashtable]$Values) {
+    $parameters = @{}
+    foreach ($key in $Values.Keys) {
+        $parameters[$key] = @{ value = $Values[$key] }
+    }
+    $doc = [ordered]@{
+        '$schema'        = 'https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#'
+        contentVersion   = '1.0.0.0'
+        parameters       = $parameters
+    }
+    $json = $doc | ConvertTo-Json -Depth 6
+    [System.IO.File]::WriteAllText($Path, $json, [System.Text.UTF8Encoding]::new($false))
+}
+
 if (-not (Test-Command az)) {
     Write-Error 'Azure CLI (az) not found. Install: https://learn.microsoft.com/cli/azure/install-azure-cli'
 }
@@ -66,10 +86,8 @@ $mongodbUri = Get-DotEnvValue "MONGODB_URI"
 $openAiEndpoint = Get-DotEnvValue "AZURE_OPENAI_ENDPOINT"
 $foundryProject = Get-DotEnvValue "FOUNDRY_PROJECT_ENDPOINT"
 if (-not $foundryProject) { $foundryProject = $openAiEndpoint }
-$foundryCluster = Get-DotEnvValue "FOUNDRY_COMPUTE_CLUSTER"
-if (-not $foundryCluster) { $foundryCluster = "local" }
-$foundryModel = Get-DotEnvValue "FOUNDRY_BASE_MODEL"
-if (-not $foundryModel) { $foundryModel = "base" }
+$foundryCluster = Resolve-PlaceholderValue (Get-DotEnvValue "FOUNDRY_COMPUTE_CLUSTER") "unused"
+$foundryModel = Resolve-PlaceholderValue (Get-DotEnvValue "FOUNDRY_BASE_MODEL") "unused"
 $trainingRegion = Get-DotEnvValue "TRAINING_REGION"
 if (-not $trainingRegion) { $trainingRegion = $Location }
 
@@ -150,24 +168,24 @@ if (-not $image) {
 
 az group create --name $ResourceGroup --location $Location | Out-Null
 
-# Use a parameters JSON file so MongoDB URI special characters are not mangled on the CLI.
+# ARM expects {"parameters": {"name": {"value": "..."}}} not flat key/value JSON.
 $paramFile = Join-Path $env:TEMP "hafizal-web-deploy-params.json"
-$paramsObj = @{
-    apiAppName              = $ApiAppName
-    staticWebAppName        = $StaticWebAppName
-    staticWebLocation       = $StaticWebLocation
-    apiImage                = $image
-    mongodbUri              = $mongodbUri
-    azureOpenAiEndpoint     = $openAiEndpoint
-    foundryProjectEndpoint  = $foundryProject
-    foundryComputeCluster   = $foundryCluster
-    foundryBaseModel        = $foundryModel
-    trainingRegion          = $trainingRegion
-    acrServer               = $acrServer
-    acrUsername             = $acrUsername
-    acrPassword             = $acrPassword
+$paramValues = @{
+    apiAppName             = $ApiAppName
+    staticWebAppName       = $StaticWebAppName
+    staticWebLocation      = $StaticWebLocation
+    apiImage               = $image
+    mongodbUri             = $mongodbUri
+    azureOpenAiEndpoint    = $openAiEndpoint
+    foundryProjectEndpoint = $foundryProject
+    foundryComputeCluster  = $foundryCluster
+    foundryBaseModel       = $foundryModel
+    trainingRegion         = $trainingRegion
+    acrServer              = $acrServer
+    acrUsername            = $acrUsername
+    acrPassword            = $acrPassword
 }
-$paramsObj | ConvertTo-Json | Set-Content -Path $paramFile -Encoding utf8
+Write-ArmParametersFile -Path $paramFile -Values $paramValues
 
 if (-not $SkipInfra) {
     Write-Host 'Deploying infra/web-stack.json...'
@@ -176,7 +194,11 @@ if (-not $SkipInfra) {
         --template-file infra/web-stack.json `
         --parameters "@$paramFile" `
         --output none
-    if ($LASTEXITCODE -ne 0) { throw 'ARM deployment failed' }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host 'Tip: image is already in ACR. Retry infra only with:'
+        Write-Host "  .\scripts\deploy-azure-web.ps1 -SkipApiImage"
+        throw 'ARM deployment failed'
+    }
 } else {
     Write-Host 'Updating Container App image...'
     if ($acrServer) {
