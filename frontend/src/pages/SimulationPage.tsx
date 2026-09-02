@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useI18n } from "../i18n/context";
 import { api, type SimulateResult } from "../api/client";
@@ -51,6 +51,10 @@ export function SimulationPage() {
     },
     [product, faultMode, jurisdiction, artifactType, seed],
   );
+
+  useEffect(() => {
+    void run();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- initial demo on load
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">

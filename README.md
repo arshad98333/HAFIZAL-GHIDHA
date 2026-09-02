@@ -121,7 +121,7 @@ Full OpenAPI: **http://127.0.0.1:8080/docs**
 .\scripts\deploy-azure-web.ps1
 ```
 
-This builds/pushes the API image, provisions `infra/web-stack.json`, deploys the UI with `VITE_API_BASE_URL` set to the live API FQDN, and prints working URLs.
+No Docker or GitHub CLI required — builds the API image in Azure Container Registry.
 
 **GitHub Actions:** `.github/workflows/deploy-web.yml` (manual dispatch, check **provision** on first run).
 
