@@ -1,4 +1,4 @@
-# THE single command for Windows — runs a profile and logs to pipeline_logs.json
+# THE single command for Windows - runs a profile and logs to pipeline_logs.json
 #
 #   .\scripts\run.ps1                    # rescore wave 1 (default)
 #   .\scripts\run.ps1 -Wave 1 -Profile smoke
@@ -26,7 +26,7 @@ if (-not (Get-Command $py -ErrorAction SilentlyContinue)) {
     Write-Error "python not found. Create a venv: python -m venv venv"
 }
 
-# PowerShell: & @($py, "a", "b") is wrong — splat args only, not the executable.
+# PowerShell: & @($py, "a", "b") is wrong - splat args only, not the executable.
 $argList = @("scripts/local_run.py", "run", "--wave", "$Wave", "--profile", $Profile)
 if ($MaxRecords -gt 0) {
     $argList += @("--max-records", "$MaxRecords")

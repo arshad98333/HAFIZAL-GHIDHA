@@ -15,7 +15,7 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $syncScript = Join-Path $scriptDir "sync-desktop-folder.ps1"
 
 if (-not (Test-Path $syncScript)) {
-    Write-Error "Missing $syncScript — run: cd $Source; git pull origin main"
+    Write-Error "Missing $syncScript - run: cd $Source; git pull origin main"
 }
 
 Write-Host "Watching $Source every ${IntervalSeconds}s -> $Dest"

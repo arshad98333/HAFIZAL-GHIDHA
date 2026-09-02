@@ -1,6 +1,6 @@
 # Local run helper for Windows PowerShell.
 #
-# RECOMMENDED — single command:
+# RECOMMENDED - single command:
 #   .\scripts\run.ps1 -Wave 1
 #   .\scripts\run.ps1 -Wave 1 -Profile smoke
 #

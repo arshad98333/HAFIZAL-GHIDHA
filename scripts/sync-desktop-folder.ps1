@@ -21,15 +21,36 @@ if (-not (Test-Path $Source)) {
 }
 
 if (-not $RobocopyOnly) {
-    Set-Location $Source
-    Remove-Item .git\HEAD.lock -Force -ErrorAction SilentlyContinue
-    Remove-Item .git\index.lock -Force -ErrorAction SilentlyContinue
-    git fetch origin
-    git checkout $Branch 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        git checkout -b $Branch "origin/$Branch"
+    Remove-Item (Join-Path $Source ".git\HEAD.lock") -Force -ErrorAction SilentlyContinue
+    Remove-Item (Join-Path $Source ".git\index.lock") -Force -ErrorAction SilentlyContinue
+
+    # Git writes informational messages to stderr; do not treat them as fatal errors.
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & git -C $Source fetch origin 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "git fetch failed with exit code $LASTEXITCODE"
+        }
+
+        $currentBranch = (& git -C $Source rev-parse --abbrev-ref HEAD 2>&1 | Out-String).Trim()
+        if ($currentBranch -ne $Branch) {
+            & git -C $Source checkout $Branch 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                & git -C $Source checkout -b $Branch "origin/$Branch" 2>&1 | Out-Null
+                if ($LASTEXITCODE -ne 0) {
+                    throw "git checkout $Branch failed with exit code $LASTEXITCODE"
+                }
+            }
+        }
+
+        & git -C $Source reset --hard "origin/$Branch" 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "git reset --hard origin/$Branch failed with exit code $LASTEXITCODE"
+        }
+    } finally {
+        $ErrorActionPreference = $prevEap
     }
-    git reset --hard "origin/$Branch"
 }
 
 if (-not (Test-Path $Dest)) {
