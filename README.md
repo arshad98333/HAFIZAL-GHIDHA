@@ -40,15 +40,36 @@ source .venv/bin/activate
 make install
 ```
 
-**Windows:**
+**Windows (PowerShell):**
+
+Install Python 3.11 or 3.12 from [python.org](https://www.python.org/downloads/) and check **"Add python.exe to PATH"** during setup. If `python` opens the Microsoft Store, disable the alias under **Settings > Apps > Advanced app settings > App execution aliases** (turn off `python.exe` and `python3.exe`).
+
+```powershell
+cd C:\Users\HI\Desktop\HAFIZAL-GHIDHA-main
+python --version
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+```
+
+If activation is blocked by execution policy:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\.venv\Scripts\Activate.ps1
+```
+
+**Windows (Command Prompt):**
 
 ```bat
 python -m venv .venv
-.venv\Scripts\activate
-make install
+.venv\Scripts\activate.bat
+pip install -r requirements-dev.txt
 ```
 
-Without Make:
+On Windows, `make` is usually not installed. Use `pip install -r requirements-dev.txt` instead of `make install`. Optional: install Make via [Chocolatey](https://chocolatey.org/) (`choco install make`) or use WSL for Linux-style commands.
+
+Without Make (any OS):
 
 ```bash
 pip install -r requirements-dev.txt
@@ -60,12 +81,27 @@ pip install -r requirements-dev.txt
 make test-fast
 ```
 
+Windows without Make:
+
+```powershell
+python -m pytest tests/unit tests/test_*.py -v --ignore=tests/integration -m "not integration"
+```
+
 This runs 340+ tests against the deterministic core (`rules_engine`, `guardrails`, `knowledge_base`, `curriculum`). No network, no MongoDB, no Azure account required.
 
 Optional full check (lint, typecheck, fast tests):
 
 ```bash
 make check
+```
+
+Windows without Make:
+
+```powershell
+python -m ruff check cold_chain tests scripts
+python -m ruff format --check cold_chain tests scripts
+python -m mypy cold_chain/config.py cold_chain/ports.py cold_chain/adapters/fakes.py --ignore-missing-imports --follow-imports=skip
+python -m pytest tests/unit tests/test_*.py -v --ignore=tests/integration -m "not integration"
 ```
 
 ### Step 4: Configure environment variables
@@ -256,6 +292,9 @@ CI builds the Docker image on every push to `main`. Deploy to Azure is a manual 
 
 | Problem | Fix |
 |---|---|
+| `python3` / `Python was not found` on Windows | Use `python` (not `python3`). Install from python.org; disable Microsoft Store app execution aliases |
+| `source` is not recognized (PowerShell) | Use `.\.venv\Scripts\Activate.ps1` instead of `source .venv/bin/activate` |
+| `make` is not recognized (Windows) | Use `pip install -r requirements-dev.txt` and `python -m pytest ...` (see Step 2 and Step 3) |
 | `Missing required environment variables` on startup | Fill every required field in `.env` (see Step 4 table) |
 | `az login` / AAD errors during `generate` | Run `az login`; confirm OpenAI User role on the resource |
 | MongoDB connection timeout | Check Atlas IP allowlist and `MONGODB_URI` |
