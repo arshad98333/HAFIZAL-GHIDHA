@@ -20,6 +20,8 @@ GSO-aligned cold-chain compliance AI for **Saudi Arabia, UAE, Qatar, Bahrain, Ku
 | **Full wave** (~663 records) | `.\scripts\run.ps1 -Profile wave` | `make run-wave` |
 | **Start API** | `.\scripts\api_server.ps1` | `make api` |
 | **Start web UI** | `.\scripts\ui.ps1` | `make ui` |
+| **Try simulation** | Open http://127.0.0.1:5173/simulation | same |
+| **Deploy to Azure** | `.\scripts\deploy-azure-web.ps1` | see DEPLOYMENT-WEB.md |
 | **Sync to `-main` folder** | `.\scripts\watch-sync-desktop.ps1` | `./scripts/sync-desktop-folder.ps1` |
 | **Health check** | `python -m cold_chain.runner health` | `make health` |
 
@@ -79,6 +81,7 @@ VITE_API_PROXY_TARGET=http://127.0.0.1:8080
 | Page | URL | Purpose |
 |------|-----|---------|
 | Landing | `/` | GSO business value, SEO |
+| **Simulation** | `/simulation` | Interactive demo: inputs → temps → rules engine |
 | Dashboard | `/dashboard` | Wave audit, Gate A, health |
 | Pipeline | `/pipeline` | Trigger plan / generate / gate-a |
 | Guide | `/guide` | Copy-paste single commands |
@@ -94,6 +97,7 @@ Toggle **EN / عربي** in the header (RTL layout for Arabic).
 |--------|------|-------------|
 | GET | `/health` | Config liveness |
 | GET | `/ready` | MongoDB ping |
+| POST | `/simulate` | Deterministic demo (no Mongo/LLM) |
 | GET | `/waves/{n}/audit` | Wave summary |
 | GET | `/waves/{n}/kpi` | 12 KPI scorecard |
 | POST | `/waves/{n}/gate-a` | Run Gate A (background job) |
@@ -111,12 +115,17 @@ Full OpenAPI: **http://127.0.0.1:8080/docs**
 | **UI** | Static Web Apps | `frontend/dist` |
 | **Pipeline batch** | Container Apps Job | `Dockerfile` |
 
-1. Provision: `infra/web-stack.json` (API + Static Web App)
-2. CI/CD: `.github/workflows/deploy-web.yml` (manual dispatch)
-3. Set GitHub vars: `VITE_API_BASE_URL=https://<api-fqdn>` (auto-injected at build)
-4. Secrets: `AZURE_STATIC_WEB_APPS_API_TOKEN`, Azure OIDC vars
+**One command (Windows, after `az login`):**
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the batch pipeline job.
+```powershell
+.\scripts\deploy-azure-web.ps1
+```
+
+This builds/pushes the API image, provisions `infra/web-stack.json`, deploys the UI with `VITE_API_BASE_URL` set to the live API FQDN, and prints working URLs.
+
+**GitHub Actions:** `.github/workflows/deploy-web.yml` (manual dispatch, check **provision** on first run).
+
+See [DEPLOYMENT-WEB.md](DEPLOYMENT-WEB.md) for details. Batch pipeline: [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 
