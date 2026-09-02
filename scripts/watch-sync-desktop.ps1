@@ -5,22 +5,23 @@
 # Press Ctrl+C to stop.
 
 param(
-    [string]$Source = "C:\Users\HI\Desktop\HAFIZAL-GHIDHA",
-    [string]$Dest = "C:\Users\HI\Desktop\HAFIZAL-GHIDHA-main",
+    [string]$Source = 'C:\Users\HI\Desktop\HAFIZAL-GHIDHA',
+    [string]$Dest = 'C:\Users\HI\Desktop\HAFIZAL-GHIDHA-main',
     [int]$IntervalSeconds = 30
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$syncScript = Join-Path $scriptDir "sync-desktop-folder.ps1"
+$syncScript = Join-Path $scriptDir 'sync-desktop-folder.ps1'
 
 if (-not (Test-Path $syncScript)) {
-    Write-Error "Missing $syncScript - run: cd $Source; git pull origin main"
+    $msg = 'Missing sync script: ' + $syncScript + '. Run: cd ' + $Source + '; git pull origin main'
+    Write-Error $msg
 }
 
-Write-Host "Watching $Source every ${IntervalSeconds}s -> $Dest"
-Write-Host "Press Ctrl+C to stop."
-Write-Host ""
+Write-Host ('Watching ' + $Source + ' every ' + $IntervalSeconds + 's -> ' + $Dest)
+Write-Host 'Press Ctrl+C to stop.'
+Write-Host ''
 
 $first = $true
 while ($true) {
