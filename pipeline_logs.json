@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "description": "Local pipeline command logs (gate-a, export, kpi, preflight, rescore)",
+  "runs": [
+    {
+      "id": "b46a5cd3-323d-4235-bbcc-d33dfe1fc147",
+      "label": "test",
+      "wave": 1,
+      "started_at": "2026-09-02T17:00:21Z",
+      "finished_at": "2026-09-02T17:00:21Z",
+      "host": "cursor",
+      "platform": "Linux-6.12.94+-x86_64-with-glibc2.39",
+      "python": "3.12.3",
+      "steps": [
+        {
+          "name": "demo",
+          "command": [
+            "echo",
+            "ok"
+          ],
+          "exit_code": 0,
+          "status": "ok",
+          "finished_at": "2026-09-02T17:00:21Z"
+        }
+      ],
+      "summary": {
+        "demo": true
+      }
+    }
+  ]
+}

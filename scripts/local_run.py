@@ -23,6 +23,10 @@ KPI scorecard (all 12 dimensions, target >= 7/10):
 
     python scripts/local_run.py kpi --wave 1
     python scripts/local_run.py preflight --wave 1
+
+Re-score an existing wave (gate-a, export, kpi, preflight) and append to pipeline_logs.json:
+
+    python scripts/local_run.py rescore --wave 1
 """
 
 from __future__ import annotations
@@ -241,6 +245,44 @@ def cmd_audit(args: argparse.Namespace) -> int:
     return asyncio.run(_audit_wave(args.wave))
 
 
+def cmd_rescore(args: argparse.Namespace) -> int:
+    """Re-run gate-a, export, kpi, preflight and append results to pipeline_logs.json."""
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from pipeline_log import append_step, capture_json_stdout, finish_run, start_run
+
+    py = _py()
+    wave = args.wave
+    run = start_run(wave, label="rescore")
+    summary: dict = {}
+
+    steps: list[tuple[str, list[str], bool]] = [
+        ("gate-a", [py, "-m", "cold_chain.runner", "gate-a", "--wave", str(wave)], False),
+        ("export", [py, str(ROOT / "scripts" / "export_wave.py"), "--wave", str(wave)], True),
+        ("kpi", [py, str(ROOT / "scripts" / "kpi_dashboard.py"), "--wave", str(wave), "--json"], False),
+        ("preflight", [py, "-m", "cold_chain.runner", "preflight", "--wave", str(wave)], True),
+    ]
+
+    last_rc = 0
+    for name, cmd, capture_json in steps:
+        if capture_json and name in ("kpi", "preflight"):
+            rc, parsed, output = capture_json_stdout(cmd)
+            print(output, end="" if output.endswith("\n") else "\n")
+            append_step(run, name, cmd, rc, extra={"result": parsed})
+            if name == "kpi" and parsed:
+                summary["kpi"] = parsed
+            if name == "preflight" and parsed:
+                summary["preflight"] = parsed
+        else:
+            rc = _run(name, cmd, stop_on_fail=False)
+            append_step(run, name, cmd, rc)
+        last_rc = rc if name == "kpi" else last_rc
+
+    finish_run(run, summary=summary)
+    log_path = ROOT / "pipeline_logs.json"
+    print(f"\nLog appended to {log_path} (run id: {run['id']})")
+    return last_rc
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="mode", required=True)
@@ -277,6 +319,12 @@ def main() -> int:
     p_preflight = sub.add_parser("preflight", help="training + Gate B readiness check")
     p_preflight.add_argument("--wave", type=int, required=True)
 
+    p_rescore = sub.add_parser(
+        "rescore",
+        help="gate-a + export + kpi + preflight; append JSON log to pipeline_logs.json",
+    )
+    p_rescore.add_argument("--wave", type=int, required=True)
+
     args = ap.parse_args()
     if args.mode == "all":
         return cmd_all(args)
@@ -293,6 +341,8 @@ def main() -> int:
         return _run("kpi", cmd, stop_on_fail=False)
     if args.mode == "preflight":
         return _run("preflight", [_py(), "-m", "cold_chain.runner", "preflight", "--wave", str(args.wave)])
+    if args.mode == "rescore":
+        return cmd_rescore(args)
     return 2
 
 

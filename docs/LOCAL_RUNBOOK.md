@@ -67,6 +67,12 @@ Gate A exit 2 on a **smoke run** (10–100 records) is normal — metrics need a
 Re-run Gate A on existing data (no regenerate needed):
 
 ```bash
+python scripts/local_run.py rescore --wave 1
+```
+
+This runs gate-a, export, kpi, and preflight, and appends a JSON entry to `pipeline_logs.json` in the repo root.
+
+```bash
 python -m cold_chain.runner gate-a --wave 1
 python scripts/local_run.py audit --wave 1
 python scripts/local_run.py kpi --wave 1
