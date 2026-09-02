@@ -15,4 +15,5 @@ numpy>=1.26,<2.5
 scipy>=1.13,<1.18
 python-dotenv>=1.0
 fastapi>=0.115
-uvicorn[standard]>=0.30
+# Plain uvicorn (no [standard]): uvloop in [standard] does not support Windows.
+uvicorn>=0.30
