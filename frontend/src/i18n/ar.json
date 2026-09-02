@@ -62,17 +62,20 @@
     "windows": "ويندوز (PowerShell)",
     "linux": "لينكس / ماك",
     "goals": "الأهداف — أمر واحد لكل هدف",
+    "goalConnect": "ربط المجلد المحلي بـ GitHub (مرة واحدة)",
+    "goalUpdateAll": "سحب آخر التحديثات وتثبيت التبعيات",
+    "goalUpdateDeploy": "سحب التحديثات والنشر على Azure",
+    "goalWatch": "تحديث تلقائي عند تغيّر main على GitHub",
     "goalRescore": "إعادة تقييم موجة 1",
     "goalSmoke": "اختبار أول 10 سجلات",
     "goalWave": "توليد موجة كاملة (~663)",
     "goalApi": "تشغيل خادم API",
     "goalUi": "تشغيل الواجهة",
-    "goalSync": "مزامنة مجلد HAFIZAL-GHIDHA-main",
     "backendLink": "الواجهة تتصل بـ",
     "troubleshoot": "حل المشاكل",
     "t1": "uvicorn غير موجود → شغّل .\\scripts\\api_server.ps1",
     "t2": "فشل البوابة A → أعد ضبط MongoDB ثم profile wave",
-    "t3": "خطأ PowerShell → git pull main"
+    "t3": "المستودع قديم → .\\scripts\\connect-github.ps1 ثم .\\scripts\\update-all.ps1"
   },
   "jobs": {
     "title": "المهام الخلفية",

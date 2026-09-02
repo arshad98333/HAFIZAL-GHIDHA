@@ -108,13 +108,12 @@ ui-windows:
 	@echo "On Windows use: .\\scripts\\ui.ps1"
 
 update-all:
-	@if [ "$(DEPLOY)" = "1" ]; then \
-		echo "Deploy flag set: run deploy-azure-web.ps1 on Windows after sync"; \
-	fi
-	git pull origin main
+	git pull --ff-only origin main
 	$(PIP) install -q -r requirements-dev.txt
-	cd frontend && npm install
-	./scripts/sync-desktop-folder.ps1 -RobocopyOnly || true
+	cd frontend && npm ci || npm install
+
+watch-github:
+	@echo "On Windows use: .\\scripts\\watch-github.ps1"
 
 # --------------------------------------------------------------------------- #
 # Legacy aliases (delegate to run profiles)

@@ -62,18 +62,20 @@
     "windows": "Windows (PowerShell)",
     "linux": "Linux / macOS",
     "goals": "Goals - single command each",
-    "goalUpdateAll": "Update GitHub, local copy, deps, and deploy to Azure",
+    "goalConnect": "Connect local folder to GitHub (one time)",
+    "goalUpdateAll": "Pull latest + install deps",
+    "goalUpdateDeploy": "Pull latest + deps + deploy to Azure",
+    "goalWatch": "Auto-update when GitHub main changes",
     "goalRescore": "Re-score existing wave 1 data",
     "goalSmoke": "First-time 10-record test",
     "goalWave": "Full wave regenerate (~663 records)",
     "goalApi": "Start API server",
     "goalUi": "Start web UI (this app)",
-    "goalSync": "Sync to HAFIZAL-GHIDHA-main folder",
     "backendLink": "Backend connects to",
     "troubleshoot": "Troubleshooting",
     "t1": "API ModuleNotFoundError uvicorn: run .\\scripts\\api_server.ps1",
     "t2": "Gate A fails on rescore: reset MongoDB then run wave profile",
-    "t3": "PowerShell parse error: git pull main for ASCII-only scripts"
+    "t3": "Behind GitHub main: run .\\scripts\\connect-github.ps1 then .\\scripts\\update-all.ps1"
   },
   "jobs": {
     "title": "Background Jobs",

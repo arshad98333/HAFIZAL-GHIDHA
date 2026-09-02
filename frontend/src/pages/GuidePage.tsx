@@ -6,9 +6,24 @@ type CmdBlock = { titleKey: string; win: string; unix: string };
 
 const commands: CmdBlock[] = [
   {
+    titleKey: "guide.goalConnect",
+    win: ".\\scripts\\connect-github.ps1",
+    unix: "git remote add origin https://github.com/arshad98333/HAFIZAL-GHIDHA.git && git pull origin main",
+  },
+  {
+    titleKey: "guide.goalWatch",
+    win: ".\\scripts\\watch-github.ps1",
+    unix: "watch -n 60 git pull origin main",
+  },
+  {
     titleKey: "guide.goalUpdateAll",
     win: ".\\scripts\\update-all.ps1",
     unix: "make update-all",
+  },
+  {
+    titleKey: "guide.goalUpdateDeploy",
+    win: ".\\scripts\\update-all.ps1 -Deploy",
+    unix: "make update-all && see DEPLOYMENT-WEB.md",
   },
   {
     titleKey: "guide.goalRescore",
@@ -32,13 +47,8 @@ const commands: CmdBlock[] = [
   },
   {
     titleKey: "guide.goalUi",
-    win: "cd frontend; npm install; npm run dev",
-    unix: "cd frontend && npm install && npm run dev",
-  },
-  {
-    titleKey: "guide.goalSync",
-    win: ".\\scripts\\watch-sync-desktop.ps1",
-    unix: "./scripts/sync-desktop-folder.ps1",
+    win: ".\\scripts\\ui.ps1",
+    unix: "make ui",
   },
 ];
 
