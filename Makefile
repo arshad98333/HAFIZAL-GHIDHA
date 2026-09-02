@@ -1,5 +1,5 @@
 .PHONY: install dev test test-fast test-integration lint format typecheck check build clean \
-	health run run-smoke run-wave run-rescore run-full \
+	health run run-smoke run-wave run-rescore run-full api \
 	local-setup smoke-run wave-run local-audit kpi preflight rescore
 
 PYTHON ?= python3
@@ -88,6 +88,12 @@ clean:
 
 health:
 	$(PY) -m cold_chain.runner health
+
+api:
+	$(PY) scripts/api_server.py --host 0.0.0.0 --port 8080
+
+api-dev:
+	$(PY) scripts/api_server.py --host 0.0.0.0 --port 8080 --reload
 
 # --------------------------------------------------------------------------- #
 # Legacy aliases (delegate to run profiles)
