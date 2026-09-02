@@ -10,6 +10,102 @@ GSO-aligned cold-chain compliance AI for **Saudi Arabia, UAE, Qatar, Bahrain, Ku
 
 ---
 
+## Live deployment (Azure)
+
+Production stack on Azure Container Apps (API, scale-to-zero) + Azure Static Web Apps (UI).
+
+| Service | Base URL |
+|---------|----------|
+| **Web UI** | https://lively-river-053b63203.3.azurestaticapps.net |
+| **API** | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io |
+| **OpenAPI / Swagger** | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/docs |
+| **ReDoc** | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/redoc |
+
+### Live UI pages
+
+| Page | URL |
+|------|-----|
+| Landing | https://lively-river-053b63203.3.azurestaticapps.net/ |
+| Simulation | https://lively-river-053b63203.3.azurestaticapps.net/simulation |
+| Dashboard | https://lively-river-053b63203.3.azurestaticapps.net/dashboard |
+| Pipeline | https://lively-river-053b63203.3.azurestaticapps.net/pipeline |
+| Setup guide | https://lively-river-053b63203.3.azurestaticapps.net/guide |
+| Jobs | https://lively-river-053b63203.3.azurestaticapps.net/jobs |
+
+The UI calls the API directly (CORS enabled). `VITE_API_BASE_URL` was set at deploy time to the API base URL above.
+
+### Live API — meta & health
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/ | Service metadata |
+| GET | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/health | Config liveness |
+| GET | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/ready | MongoDB readiness |
+
+### Live API — simulation
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/simulate | Deterministic demo: synthesize temps, rules-engine label, artifact preview (no LLM) |
+
+```powershell
+curl -X POST "https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/simulate" `
+  -H "Content-Type: application/json" `
+  -d '{"product":"finfish_seafood","fault_mode":"door_open","jurisdiction":"AE","artifact_type":"logger_csv","seed":42}'
+```
+
+### Live API — waves (read)
+
+Replace `{n}` with wave number (e.g. `1`).
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `.../waves/{n}/audit` | Wave summary (rows, kept, Gate A status) |
+| GET | `.../waves/{n}/plan` | Read `plan.json` |
+| GET | `.../waves/{n}/gate-a` | Read Gate A report |
+| GET | `.../waves/{n}/gate-b` | Read Gate B report |
+| GET | `.../waves/{n}/preflight` | Read preflight report |
+| GET | `.../waves/{n}/decisions` | Decision log |
+| GET | `.../waves/{n}/records` | Paginated generation log (`?limit=20&offset=0`) |
+| GET | `.../waves/{n}/records/count` | Outcome counts |
+| GET | `.../waves/{n}/kpi` | 12-KPI scorecard |
+
+Example: https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/waves/1/audit
+
+### Live API — pipeline (write, background jobs)
+
+POST returns `202 Accepted` with a `job_id`. Poll `/jobs/{id}` until `status` is `succeeded` or `failed`.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `.../waves/{n}/plan` | Run wave planning |
+| POST | `.../waves/{n}/generate` | Run corpus generation |
+| POST | `.../waves/{n}/gate-a` | Run Gate A evaluation |
+| POST | `.../waves/{n}/preflight` | Run preflight check |
+| POST | `.../waves/{n}/train` | Run training submit |
+| POST | `.../waves/{n}/gate-b` | Run Gate B evaluation |
+
+Example: `POST https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/waves/1/gate-a`
+
+### Live API — jobs
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/jobs | List jobs (`?wave=1` optional) |
+| GET | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/jobs/{id} | Job status and result |
+
+### Live API — data
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/ledger | Training ledger |
+| GET | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/coverage | Coverage matrix |
+
+> **Note:** `...` = `https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io`  
+> Jobs are in-memory on the API container; they reset when the app scales to zero or restarts.
+
+---
+
 ## One command per goal
 
 | Goal | Windows (PowerShell) | Linux / macOS |
@@ -91,17 +187,35 @@ Toggle **EN / عربي** in the header (RTL layout for Arabic).
 
 ---
 
-## API endpoints
+## API endpoints (local)
+
+For local development, base URL is **http://127.0.0.1:8080**. See [Live deployment](#live-deployment-azure) for production URLs.
 
 | Method | Path | Description |
 |--------|------|-------------|
+| GET | `/` | Service metadata |
 | GET | `/health` | Config liveness |
 | GET | `/ready` | MongoDB ping |
 | POST | `/simulate` | Deterministic demo (no Mongo/LLM) |
 | GET | `/waves/{n}/audit` | Wave summary |
+| GET | `/waves/{n}/plan` | Read plan |
+| GET | `/waves/{n}/gate-a` | Read Gate A report |
+| GET | `/waves/{n}/gate-b` | Read Gate B report |
+| GET | `/waves/{n}/preflight` | Read preflight |
+| GET | `/waves/{n}/decisions` | Decision log |
+| GET | `/waves/{n}/records` | Paginated records |
+| GET | `/waves/{n}/records/count` | Outcome counts |
 | GET | `/waves/{n}/kpi` | 12 KPI scorecard |
-| POST | `/waves/{n}/gate-a` | Run Gate A (background job) |
-| GET | `/jobs/{id}` | Poll job status |
+| POST | `/waves/{n}/plan` | Run plan (background job) |
+| POST | `/waves/{n}/generate` | Run generate |
+| POST | `/waves/{n}/gate-a` | Run Gate A |
+| POST | `/waves/{n}/preflight` | Run preflight |
+| POST | `/waves/{n}/train` | Run train |
+| POST | `/waves/{n}/gate-b` | Run Gate B |
+| GET | `/jobs` | List jobs |
+| GET | `/jobs/{id}` | Job status |
+| GET | `/ledger` | Training ledger |
+| GET | `/coverage` | Coverage matrix |
 
 Full OpenAPI: **http://127.0.0.1:8080/docs**
 

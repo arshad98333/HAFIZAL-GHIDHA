@@ -18,11 +18,12 @@ az login
 .\scripts\deploy-azure-web.ps1
 ```
 
-On success you get:
+On success you get URLs like:
 
-- `API: https://<fqdn>` — FastAPI + `/simulate` + `/docs`
-- `UI: https://<swa-host>` — React app with `VITE_API_BASE_URL` pointing at the API
-- `Simulation: https://<swa-host>/simulation`
+- **UI:** https://lively-river-053b63203.3.azurestaticapps.net
+- **API:** https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io
+
+Full endpoint list: [README — Live deployment](README.md#live-deployment-azure).
 
 First run takes ~5–10 minutes (ACR cloud build + ARM deploy + npm build).
 
