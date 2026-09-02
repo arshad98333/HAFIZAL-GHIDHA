@@ -26,13 +26,14 @@ if (-not (Get-Command $py -ErrorAction SilentlyContinue)) {
     Write-Error "python not found. Create a venv: python -m venv venv"
 }
 
-$cmd = @($py, "scripts/local_run.py", "run", "--wave", "$Wave", "--profile", $Profile)
+# PowerShell: & @($py, "a", "b") is wrong — splat args only, not the executable.
+$argList = @("scripts/local_run.py", "run", "--wave", "$Wave", "--profile", $Profile)
 if ($MaxRecords -gt 0) {
-    $cmd += @("--max-records", "$MaxRecords")
+    $argList += @("--max-records", "$MaxRecords")
 }
 if ($SkipTests) {
-    $cmd += "--skip-tests"
+    $argList += "--skip-tests"
 }
 
-& @cmd
+& $py @argList
 exit $LASTEXITCODE

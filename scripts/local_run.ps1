@@ -36,30 +36,30 @@ if (-not (Get-Command $py -ErrorAction SilentlyContinue)) {
     Write-Error "python not found on PATH. Activate your venv first."
 }
 
-$cmd = @($py, "scripts/local_run.py", $Mode)
+$argList = @("scripts/local_run.py", $Mode)
 
 if ($Mode -eq "step") {
     if (-not $StepName) {
         Write-Error "step mode requires a step name, e.g. .\scripts\local_run.ps1 step setup"
     }
-    $cmd += $StepName
+    $argList += $StepName
 }
 
 if ($Wave -gt 0) {
-    $cmd += @("--wave", "$Wave")
+    $argList += @("--wave", "$Wave")
 }
 if ($Profile) {
-    $cmd += @("--profile", $Profile)
+    $argList += @("--profile", $Profile)
 }
 if ($MaxRecords -gt 0) {
-    $cmd += @("--max-records", "$MaxRecords")
+    $argList += @("--max-records", "$MaxRecords")
 }
 if ($SkipTests) {
-    $cmd += "--skip-tests"
+    $argList += "--skip-tests"
 }
 if ($SkipSetup) {
-    $cmd += "--skip-setup"
+    $argList += "--skip-setup"
 }
 
-& @cmd
+& $py @argList
 exit $LASTEXITCODE
