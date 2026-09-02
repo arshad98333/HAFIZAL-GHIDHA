@@ -1,0 +1,109 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "HTTP API (Container Apps) + Static Web App for the GCC cold-chain dashboard. Deploy after building images and setting VITE_API_BASE_URL to the API FQDN."
+  },
+  "parameters": {
+    "apiAppName": { "type": "string", "defaultValue": "gcc-coldchain-api" },
+    "staticWebAppName": { "type": "string", "defaultValue": "gcc-coldchain-ui" },
+    "location": { "type": "string", "defaultValue": "[resourceGroup().location]" },
+    "apiImage": {
+      "type": "string",
+      "metadata": { "description": "Container image for FastAPI, e.g. ghcr.io/owner/repo-api:latest" }
+    },
+    "mongodbUri": { "type": "securestring" },
+    "azureOpenAiEndpoint": { "type": "string" },
+    "foundryProjectEndpoint": { "type": "string" },
+    "foundryComputeCluster": { "type": "string" },
+    "foundryBaseModel": { "type": "string" },
+    "trainingRegion": { "type": "string" }
+  },
+  "variables": {
+    "suffix": "[uniqueString(resourceGroup().id)]",
+    "envName": "[format('cae-api-{0}', variables('suffix'))]",
+    "lawName": "[format('law-api-{0}', variables('suffix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[variables('lawName')]",
+      "location": "[parameters('location')]",
+      "properties": { "sku": { "name": "PerGB2018" }, "retentionInDays": 30 }
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2023-05-01",
+      "name": "[variables('envName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[resourceId('Microsoft.OperationalInsights/workspaces', variables('lawName'))]"],
+      "properties": {
+        "appLogsConfiguration": {
+          "destination": "log-analytics",
+          "logAnalyticsConfiguration": {
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', variables('lawName'))).customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('lawName')), '2022-10-01').primarySharedKey]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2023-05-01",
+      "name": "[parameters('apiAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": ["[resourceId('Microsoft.App/managedEnvironments', variables('envName'))]"],
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', variables('envName'))]",
+        "configuration": {
+          "ingress": {
+            "external": true,
+            "targetPort": 8080,
+            "transport": "auto"
+          }
+        },
+        "template": {
+          "scale": { "minReplicas": 0, "maxReplicas": 3 },
+          "containers": [
+            {
+              "name": "api",
+              "image": "[parameters('apiImage')]",
+              "resources": { "cpu": 0.5, "memory": "1Gi" },
+              "env": [
+                { "name": "MONGODB_URI", "secretRef": "mongodb-uri" },
+                { "name": "AZURE_OPENAI_ENDPOINT", "value": "[parameters('azureOpenAiEndpoint')]" },
+                { "name": "FOUNDRY_PROJECT_ENDPOINT", "value": "[parameters('foundryProjectEndpoint')]" },
+                { "name": "FOUNDRY_COMPUTE_CLUSTER", "value": "[parameters('foundryComputeCluster')]" },
+                { "name": "FOUNDRY_BASE_MODEL", "value": "[parameters('foundryBaseModel')]" },
+                { "name": "TRAINING_REGION", "value": "[parameters('trainingRegion')]" }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/staticSites",
+      "apiVersion": "2022-03-01",
+      "name": "[parameters('staticWebAppName')]",
+      "location": "[parameters('location')]",
+      "sku": { "name": "Free", "tier": "Free" },
+      "properties": {}
+    }
+  ],
+  "outputs": {
+    "apiFqdn": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.App/containerApps', parameters('apiAppName'))).configuration.ingress.fqdn]"
+    },
+    "staticWebAppDefaultHostname": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Web/staticSites', parameters('staticWebAppName'))).defaultHostname]"
+    },
+    "viteApiBaseUrl": {
+      "type": "string",
+      "value": "[format('https://{0}', reference(resourceId('Microsoft.App/containerApps', parameters('apiAppName'))).configuration.ingress.fqdn)]"
+    }
+  }
+}

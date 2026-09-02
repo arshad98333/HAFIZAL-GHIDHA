@@ -95,8 +95,17 @@ api:
 api-dev:
 	$(PY) scripts/api_server.py --host 0.0.0.0 --port 8080 --reload
 
+ui:
+	cd frontend && npm install && npm run dev
+
+ui-build:
+	cd frontend && npm install && npm run build
+
 api-windows:
 	@echo "On Windows use: .\\scripts\\api_server.ps1"
+
+ui-windows:
+	@echo "On Windows use: .\\scripts\\ui.ps1"
 
 # --------------------------------------------------------------------------- #
 # Legacy aliases (delegate to run profiles)

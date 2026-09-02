@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "pipeline": "Pipeline",
+    "guide": "Setup Guide",
+    "jobs": "Jobs",
+    "apiDocs": "API Docs"
+  },
+  "landing": {
+    "badge": "GSO-aligned · Six GCC jurisdictions",
+    "title": "Cold-chain compliance AI for the Gulf",
+    "subtitle": "Automate inspection of temperature logs, QC forms, chat messages, and voice notes — grounded in GCC food-safety law. Every training label from a deterministic rules engine, never from an LLM.",
+    "ctaPrimary": "Open Dashboard",
+    "ctaGuide": "Setup in one command",
+    "valueTitle": "Business value for regulators & operators",
+    "value1Title": "GSO & national standards alignment",
+    "value1Body": "Maps to Gulf Standardization Organization food-safety frameworks and jurisdiction-specific instruments (SFDA, ESMA, MoPH Qatar, and more).",
+    "value2Title": "Audit-ready provenance",
+    "value2Body": "Every record carries wave, cell, rules-engine hash, and screener verdict — built for HACCP cold-chain audits and traceability.",
+    "value3Title": "Faster gate reviews",
+    "value3Body": "Gate A/B KPIs score corpus quality before training spend. Rescore existing data in one command without regenerating.",
+    "value4Title": "Multilingual field reality",
+    "value4Body": "English and Arabic artifacts with authenticity scoring — designed for how GCC logistics teams actually communicate.",
+    "jurisdictions": "SA · AE · QA · BH · KW · OM",
+    "seoTitle": "GCC Cold-Chain Compliance AI | GSO Food Safety",
+    "seoDesc": "AI-assisted cold-chain compliance for GCC food operators. GSO-aligned, rules-engine labels, Gate A/B quality gates."
+  },
+  "dashboard": {
+    "title": "Operations Dashboard",
+    "wave": "Wave",
+    "refresh": "Refresh",
+    "health": "API Health",
+    "ready": "MongoDB Ready",
+    "records": "Records",
+    "kept": "Kept",
+    "gateA": "Gate A",
+    "passed": "Passed",
+    "failed": "Failed",
+    "metrics": "Gate A Metrics",
+    "viewPipeline": "Run pipeline",
+    "apiBase": "Backend URL"
+  },
+  "pipeline": {
+    "title": "Pipeline Control",
+    "subtitle": "Trigger stages via the API. Long jobs run in the background — poll Jobs page for status.",
+    "plan": "Plan wave",
+    "generate": "Generate corpus",
+    "gateA": "Run Gate A",
+    "preflight": "Preflight check",
+    "rescoreHint": "For rescore only (no regenerate), use the CLI: .\\scripts\\run.ps1",
+    "started": "Job started",
+    "viewJob": "View job"
+  },
+  "guide": {
+    "title": "Setup Guide",
+    "subtitle": "One command per goal. Copy, paste, run.",
+    "prereq": "Prerequisites",
+    "prereqList": "Python 3.11+, Git, MongoDB Atlas URI, Azure OpenAI endpoint, az login",
+    "windows": "Windows (PowerShell)",
+    "linux": "Linux / macOS",
+    "goals": "Goals — single command each",
+    "goalRescore": "Re-score existing wave 1 data",
+    "goalSmoke": "First-time 10-record test",
+    "goalWave": "Full wave regenerate (~663 records)",
+    "goalApi": "Start API server",
+    "goalUi": "Start web UI (this app)",
+    "goalSync": "Sync to HAFIZAL-GHIDHA-main folder",
+    "backendLink": "Backend connects to",
+    "troubleshoot": "Troubleshooting",
+    "t1": "API ModuleNotFoundError uvicorn → run .\\scripts\\api_server.ps1",
+    "t2": "Gate A fails on rescore → reset MongoDB then run wave profile",
+    "t3": "PowerShell parse error → git pull main for ASCII-only scripts"
+  },
+  "jobs": {
+    "title": "Background Jobs",
+    "empty": "No jobs yet. Start a stage from Pipeline.",
+    "status": "Status",
+    "name": "Stage",
+    "wave": "Wave"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Error",
+    "retry": "Retry",
+    "online": "Online",
+    "offline": "Offline"
+  }
+}
