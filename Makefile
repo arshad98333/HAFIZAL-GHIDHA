@@ -95,6 +95,9 @@ api:
 api-dev:
 	$(PY) scripts/api_server.py --host 0.0.0.0 --port 8080 --reload
 
+api-windows:
+	@echo "On Windows use: .\\scripts\\api_server.ps1"
+
 # --------------------------------------------------------------------------- #
 # Legacy aliases (delegate to run profiles)
 # --------------------------------------------------------------------------- #
