@@ -3,13 +3,16 @@
 #
 # Usage:
 #   .\scripts\sync-desktop-folder.ps1
-#   .\scripts\sync-desktop-folder.ps1 -RobocopyOnly   # copy files only, no git
+#   .\scripts\sync-desktop-folder.ps1 -RobocopyOnly
+#   .\scripts\sync-desktop-folder.ps1 -InstallDeps -Deploy
 
 param(
     [string]$Source = "C:\Users\HI\Desktop\HAFIZAL-GHIDHA",
     [string]$Dest = "C:\Users\HI\Desktop\HAFIZAL-GHIDHA-main",
     [string]$Branch = "main",
-    [switch]$RobocopyOnly
+    [switch]$RobocopyOnly,
+    [switch]$InstallDeps,
+    [switch]$Deploy
 )
 
 $ErrorActionPreference = "Stop"
@@ -74,11 +77,40 @@ Write-Host "Done. Updated: $Dest"
 if (-not $RobocopyOnly) {
     Write-Host "Branch: $Branch ($(git -C $Source rev-parse --short HEAD))"
 }
-Write-Host ""
-Write-Host "Next (one command for everything):"
-Write-Host "  .\scripts\update-all.ps1"
-Write-Host ""
-Write-Host "Or run API + UI (two terminals):"
-Write-Host "  cd $Dest"
-Write-Host "  .\scripts\api_server.ps1"
-Write-Host "  .\scripts\ui.ps1"
+
+$updateAll = Join-Path $Source "scripts\update-all.ps1"
+if ($InstallDeps -or $Deploy) {
+    if (-not (Test-Path $updateAll)) {
+        Write-Host ""
+        Write-Host "update-all.ps1 not found yet. Run:"
+        Write-Host "  git -C $Source pull origin $Branch"
+        Write-Host "  .\scripts\update-all.ps1 -Deploy"
+    } else {
+        Write-Host ""
+        Write-Host "Running update-all.ps1 (deps + optional deploy)..."
+        $uaArgs = @('-SkipSync')
+        if ($Deploy) { $uaArgs += '-Deploy' }
+        if (-not $InstallDeps -and -not $Deploy) { $uaArgs += '-SkipDeps'; $uaArgs += '-SkipFrontendDeps' }
+        & $updateAll @uaArgs
+        if ($LASTEXITCODE -ne 0) { throw 'update-all failed' }
+    }
+} else {
+    Write-Host ""
+    if (Test-Path $updateAll) {
+        Write-Host "Next (one command for everything):"
+        Write-Host "  .\scripts\update-all.ps1"
+        Write-Host "  .\scripts\update-all.ps1 -Deploy"
+    } else {
+        Write-Host "Next (pull latest scripts first):"
+        Write-Host "  git -C $Source pull origin $Branch"
+        Write-Host "  .\scripts\update-all.ps1 -Deploy"
+        Write-Host ""
+        Write-Host "Or use sync which already fetched main:"
+        Write-Host "  git -C $Source reset --hard origin/$Branch"
+    }
+    Write-Host ""
+    Write-Host "Run API + UI (two terminals):"
+    Write-Host "  cd $Dest"
+    Write-Host "  .\scripts\api_server.ps1"
+    Write-Host "  .\scripts\ui.ps1"
+}

@@ -118,6 +118,7 @@ Example: `POST https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontai
 | **Start web UI** | `.\scripts\ui.ps1` | `make ui` |
 | **Try simulation** | Open http://127.0.0.1:5173/simulation | same |
 | **Deploy to Azure** | `.\scripts\deploy-azure-web.ps1` | see DEPLOYMENT-WEB.md |
+| **Pull latest main** (bootstrap) | `.\scripts\pull-main.ps1` | `git pull origin main` |
 | **Update all** (git + deps + sync) | `.\scripts\update-all.ps1` | `make update-all` |
 | **Update + deploy Azure** | `.\scripts\update-all.ps1 -Deploy` | `make update-all DEPLOY=1` |
 | **Sync to `-main` folder** | `.\scripts\watch-sync-desktop.ps1` | `./scripts/sync-desktop-folder.ps1` |
@@ -253,6 +254,7 @@ See [DEPLOYMENT-WEB.md](DEPLOYMENT-WEB.md) for details. Batch pipeline: [DEPLOYM
 | Gate A fails on rescore | Reset MongoDB: `python scripts/reset_pipeline_state.py --yes --wave 1` then `.\scripts\run.ps1 -Profile wave` |
 | PowerShell parse error | `git pull origin main` (ASCII-only `.ps1` scripts) |
 | UI cannot reach API | Start API first; check `frontend/.env` proxy target |
+| `update-all.ps1` not found | Repo is behind GitHub `main`. Run `.\scripts\sync-desktop-folder.ps1` (fetches latest), then `.\scripts\update-all.ps1`. Or: `git pull origin main` / `.\scripts\pull-main.ps1` |
 
 ---
 
