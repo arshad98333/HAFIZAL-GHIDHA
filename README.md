@@ -17,8 +17,8 @@ Deployed with `.\deploy.ps1` (pushes to GitHub, then rebuilds + redeploys
 both). Last verified working end-to-end: 2026-09-03.
 
 | Service | Base URL |
-|---------|----------|
-| **Web UI** | https://lively-river-053b63203.3.azurestaticapps.net |
+|---------|----------| 
+| **Web UI** | https://lively-river-053b63203.3.azurestaticapps.net | http://gidha.arshadify.online/
 | **API** | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io |
 | **OpenAPI / Swagger** | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/docs |
 | **ReDoc** | https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontainerapps.io/redoc |
