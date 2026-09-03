@@ -28,6 +28,12 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# PowerShell 7.3+ can treat ANY stderr line from a native command (git,
+# npm, az, docker -- even routine progress/warning text on success) as a
+# terminating error when combined with $ErrorActionPreference = "Stop".
+# Disable that so only real failures (checked via $LASTEXITCODE) stop
+# this script. No effect on Windows PowerShell 5.1.
+$PSNativeCommandUseErrorActionPreference = $false
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
 

@@ -27,6 +27,13 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# PowerShell 7.3+ treats ANY stderr line from a native command (even
+# git's routine progress text, e.g. "From https://..." on fetch or
+# "To https://..." on push) as a terminating error when combined with
+# $ErrorActionPreference = "Stop". Disable that so only real failures
+# (checked via $LASTEXITCODE below) stop the script. No effect on
+# Windows PowerShell 5.1, where this feature does not exist.
+$PSNativeCommandUseErrorActionPreference = $false
 $Root = $PSScriptRoot
 Set-Location $Root
 
