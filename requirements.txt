@@ -246,7 +246,7 @@ packaging==26.3
     #   marshmallow
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-flask
-pillow==11.0.0
+pillow==12.3.0
     # via reportlab
 propcache==0.5.2
     # via

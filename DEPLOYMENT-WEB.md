@@ -8,14 +8,25 @@ Deploy the FastAPI backend to **Azure Container Apps** (scale-to-zero) and the R
 - **Node.js 20+** (frontend build + SWA deploy)
 - `.env` with `MONGODB_URI`, `AZURE_OPENAI_ENDPOINT`
 - **No Docker required** — API image builds in Azure Container Registry
-- Optional, for the compliance Q&A chat (`/ask`, `POST /compliance/ask`):
-  `K2_API_KEY` in `.env`, **and confirm the Container App's network egress
-  reaches `api.k2think.ai`** before relying on it live — this integration was
-  previously removed from the pipeline after being network-blocked in a
-  different sandbox (see `TESTING_REPORT_azure_review_migration.md`); it has
-  not yet been confirmed reachable from the Container Apps environment
-  itself. If it can't reach it, the chat still degrades cleanly (503) rather
-  than breaking the rest of the API.
+- Optional, for the compliance Q&A chat (`/ask`, `POST /compliance/ask`) and
+  LiveOps narration: `K2_API_KEY` in `.env` (`deploy-azure-web.ps1` now reads
+  it and wires it into the Container App automatically — previously it was
+  documented here but never actually passed through, so the deployed chat
+  silently 503'd even with a valid key in `.env`). **Confirm the Container
+  App's network egress reaches `api.k2think.ai`** before relying on it live —
+  this integration was previously removed from the pipeline after being
+  network-blocked in a different sandbox (see
+  `TESTING_REPORT_azure_review_migration.md`); it has not yet been confirmed
+  reachable from the Container Apps environment itself. If it can't reach it,
+  the chat still degrades cleanly (503) rather than breaking the rest of the
+  API. If `K2_API_KEY` is left unset, the Ask/LiveOps chat returns 503 by
+  design; every other endpoint is unaffected.
+- The API app now runs with `minReplicas: 1` (was `0`) specifically so the
+  Ask/LiveOps SSE endpoints don't hit a cold-start request while the
+  container is still booting, which Azure's ingress can surface to the
+  browser as a bare `HTTP 500` with an empty body (indistinguishable from a
+  real server error). This costs a small always-on compute charge; drop it
+  back to `0` in `infra/web-stack.json` if that trade-off isn't wanted.
 
 ## One command (Windows)
 

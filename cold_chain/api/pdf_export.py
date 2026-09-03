@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import io
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_JUSTIFY
@@ -70,7 +70,7 @@ class DecisionTraceDocument:
     steps: list[DecisionStep]
     final_answer: str
     citation_eval: dict[str, object] | None
-    generated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    generated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 def _styles() -> dict[str, ParagraphStyle]:
@@ -132,11 +132,7 @@ def _kind_subtitle(kind: str) -> str:
 
 
 def _escape(text: str) -> str:
-    return (
-        text.replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-    )
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 def _paragraphs(text: str, style: ParagraphStyle) -> list[Paragraph]:
@@ -197,11 +193,28 @@ def _citation_table(citation_eval: dict[str, object], styles: dict[str, Paragrap
         return ", ".join(str(i) for i in items) if items else "-- none --"
 
     rows = [
-        [Paragraph("<b>Citation check</b>", styles["Body"]), Paragraph("<b>PASS -- all citations grounded</b>" if all_verified else "<b>REVIEW -- unverified citations found</b>", styles["Body"])],
+        [
+            Paragraph("<b>Citation check</b>", styles["Body"]),
+            Paragraph(
+                "<b>PASS -- all citations grounded</b>"
+                if all_verified
+                else "<b>REVIEW -- unverified citations found</b>",
+                styles["Body"],
+            ),
+        ],
         [Paragraph("Verified rule IDs", styles["Meta"]), Paragraph(_escape(joined(verified_rules)), styles["Meta"])],
-        [Paragraph("Unverified rule IDs", styles["Meta"]), Paragraph(_escape(joined(unverified_rules)), styles["Meta"])],
-        [Paragraph("Verified GSO clauses", styles["Meta"]), Paragraph(_escape(joined(f"GSO {g}" for g in verified_gso)), styles["Meta"])],
-        [Paragraph("Unverified GSO clauses", styles["Meta"]), Paragraph(_escape(joined(f"GSO {g}" for g in unverified_gso)), styles["Meta"])],
+        [
+            Paragraph("Unverified rule IDs", styles["Meta"]),
+            Paragraph(_escape(joined(unverified_rules)), styles["Meta"]),
+        ],
+        [
+            Paragraph("Verified GSO clauses", styles["Meta"]),
+            Paragraph(_escape(joined(f"GSO {g}" for g in verified_gso)), styles["Meta"]),
+        ],
+        [
+            Paragraph("Unverified GSO clauses", styles["Meta"]),
+            Paragraph(_escape(joined(f"GSO {g}" for g in unverified_gso)), styles["Meta"]),
+        ],
     ]
     table = Table(rows, colWidths=[45 * mm, 115 * mm])
     table.setStyle(

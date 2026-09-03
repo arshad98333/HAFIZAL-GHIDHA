@@ -25,7 +25,13 @@
     "foundryProjectEndpoint": { "type": "string" },
     "foundryComputeCluster": { "type": "string" },
     "foundryBaseModel": { "type": "string" },
-    "trainingRegion": { "type": "string" }
+    "trainingRegion": { "type": "string" },
+    "k2ApiKey": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": { "description": "K2-Think API key for the compliance Ask chat and LiveOps narration. Leave empty to deploy with those features disabled (they will return 503)." }
+    },
+    "k2BaseUrl": { "type": "string", "defaultValue": "https://api.k2think.ai/v1" }
   },
   "variables": {
     "suffix": "[uniqueString(resourceGroup().id)]",
@@ -78,12 +84,16 @@
             {
               "name": "acr-password",
               "value": "[parameters('acrPassword')]"
+            },
+            {
+              "name": "k2-api-key",
+              "value": "[parameters('k2ApiKey')]"
             }
           ],
           "registries": "[if(not(empty(parameters('acrServer'))), createArray(createObject('server', parameters('acrServer'), 'username', parameters('acrUsername'), 'passwordSecretRef', 'acr-password')), createArray())]"
         },
         "template": {
-          "scale": { "minReplicas": 0, "maxReplicas": 3 },
+          "scale": { "minReplicas": 1, "maxReplicas": 3 },
           "containers": [
             {
               "name": "api",
@@ -95,7 +105,9 @@
                 { "name": "FOUNDRY_PROJECT_ENDPOINT", "value": "[parameters('foundryProjectEndpoint')]" },
                 { "name": "FOUNDRY_COMPUTE_CLUSTER", "value": "[parameters('foundryComputeCluster')]" },
                 { "name": "FOUNDRY_BASE_MODEL", "value": "[parameters('foundryBaseModel')]" },
-                { "name": "TRAINING_REGION", "value": "[parameters('trainingRegion')]" }
+                { "name": "TRAINING_REGION", "value": "[parameters('trainingRegion')]" },
+                { "name": "K2_API_KEY", "secretRef": "k2-api-key" },
+                { "name": "K2_BASE_URL", "value": "[parameters('k2BaseUrl')]" }
               ]
             }
           ]

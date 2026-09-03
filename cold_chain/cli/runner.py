@@ -93,7 +93,9 @@ def _prompt_template_hash(language: str, artifact_type: str) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()[:12]
 
 
-def _expand_allocation(alloc: dict[str, Any], wave: int, *, attempt_buffer: float = 1.0) -> list[simulate.GenerationRequest]:
+def _expand_allocation(
+    alloc: dict[str, Any], wave: int, *, attempt_buffer: float = 1.0
+) -> list[simulate.GenerationRequest]:
     n = max(1, int(round(alloc["count"] * attempt_buffer)))
     cell = lb.cell_key(alloc["product"], alloc["fault_mode"])
     langs = _round_robin(alloc["language_split"])
@@ -454,15 +456,11 @@ async def stage_generate(
         rate_per_minute=rate_per_minute,
     )
 
-    await _dispatch_generation_batch(
-        all_reqs, wave, azure, safety, book, engine_sha_val, settings, rate_per_minute
-    )
+    await _dispatch_generation_batch(all_reqs, wave, azure, safety, book, engine_sha_val, settings, rate_per_minute)
     await book.flush_generation()
 
     if max_records is None:
-        await _top_up_underfilled_cells(
-            wave, plan, book, azure, safety, settings, engine_sha_val, rate_per_minute
-        )
+        await _top_up_underfilled_cells(wave, plan, book, azure, safety, settings, engine_sha_val, rate_per_minute)
 
     await book.update_coverage(wave)
     log_extra(log, 20, "generation complete", n=len(all_reqs))
@@ -575,16 +573,16 @@ async def stage_train(
 ) -> dict[str, Any]:
     """Submits the SFT job via the training adapter (or dry-run preflight)."""
     submitter = FoundryTrainingSubmitter(settings)
-    export_path = str(Path(__file__).resolve().parent.parent.parent / "exports" / f"generation_log_wave{wave:02d}.jsonl")
+    export_path = str(
+        Path(__file__).resolve().parent.parent.parent / "exports" / f"generation_log_wave{wave:02d}.jsonl"
+    )
     result = await submitter.submit(wave, dataset_hash=dataset_hash, export_path=export_path, dry_run=dry_run)
     await book.write_json(wave, "train_submission.json", result)
     log_extra(log, 20, "training job submitted" if not dry_run else "training dry-run", **result)
     return result
 
 
-async def stage_preflight(
-    wave: int, settings: Settings, book: lb.Logbook
-) -> dict[str, Any]:
+async def stage_preflight(wave: int, settings: Settings, book: lb.Logbook) -> dict[str, Any]:
     """Readiness check for train and Gate B without side effects."""
     from cold_chain.adapters.training import preflight_check
 

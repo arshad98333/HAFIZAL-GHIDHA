@@ -28,9 +28,10 @@ import argparse
 import asyncio
 import subprocess
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -206,7 +207,9 @@ def _execute_profile(
     summary: dict[str, Any] = {}
     exit_code = 0
 
-    for spec in _profile_steps(profile, wave, max_records=max_records, rate_per_minute=rate_per_minute, skip_tests=skip_tests):
+    for spec in _profile_steps(
+        profile, wave, max_records=max_records, rate_per_minute=rate_per_minute, skip_tests=skip_tests
+    ):
         cmd = spec.build_cmd()
         if spec.capture_json:
             rc, parsed, output = capture_json_stdout(cmd)
@@ -334,7 +337,9 @@ def cmd_step(args: argparse.Namespace) -> int:
             ],
         )
     if name in ("train", "gate-b"):
-        return _run_subprocess(name, [py, "-m", "cold_chain.runner", name, "--wave", str(args.wave)], stop_on_fail=False)
+        return _run_subprocess(
+            name, [py, "-m", "cold_chain.runner", name, "--wave", str(args.wave)], stop_on_fail=False
+        )
     print(f"error: unknown step {name!r}", file=sys.stderr)
     return 2
 

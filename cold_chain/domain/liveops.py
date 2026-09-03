@@ -317,7 +317,9 @@ def build_narration_messages(
         for sid, title in LIVEOPS_STEPS
         if sid in prior_outputs
     )
-    officer_block = f"\n\nOFFICER NOTE (optional, free text from the compliance officer):\n{officer_note}" if officer_note else ""
+    officer_block = (
+        f"\n\nOFFICER NOTE (optional, free text from the compliance officer):\n{officer_note}" if officer_note else ""
+    )
     header = (
         f"SCENARIO FACTS:\n{scenario_facts_block(scenario)}"
         f"{officer_block}\n\nCONTEXT (law/guardrail data you may cite from):\n{context_block}"

@@ -67,6 +67,7 @@ _MAX_CONNECT_ATTEMPTS = 5
 _BACKOFF_BASE_S = 2.0
 _BACKOFF_MAX_S = 30.0
 
+
 class K2Error(RuntimeError):
     """K2 endpoint unreachable, unauthorized, or returned a malformed stream."""
 

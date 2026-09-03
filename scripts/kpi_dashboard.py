@@ -33,11 +33,7 @@ def _holdout_count(rows: list[dict]) -> int:
     import hashlib
 
     kept = [r for r in rows if r.get("outcome") == "kept"]
-    return sum(
-        1
-        for r in kept
-        if int(hashlib.sha256(r["state_id"].encode()).hexdigest()[:8], 16) % 100 < 5
-    )
+    return sum(1 for r in kept if int(hashlib.sha256(r["state_id"].encode()).hexdigest()[:8], 16) % 100 < 5)
 
 
 def _cmd_ok(cmd: list[str]) -> bool:
@@ -56,13 +52,24 @@ async def score_wave(wave: int) -> dict:
 
     kept = [r for r in rows if r.get("outcome") == "kept"]
     metrics = (gate_a or {}).get("metrics") or {}
-    gate_a_scores = kpi.score_gate_a_metrics(metrics) if metrics else [
-        kpi.KpiScore(name, 5.0, "run gate-a first", {}) for name in [
-            "schema_validity", "round_trip_recovery", "screener_calibration",
-            "corpus_uniqueness", "cell_balance", "class_balance",
-            "leakage_resistance", "qualitative_review", "guardrail_integrity",
+    gate_a_scores = (
+        kpi.score_gate_a_metrics(metrics)
+        if metrics
+        else [
+            kpi.KpiScore(name, 5.0, "run gate-a first", {})
+            for name in [
+                "schema_validity",
+                "round_trip_recovery",
+                "screener_calibration",
+                "corpus_uniqueness",
+                "cell_balance",
+                "class_balance",
+                "leakage_resistance",
+                "qualitative_review",
+                "guardrail_integrity",
+            ]
         ]
-    ]
+    )
 
     train_preflight = preflight_check(settings, wave, export_path=export_path)
     training_score = kpi.score_training_readiness(

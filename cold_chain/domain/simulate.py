@@ -260,7 +260,7 @@ def render_prompt(
     for f in state.missing_fields:
         visible.pop(f, None)
     jurisdiction_line = f" {_JURISDICTION_CONTEXT[jurisdiction]}" if jurisdiction in _JURISDICTION_CONTEXT else ""
-    variant_idx = (style_seed if style_seed is not None else hash(state.product) % len(_RENDER_STYLE_VARIANTS))
+    variant_idx = style_seed if style_seed is not None else hash(state.product) % len(_RENDER_STYLE_VARIANTS)
     style_line = _RENDER_STYLE_VARIANTS[variant_idx % len(_RENDER_STYLE_VARIANTS)]
     return (
         "You are rendering a realistic GCC cold-chain field artifact from structured sensor data. "

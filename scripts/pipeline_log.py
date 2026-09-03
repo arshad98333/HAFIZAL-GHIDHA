@@ -46,7 +46,9 @@ def start_run(wave: int, *, label: str = "rescore") -> dict[str, Any]:
     }
 
 
-def append_step(run: dict[str, Any], name: str, cmd: list[str], exit_code: int, *, extra: dict[str, Any] | None = None) -> None:
+def append_step(
+    run: dict[str, Any], name: str, cmd: list[str], exit_code: int, *, extra: dict[str, Any] | None = None
+) -> None:
     step: dict[str, Any] = {
         "name": name,
         "command": cmd,

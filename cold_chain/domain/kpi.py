@@ -112,9 +112,7 @@ def score_gate_a_metrics(metrics: dict[str, float]) -> list[KpiScore]:
         ),
         KpiScore(
             "guardrail_integrity",
-            _clamp(
-                _linear(metrics.get("guardrail_violation_rate", 1.0), good=0.01, bad=0.08, higher_is_better=False)
-            ),
+            _clamp(_linear(metrics.get("guardrail_violation_rate", 1.0), good=0.01, bad=0.08, higher_is_better=False)),
             "regex guardrail hits on kept records",
             {"value": metrics.get("guardrail_violation_rate")},
         ),

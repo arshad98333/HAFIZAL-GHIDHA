@@ -36,17 +36,17 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any
 
+from . import guardrails as gr
+from . import knowledge_base as kb
+from .catalog import JURISDICTIONS, PRODUCTS
+from .rules_engine import SPECS
+
 # Every rule_id in the guardrail pack matches this shape: a 2-letter country
 # code or "GCC", then EDGE or NORM, then a zero-padded number -- see
 # guardrails/README.md. Used by evaluate_citations() below to find every
 # rule ID the model *claims* to cite, so it can be checked against what was
 # actually retrieved.
 _RULE_ID_PATTERN = re.compile(r"\b(?:GCC|AE|SA|QA|KW|OM|BH)-(?:EDGE|NORM)-\d{3}\b")
-
-from . import guardrails as gr
-from . import knowledge_base as kb
-from .catalog import JURISDICTIONS, PRODUCTS
-from .rules_engine import SPECS
 
 # A GSO (GCC Standardization Organization) instrument code, e.g. "GSO 150-1",
 # "GSO 9", "GSO 2500". Used by evaluate_citations() below for the same
@@ -85,13 +85,46 @@ def _known_gso_codes() -> frozenset[str]:
     haystack = "\n".join(blobs)
     return frozenset(m.group(1).upper() for m in _GSO_CODE_PATTERN.finditer(haystack))
 
+
 # -- retrieval -------------------------------------------------------------- #
 
 _STOPWORDS = {
-    "the", "a", "an", "is", "are", "was", "were", "this", "that", "to", "of",
-    "in", "on", "for", "and", "or", "but", "does", "do", "did", "can", "it",
-    "its", "shows", "during", "mins", "min", "minutes", "with", "at", "by",
-    "as", "be", "if", "so", "not",
+    "the",
+    "a",
+    "an",
+    "is",
+    "are",
+    "was",
+    "were",
+    "this",
+    "that",
+    "to",
+    "of",
+    "in",
+    "on",
+    "for",
+    "and",
+    "or",
+    "but",
+    "does",
+    "do",
+    "did",
+    "can",
+    "it",
+    "its",
+    "shows",
+    "during",
+    "mins",
+    "min",
+    "minutes",
+    "with",
+    "at",
+    "by",
+    "as",
+    "be",
+    "if",
+    "so",
+    "not",
 }
 
 
@@ -151,7 +184,9 @@ def _score_rule(rule: dict[str, Any], query_terms: set[str]) -> int:
     return len(query_terms & _tokenize(haystack))
 
 
-def retrieve(question: str, jurisdiction: str | None = None, product: str | None = None, top_k: int = 6) -> RetrievedContext:
+def retrieve(
+    question: str, jurisdiction: str | None = None, product: str | None = None, top_k: int = 6
+) -> RetrievedContext:
     """Best-effort keyword retrieval over the guardrail pack, scoped to a
     jurisdiction if one is given (or mentioned in the question) and scored
     against the question's own terms. Always includes the base (GCC-wide)
@@ -299,9 +334,7 @@ def build_step_messages(
     multi-section completion) so the UI's 4 nodes reflect 4 real reasoning
     passes, each conditioned on the previous step's actual output."""
     history = "\n\n".join(
-        f"--- {title} (already completed) ---\n{prior_outputs[sid]}"
-        for sid, title in STEPS
-        if sid in prior_outputs
+        f"--- {title} (already completed) ---\n{prior_outputs[sid]}" for sid, title in STEPS if sid in prior_outputs
     )
     header = f"USER QUESTION:\n{question}\n\nCONTEXT:\n{context_block}"
     if history:

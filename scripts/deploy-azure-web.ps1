@@ -142,9 +142,14 @@ $foundryCluster = Resolve-PlaceholderValue (Get-DotEnvValue "FOUNDRY_COMPUTE_CLU
 $foundryModel = Resolve-PlaceholderValue (Get-DotEnvValue "FOUNDRY_BASE_MODEL") "unused"
 $trainingRegion = Get-DotEnvValue "TRAINING_REGION"
 if (-not $trainingRegion) { $trainingRegion = $Location }
+$k2ApiKey = Get-DotEnvValue "K2_API_KEY"
+if (-not $k2ApiKey) { $k2ApiKey = "" }
+$k2BaseUrl = Get-DotEnvValue "K2_BASE_URL"
+if (-not $k2BaseUrl) { $k2BaseUrl = "https://api.k2think.ai/v1" }
 
 if (-not $mongodbUri) { Write-Error 'MONGODB_URI missing in .env' }
 if (-not $openAiEndpoint) { Write-Error 'AZURE_OPENAI_ENDPOINT missing in .env' }
+if (-not $k2ApiKey) { Write-Host 'Warning: K2_API_KEY missing in .env -- the compliance Ask chat and LiveOps narration will return 503 on this deployment.' -ForegroundColor Yellow }
 
 $acrServer = ""
 $acrUsername = ""
@@ -250,6 +255,8 @@ $paramValues = @{
     foundryComputeCluster  = $foundryCluster
     foundryBaseModel       = $foundryModel
     trainingRegion         = $trainingRegion
+    k2ApiKey               = $k2ApiKey
+    k2BaseUrl              = $k2BaseUrl
     acrServer              = $acrServer
     acrUsername            = $acrUsername
     acrPassword            = $acrPassword

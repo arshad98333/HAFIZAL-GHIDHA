@@ -124,9 +124,7 @@ def run_simulation(req: SimulateRequest) -> SimulateResponse:
         SimulateStep(
             id="guardrails",
             title="Guardrail scan",
-            detail=(
-                f"{len(violations)} violation(s): {', '.join(violation_codes) or 'none'}"
-            ),
+            detail=(f"{len(violations)} violation(s): {', '.join(violation_codes) or 'none'}"),
             status="done" if not violations else "warn",
         ),
     ]

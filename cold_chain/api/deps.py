@@ -7,8 +7,8 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 
-from cold_chain.adapters import logbook as lb
 from cold_chain.adapters import k2_client as k2
+from cold_chain.adapters import logbook as lb
 from cold_chain.api.jobs import Job, job_manager
 from cold_chain.config import Settings, get_settings
 
