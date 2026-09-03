@@ -150,6 +150,9 @@ class Logbook:
         await db.access_audit.create_index([("allowed", 1)])
         await db.gate_b_deliberation.create_index([("wave", 1)])
         await db.live_logs.create_index([("ts", 1)], expireAfterSeconds=30 * 24 * 3600)
+        await db.qa_log.create_index([("ts", -1)])
+        await db.qa_log.create_index([("jurisdiction", 1)])
+        await db.qa_log.create_index([("kind", 1)])
 
     # ----------------------------------------------------------------- #
     # Gate B deliberation trail — the audit surface that replaces a human
@@ -335,6 +338,58 @@ class Logbook:
     # access audit — standing constraint #2: the golden set is never mounted
     # into an agent environment. This is the trail that proves it held.
     # ----------------------------------------------------------------- #
+
+    # ----------------------------------------------------------------- #
+    # compliance Q&A chat (/compliance/ask) audit trail -- one document per
+    # question, holding the retrieved context and every chained step's
+    # output. This is the record a human reviews if K2 said something
+    # wrong; it is not read by anything else in the pipeline.
+    # ----------------------------------------------------------------- #
+
+    async def write_qa_log(
+        self,
+        *,
+        question: str,
+        jurisdiction: str | None,
+        product: str | None,
+        context_block: str,
+        steps: list[dict[str, Any]],
+        status: str,
+        error: str | None = None,
+        citation_eval: dict[str, Any] | None = None,
+        retry_count: int = 0,
+        kind: str = "ask",
+        scenario: dict[str, Any] | None = None,
+    ) -> None:
+        assert self._db is not None
+        await self._db.qa_log.insert_one(
+            {
+                # kind distinguishes /compliance/ask ("ask") from LiveOps
+                # narrations ("liveops") in the same collection -- one audit
+                # trail, not two, since both are K2 chains grounded the same
+                # way and reviewed the same way.
+                "kind": kind,
+                "question": question,
+                "jurisdiction": jurisdiction,
+                "product": product,
+                "context_block": context_block,
+                "steps": steps,
+                "status": status,
+                "error": error,
+                # citation_eval: compliance_qa.evaluate_citations() output --
+                # which rule IDs the model cited vs. which were actually
+                # retrieved. retry_count: how many K2 rate-limit/backoff
+                # cycles this exchange needed (K2's tier is low-RPM).
+                "citation_eval": citation_eval,
+                "retry_count": retry_count,
+                # scenario: the full TruckScenario payload for a LiveOps
+                # narration (None for /compliance/ask entries) -- lets a
+                # human reviewer see exactly what the model was narrating.
+                "scenario": scenario,
+                "run_id": self._run_id,
+                "ts": _now(),
+            }
+        )
 
     async def audit_access(self, principal: str, resource: str, action: str, allowed: bool) -> None:
         assert self._db is not None

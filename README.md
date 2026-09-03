@@ -110,44 +110,21 @@ Example: `POST https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontai
 
 | Goal | Windows (PowerShell) | Linux / macOS |
 |------|----------------------|---------------|
-| **First-time GitHub link** | `.\scripts\connect-github.ps1` | `git remote add origin …; git pull origin main` |
 | **Setup** (venv + deps) | `python -m venv venv; .\venv\Scripts\Activate.ps1; pip install -r requirements-dev.txt` | `make install` |
-| **Update** (git pull + deps) | `.\scripts\update-all.ps1` | `make update-all` |
-| **Update + deploy Azure** | `.\scripts\update-all.ps1 -Deploy` | see DEPLOYMENT-WEB.md |
-| **Auto-update from GitHub** | `.\scripts\watch-github.ps1` | `watch -n 60 git pull origin main` |
 | **Re-score** existing data | `.\scripts\run.ps1` | `make run` |
 | **Smoke test** (10 records) | `.\scripts\run.ps1 -Profile smoke` | `make run-smoke` |
 | **Full wave** (~663 records) | `.\scripts\run.ps1 -Profile wave` | `make run-wave` |
 | **Start API** | `.\scripts\api_server.ps1` | `make api` |
 | **Start web UI** | `.\scripts\ui.ps1` | `make ui` |
 | **Try simulation** | Open http://127.0.0.1:5173/simulation | same |
-| **Deploy to Azure only** | `.\scripts\deploy-azure-web.ps1` | see DEPLOYMENT-WEB.md |
-| **Mirror to `-main` folder** (optional) | `.\scripts\update-all.ps1 -MirrorDesktop` | N/A |
+| **Deploy to Azure** | `.\scripts\deploy-azure-web.ps1` | see DEPLOYMENT-WEB.md |
+| **Pull latest main** (bootstrap) | `.\scripts\pull-main.ps1` | `git pull origin main` |
+| **Update all** (git + deps + sync) | `.\scripts\update-all.ps1` | `make update-all` |
+| **Update + deploy Azure** | `.\scripts\update-all.ps1 -Deploy` | `make update-all DEPLOY=1` |
+| **Sync to `-main` folder** | `.\scripts\watch-sync-desktop.ps1` | `./scripts/sync-desktop-folder.ps1` |
 | **Health check** | `python -m cold_chain.runner health` | `make health` |
 
 Open **http://127.0.0.1:5173** (UI) · **http://127.0.0.1:8080/docs** (API)
-
-### Windows workflow (recommended)
-
-Work in **one folder** — your git clone (`HAFIZAL-GHIDHA`). No second copy required.
-
-```powershell
-# 1) One-time: link folder to GitHub
-.\scripts\connect-github.ps1
-
-# 2) One-time: Python + Node deps
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements-dev.txt
-copy .env.example .env   # fill MONGODB_URI, AZURE_OPENAI_*, etc.
-
-# 3) Leave running in a terminal — auto-pulls when GitHub main changes
-.\scripts\watch-github.ps1
-
-# 4) Manual update or deploy (other terminal)
-.\scripts\update-all.ps1
-.\scripts\update-all.ps1 -Deploy
-```
 
 ---
 
@@ -204,6 +181,7 @@ VITE_API_PROXY_TARGET=http://127.0.0.1:8080
 |------|-----|---------|
 | Landing | `/` | GSO business value, SEO |
 | **Simulation** | `/simulation` | Interactive demo: inputs → temps → rules engine |
+| **Ask** | `/ask` | Free-form compliance Q&A chat, grounded in the guardrail pack, streamed as a 4-step reasoning chain (K2-Think-v2, optional — see `K2_API_KEY`) |
 | Dashboard | `/dashboard` | Wave audit, Gate A, health |
 | Pipeline | `/pipeline` | Trigger plan / generate / gate-a |
 | Guide | `/guide` | Copy-paste single commands |
@@ -242,8 +220,39 @@ For local development, base URL is **http://127.0.0.1:8080**. See [Live deployme
 | GET | `/jobs/{id}` | Job status |
 | GET | `/ledger` | Training ledger |
 | GET | `/coverage` | Coverage matrix |
+| POST | `/compliance/ask` | Compliance Q&A chat — SSE stream of a 4-step reasoning chain over K2-Think-v2, grounded in `guardrails/` + `gcc_food_law_json/`. 503 if `K2_API_KEY` is unset. |
 
 Full OpenAPI: **http://127.0.0.1:8080/docs**
+
+---
+
+## Compliance Q&A chat (K2-Think-v2)
+
+The `/ask` page and `POST /compliance/ask` let you ask a free-form cold-chain
+compliance question and watch a 4-step reasoning chain run live over SSE:
+Intent Extraction & Law Anchoring → Constraint & Variable Mapping →
+Strategic Counterfactual Analysis → Final Recommendation Synthesis. Each step
+is a real, independent call to K2-Think-v2 (MBZUAI), grounded only in this
+repo's own `guardrails/` pack and `gcc_food_law_json/` citations — the model
+is instructed to say a clause isn't in the loaded pack rather than invent
+one. Every exchange is written to the `qa_log` Mongo collection.
+
+Set in `.env` (optional — the feature reports 503 rather than failing the
+whole API if unset):
+
+```
+K2_API_KEY=your-key
+K2_BASE_URL=https://api.k2think.ai/v1
+K2_MODEL=MBZUAI-IFM/K2-Think-v2
+K2_MAX_CONCURRENCY=4
+```
+
+This is unrelated to the training pipeline's Azure OpenAI render/screen/judge
+path — see `TESTING_REPORT_azure_review_migration.md` for why K2 was removed
+from *that* path previously. **Before relying on this in production**,
+confirm the deployed API container (Azure Container Apps) actually has
+network egress to `api.k2think.ai` — that was the failure mode that shut
+down the earlier K2 integration.
 
 ---
 
@@ -277,8 +286,7 @@ See [DEPLOYMENT-WEB.md](DEPLOYMENT-WEB.md) for details. Batch pipeline: [DEPLOYM
 | Gate A fails on rescore | Reset MongoDB: `python scripts/reset_pipeline_state.py --yes --wave 1` then `.\scripts\run.ps1 -Profile wave` |
 | PowerShell parse error | `git pull origin main` (ASCII-only `.ps1` scripts) |
 | UI cannot reach API | Start API first; check `frontend/.env` proxy target |
-| Script not found / repo behind GitHub | `.\scripts\connect-github.ps1` then `.\scripts\update-all.ps1` |
-| Want GitHub changes automatically | `.\scripts\watch-github.ps1` (leave terminal open) |
+| `update-all.ps1` not found | Repo is behind GitHub `main`. Run `.\scripts\sync-desktop-folder.ps1` (fetches latest), then `.\scripts\update-all.ps1`. Or: `git pull origin main` / `.\scripts\pull-main.ps1` |
 
 ---
 

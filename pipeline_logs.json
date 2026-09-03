@@ -1,5 +1,401 @@
 {
   "version": 1,
   "description": "Pipeline run logs (profiles: smoke, wave, rescore, full)",
-  "runs": []
+  "runs": [
+    {
+      "id": "0b1ad5ad-121a-49fc-8f17-353194044780",
+      "label": "rescore",
+      "wave": 1,
+      "started_at": "2026-09-02T17:51:49Z",
+      "finished_at": "2026-09-02T17:54:27Z",
+      "host": "DESKTOP-90KBJMH",
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python": "3.14.3",
+      "steps": [
+        {
+          "name": "gate-a",
+          "command": [
+            "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\venv\\Scripts\\python.exe",
+            "-m",
+            "cold_chain.runner",
+            "gate-a",
+            "--wave",
+            "1"
+          ],
+          "exit_code": 2,
+          "status": "exit_2",
+          "finished_at": "2026-09-02T17:53:53Z"
+        },
+        {
+          "name": "export",
+          "command": [
+            "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\venv\\Scripts\\python.exe",
+            "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\scripts\\export_wave.py",
+            "--wave",
+            "1"
+          ],
+          "exit_code": 0,
+          "status": "ok",
+          "finished_at": "2026-09-02T17:53:59Z"
+        },
+        {
+          "name": "kpi",
+          "command": [
+            "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\venv\\Scripts\\python.exe",
+            "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\scripts\\kpi_dashboard.py",
+            "--wave",
+            "1",
+            "--json"
+          ],
+          "exit_code": 2,
+          "status": "exit_2",
+          "finished_at": "2026-09-02T17:54:17Z",
+          "extra": {
+            "result": {
+              "wave": 1,
+              "gate_a_passed": false,
+              "training_preflight": {
+                "ready": true,
+                "wave": 1,
+                "export_path": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+                "checks": {
+                  "foundry_project": {
+                    "ok": true,
+                    "detail": "FOUNDRY_PROJECT_ENDPOINT"
+                  },
+                  "compute_cluster": {
+                    "ok": true,
+                    "detail": "FOUNDRY_COMPUTE_CLUSTER"
+                  },
+                  "base_model": {
+                    "ok": true,
+                    "detail": "FOUNDRY_BASE_MODEL"
+                  },
+                  "training_region": {
+                    "ok": true,
+                    "detail": "TRAINING_REGION"
+                  },
+                  "export_file": {
+                    "ok": true,
+                    "detail": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+                    "lines": 750
+                  },
+                  "training_module": {
+                    "ok": true,
+                    "detail": "training.sft"
+                  }
+                }
+              },
+              "scores": {
+                "schema_validity": {
+                  "score": 9.6,
+                  "detail": "extraction schema pass rate across all attempts",
+                  "value": 0.9909560723514211
+                },
+                "round_trip_recovery": {
+                  "score": 10.0,
+                  "detail": "kept records whose extractor recovers ground-truth ranges",
+                  "value": 1.0
+                },
+                "screener_calibration": {
+                  "score": 5.3,
+                  "detail": "screener/guardrail/safety drop rate (target 2–8%)",
+                  "value": 0.0012919896640826874
+                },
+                "corpus_uniqueness": {
+                  "score": 1.0,
+                  "detail": "stratified near-duplicate rate on kept text",
+                  "value": 0.43333333333333335
+                },
+                "cell_balance": {
+                  "score": 8.0,
+                  "detail": "survival-adjusted deviation from plan cell targets",
+                  "value": 0.15668058598028478
+                },
+                "class_balance": {
+                  "score": 10.0,
+                  "detail": "largest disposition share in kept records",
+                  "value": 0.42133333333333334
+                },
+                "leakage_resistance": {
+                  "score": 10.0,
+                  "detail": "bag-of-words probe accuracy on disposition (lower is better)",
+                  "value": 0.4374217772215269
+                },
+                "qualitative_review": {
+                  "score": 1.0,
+                  "detail": "language authenticity + judge-ensemble agreement",
+                  "language_authenticity": 2,
+                  "annotator_kappa": 0.0
+                },
+                "guardrail_integrity": {
+                  "score": 10.0,
+                  "detail": "regex guardrail hits on kept records",
+                  "value": 0.0
+                },
+                "training_readiness": {
+                  "score": 8.5,
+                  "detail": "Gate A pass, export on disk, Foundry config, training module",
+                  "gate_a_passed": false,
+                  "kept_count": 750,
+                  "export_exists": true,
+                  "preflight_ok": true
+                },
+                "inference_gate_b_readiness": {
+                  "score": 7.5,
+                  "detail": "student endpoint or human sealed-eval path, holdout pool size",
+                  "student_endpoint": false,
+                  "holdout_count": 36,
+                  "gate_b_ran": false,
+                  "gate_b_passed": null
+                },
+                "operational_maturity": {
+                  "score": 10.0,
+                  "detail": "one-command flow, health/ready, runbook, Makefile targets",
+                  "health_ok": true,
+                  "ready_ok": true,
+                  "local_run": true,
+                  "runbook": true,
+                  "makefile": true
+                }
+              },
+              "mean": 7.6,
+              "min": 1.0,
+              "all_above_target": false,
+              "below_target": [
+                "screener_calibration",
+                "corpus_uniqueness",
+                "qualitative_review"
+              ],
+              "target": 7.0
+            }
+          }
+        },
+        {
+          "name": "preflight",
+          "command": [
+            "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\venv\\Scripts\\python.exe",
+            "-m",
+            "cold_chain.runner",
+            "preflight",
+            "--wave",
+            "1"
+          ],
+          "exit_code": 0,
+          "status": "ok",
+          "finished_at": "2026-09-02T17:54:27Z",
+          "extra": {
+            "result": {
+              "wave": 1,
+              "training": {
+                "ready": true,
+                "wave": 1,
+                "export_path": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+                "checks": {
+                  "foundry_project": {
+                    "ok": true,
+                    "detail": "FOUNDRY_PROJECT_ENDPOINT"
+                  },
+                  "compute_cluster": {
+                    "ok": true,
+                    "detail": "FOUNDRY_COMPUTE_CLUSTER"
+                  },
+                  "base_model": {
+                    "ok": true,
+                    "detail": "FOUNDRY_BASE_MODEL"
+                  },
+                  "training_region": {
+                    "ok": true,
+                    "detail": "TRAINING_REGION"
+                  },
+                  "export_file": {
+                    "ok": true,
+                    "detail": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+                    "lines": 750
+                  },
+                  "training_module": {
+                    "ok": true,
+                    "detail": "training.sft"
+                  }
+                },
+                "gate_a_passed": false,
+                "kept_count": 750
+              },
+              "gate_b": {
+                "student_endpoint_configured": false,
+                "holdout_items": 36,
+                "auto_path_ready": false,
+                "human_path_ready": true,
+                "note": "Use gate-b --results <path> when no student endpoint is deployed"
+              }
+            }
+          }
+        }
+      ],
+      "summary": {
+        "kpi": {
+          "wave": 1,
+          "gate_a_passed": false,
+          "training_preflight": {
+            "ready": true,
+            "wave": 1,
+            "export_path": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+            "checks": {
+              "foundry_project": {
+                "ok": true,
+                "detail": "FOUNDRY_PROJECT_ENDPOINT"
+              },
+              "compute_cluster": {
+                "ok": true,
+                "detail": "FOUNDRY_COMPUTE_CLUSTER"
+              },
+              "base_model": {
+                "ok": true,
+                "detail": "FOUNDRY_BASE_MODEL"
+              },
+              "training_region": {
+                "ok": true,
+                "detail": "TRAINING_REGION"
+              },
+              "export_file": {
+                "ok": true,
+                "detail": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+                "lines": 750
+              },
+              "training_module": {
+                "ok": true,
+                "detail": "training.sft"
+              }
+            }
+          },
+          "scores": {
+            "schema_validity": {
+              "score": 9.6,
+              "detail": "extraction schema pass rate across all attempts",
+              "value": 0.9909560723514211
+            },
+            "round_trip_recovery": {
+              "score": 10.0,
+              "detail": "kept records whose extractor recovers ground-truth ranges",
+              "value": 1.0
+            },
+            "screener_calibration": {
+              "score": 5.3,
+              "detail": "screener/guardrail/safety drop rate (target 2–8%)",
+              "value": 0.0012919896640826874
+            },
+            "corpus_uniqueness": {
+              "score": 1.0,
+              "detail": "stratified near-duplicate rate on kept text",
+              "value": 0.43333333333333335
+            },
+            "cell_balance": {
+              "score": 8.0,
+              "detail": "survival-adjusted deviation from plan cell targets",
+              "value": 0.15668058598028478
+            },
+            "class_balance": {
+              "score": 10.0,
+              "detail": "largest disposition share in kept records",
+              "value": 0.42133333333333334
+            },
+            "leakage_resistance": {
+              "score": 10.0,
+              "detail": "bag-of-words probe accuracy on disposition (lower is better)",
+              "value": 0.4374217772215269
+            },
+            "qualitative_review": {
+              "score": 1.0,
+              "detail": "language authenticity + judge-ensemble agreement",
+              "language_authenticity": 2,
+              "annotator_kappa": 0.0
+            },
+            "guardrail_integrity": {
+              "score": 10.0,
+              "detail": "regex guardrail hits on kept records",
+              "value": 0.0
+            },
+            "training_readiness": {
+              "score": 8.5,
+              "detail": "Gate A pass, export on disk, Foundry config, training module",
+              "gate_a_passed": false,
+              "kept_count": 750,
+              "export_exists": true,
+              "preflight_ok": true
+            },
+            "inference_gate_b_readiness": {
+              "score": 7.5,
+              "detail": "student endpoint or human sealed-eval path, holdout pool size",
+              "student_endpoint": false,
+              "holdout_count": 36,
+              "gate_b_ran": false,
+              "gate_b_passed": null
+            },
+            "operational_maturity": {
+              "score": 10.0,
+              "detail": "one-command flow, health/ready, runbook, Makefile targets",
+              "health_ok": true,
+              "ready_ok": true,
+              "local_run": true,
+              "runbook": true,
+              "makefile": true
+            }
+          },
+          "mean": 7.6,
+          "min": 1.0,
+          "all_above_target": false,
+          "below_target": [
+            "screener_calibration",
+            "corpus_uniqueness",
+            "qualitative_review"
+          ],
+          "target": 7.0
+        },
+        "preflight": {
+          "wave": 1,
+          "training": {
+            "ready": true,
+            "wave": 1,
+            "export_path": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+            "checks": {
+              "foundry_project": {
+                "ok": true,
+                "detail": "FOUNDRY_PROJECT_ENDPOINT"
+              },
+              "compute_cluster": {
+                "ok": true,
+                "detail": "FOUNDRY_COMPUTE_CLUSTER"
+              },
+              "base_model": {
+                "ok": true,
+                "detail": "FOUNDRY_BASE_MODEL"
+              },
+              "training_region": {
+                "ok": true,
+                "detail": "TRAINING_REGION"
+              },
+              "export_file": {
+                "ok": true,
+                "detail": "C:\\Users\\HI\\Desktop\\HAFIZAL-GHIDHA-main\\exports\\generation_log_wave01.jsonl",
+                "lines": 750
+              },
+              "training_module": {
+                "ok": true,
+                "detail": "training.sft"
+              }
+            },
+            "gate_a_passed": false,
+            "kept_count": 750
+          },
+          "gate_b": {
+            "student_endpoint_configured": false,
+            "holdout_items": 36,
+            "auto_path_ready": false,
+            "human_path_ready": true,
+            "note": "Use gate-b --results <path> when no student endpoint is deployed"
+          }
+        }
+      }
+    }
+  ]
 }

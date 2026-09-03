@@ -3,6 +3,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useSimulation } from "../hooks/useSimulation";
 import { useI18n } from "../i18n/context";
 import { TemperatureChart } from "../components/TemperatureChart";
+import { PageExplainer } from "../components/PageExplainer";
 
 const PRODUCTS = ["finfish_seafood", "table_eggs", "chilled_dairy", "frozen_goods"] as const;
 const FAULTS = ["in_spec", "door_open", "compressor_fail", "setpoint_drift", "sensor_artifact"] as const;
@@ -42,6 +43,8 @@ export function SimulationPage() {
         <h1 className="text-3xl font-bold text-gcc-navy">{t("simulation.title")}</h1>
         <p className="mt-3 text-slate-600 leading-relaxed">{t("simulation.subtitle")}</p>
       </div>
+
+      <PageExplainer whatKey="simulation.explainWhat" inputKey="simulation.explainInput" outputKey="simulation.explainOutput" />
 
       <form onSubmit={onSubmit} className="mt-8 grid gap-6 lg:grid-cols-[320px_1fr]">
         <fieldset className="card space-y-4">

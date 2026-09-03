@@ -1,6 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useI18n } from "../i18n/context";
-import { getApiDocsUrl } from "../api/client";
 
 export function Layout() {
   const { t, lang, setLang, dir } = useI18n();
@@ -21,24 +20,15 @@ export function Layout() {
             <NavLink to="/" className={navClass} end>
               {t("nav.home")}
             </NavLink>
-            <NavLink to="/dashboard" className={navClass}>
-              {t("nav.dashboard")}
-            </NavLink>
             <NavLink to="/simulation" className={navClass}>
               {t("nav.simulation")}
             </NavLink>
-            <NavLink to="/pipeline" className={navClass}>
-              {t("nav.pipeline")}
+            <NavLink to="/ask" className={navClass}>
+              {t("nav.ask")}
             </NavLink>
-            <NavLink to="/guide" className={navClass}>
-              {t("nav.guide")}
+            <NavLink to="/liveops" className={navClass}>
+              {t("nav.liveops")}
             </NavLink>
-            <NavLink to="/jobs" className={navClass}>
-              {t("nav.jobs")}
-            </NavLink>
-            <a href={getApiDocsUrl()} target="_blank" rel="noreferrer" className="text-sm text-slate-600 hover:text-gcc-navy">
-              {t("nav.apiDocs")}
-            </a>
           </nav>
           <div className="flex items-center gap-2">
             <button

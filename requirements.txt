@@ -246,6 +246,8 @@ packaging==26.3
     #   marshmallow
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-flask
+pillow==11.0.0
+    # via reportlab
 propcache==0.5.2
     # via
     #   aiohttp
@@ -284,6 +286,8 @@ referencing==0.37.0
     # via
     #   jsonschema
     #   jsonschema-specifications
+reportlab==4.2.5
+    # via -r requirements.in
 requests==2.34.2
     # via
     #   azure-core

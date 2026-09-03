@@ -5,7 +5,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from cold_chain.api.routes import data, health, jobs, pipeline, simulate, waves
+from cold_chain.api.routes import compliance, data, export, health, jobs, liveops, pipeline, simulate, waves
 
 
 def create_app() -> FastAPI:
@@ -30,6 +30,9 @@ def create_app() -> FastAPI:
     app.include_router(data.router)
     app.include_router(pipeline.router)
     app.include_router(jobs.router)
+    app.include_router(compliance.router)
+    app.include_router(liveops.router)
+    app.include_router(export.router)
 
     @app.get("/", tags=["meta"])
     def root() -> dict[str, str]:

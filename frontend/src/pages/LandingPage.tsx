@@ -21,14 +21,11 @@ export function LandingPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-white/85 sm:text-xl">{t("landing.subtitle")}</p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <Link to="/dashboard" className="btn-primary bg-white text-gcc-navy hover:bg-gcc-sand">
+            <Link to="/ask" className="btn-primary bg-white text-gcc-navy hover:bg-gcc-sand">
               {t("landing.ctaPrimary")}
             </Link>
             <Link to="/simulation" className="btn-secondary border-white/30 bg-transparent text-white hover:bg-white/10">
               {t("landing.ctaSimulation")}
-            </Link>
-            <Link to="/guide" className="btn-secondary border-white/30 bg-transparent text-white hover:bg-white/10">
-              {t("landing.ctaGuide")}
             </Link>
           </div>
           <p className="mt-8 text-sm font-medium tracking-widest text-gcc-gold">{t("landing.jurisdictions")}</p>

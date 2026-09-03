@@ -8,6 +8,14 @@ Deploy the FastAPI backend to **Azure Container Apps** (scale-to-zero) and the R
 - **Node.js 20+** (frontend build + SWA deploy)
 - `.env` with `MONGODB_URI`, `AZURE_OPENAI_ENDPOINT`
 - **No Docker required** — API image builds in Azure Container Registry
+- Optional, for the compliance Q&A chat (`/ask`, `POST /compliance/ask`):
+  `K2_API_KEY` in `.env`, **and confirm the Container App's network egress
+  reaches `api.k2think.ai`** before relying on it live — this integration was
+  previously removed from the pipeline after being network-blocked in a
+  different sandbox (see `TESTING_REPORT_azure_review_migration.md`); it has
+  not yet been confirmed reachable from the Container Apps environment
+  itself. If it can't reach it, the chat still degrades cleanly (503) rather
+  than breaking the rest of the API.
 
 ## One command (Windows)
 

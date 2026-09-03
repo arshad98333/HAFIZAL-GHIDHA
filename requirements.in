@@ -17,3 +17,4 @@ python-dotenv>=1.0
 fastapi>=0.115
 # Plain uvicorn (no [standard]): uvloop in [standard] does not support Windows.
 uvicorn>=0.30
+reportlab>=4.2

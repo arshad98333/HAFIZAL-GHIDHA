@@ -1,2 +1,17 @@
+# Normalize line endings to LF in the repository for everything except the
+# PowerShell scripts below (PowerShell 5.1 on Windows needs CRLF). Prevents
+# whole-file "modified" noise when files are edited/saved on Windows with
+# CRLF line endings but the repo canonically stores LF (.editorconfig).
+* text=auto eol=lf
+
 # PowerShell scripts must stay ASCII-safe for Windows PowerShell 5.1.
 *.ps1 text eol=crlf
+
+# Binary assets -- never text-normalize these.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.ico binary
+*.woff binary
+*.woff2 binary

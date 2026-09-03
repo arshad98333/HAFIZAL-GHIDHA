@@ -1,7 +1,8 @@
-# Emergency reset to match origin/main exactly (discards local commits).
-# Prefer: git pull --ff-only origin main
+# Pull latest main into this repo (bootstrap when update-all.ps1 is missing).
+# ASCII-only for Windows PowerShell 5.1.
 #
 #   .\scripts\pull-main.ps1
+#   .\scripts\pull-main.ps1 -Branch main
 
 param(
     [string]$Branch = "main"
@@ -27,8 +28,8 @@ if ($LASTEXITCODE -ne 0 -or $current -ne $Branch) {
 git reset --hard "origin/$Branch"
 if ($LASTEXITCODE -ne 0) { throw 'git reset failed' }
 
-Write-Host "Reset to origin/$Branch @ $(git rev-parse --short HEAD)"
+Write-Host "Updated to origin/$Branch @ $(git rev-parse --short HEAD)"
 Write-Host ""
 Write-Host "Next:"
 Write-Host "  .\scripts\update-all.ps1"
-Write-Host "  .\scripts\watch-github.ps1"
+Write-Host "  .\scripts\update-all.ps1 -Deploy"

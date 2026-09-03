@@ -97,6 +97,24 @@ class Settings(BaseSettings):
     foundry_base_model: str = Field(..., alias="FOUNDRY_BASE_MODEL")
     training_region: str = Field(..., alias="TRAINING_REGION")
 
+    # -- K2-Think-v2 (MBZUAI, UAE sovereign model) -----------------------------
+    # Used only by the compliance Q&A chat (`/compliance/ask`) for free-form,
+    # multi-step reasoning over edge-case questions. Entirely optional: if
+    # unset, the route reports the feature as unavailable rather than the
+    # whole API failing to start. This is a *separate* concern from the
+    # deterministic rules_engine (ground truth) and the Azure judge (training
+    # data QA) -- see cold_chain/domain/compliance_qa.py module docstring for
+    # why free-text answers here are grounded against guardrails/ and
+    # gcc_food_law_json/ rather than left to the model's own recall.
+    k2_api_key: str | None = Field(None, alias="K2_API_KEY")
+    k2_base_url: str = Field("https://api.k2think.ai/v1", alias="K2_BASE_URL")
+    k2_model: str = Field("MBZUAI-IFM/K2-Think-v2", alias="K2_MODEL")
+    # K2's account tier is low-RPM (confirmed by request) -- default kept low
+    # so concurrent /compliance/ask requests don't each burst independently;
+    # the real throttle is the shared singleton client's semaphore plus the
+    # retry/backoff in K2Client.stream_chat (see k2_client.py).
+    k2_max_concurrency: int = Field(2, alias="K2_MAX_CONCURRENCY")
+
     # -- knowledge base + guardrails (GCC food-law corpus) ---------------------
     # Read-only reference data shipped with the repo. Paths are resolved
     # relative to the repo root by default; override only for a non-standard
@@ -120,6 +138,8 @@ class Settings(BaseSettings):
             data["student_inference_key"] = "***"
         if data.get("content_safety_key"):
             data["content_safety_key"] = "***"
+        if data.get("k2_api_key"):
+            data["k2_api_key"] = "***"
         return data
 
     def __repr__(self) -> str:
