@@ -12,7 +12,9 @@ GSO-aligned cold-chain compliance AI for **Saudi Arabia, UAE, Qatar, Bahrain, Ku
 
 ## Live deployment (Azure)
 
-Production stack on Azure Container Apps (API, scale-to-zero) + Azure Static Web Apps (UI).
+Production stack on Azure Container Apps (API) + Azure Static Web Apps (UI).
+Deployed with `.\deploy.ps1` (pushes to GitHub, then rebuilds + redeploys
+both). Last verified working end-to-end: 2026-09-03.
 
 | Service | Base URL |
 |---------|----------|
@@ -108,16 +110,28 @@ Example: `POST https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontai
 
 ## One command per goal
 
+**Windows / VS Code — the 3 root command files (recommended):**
+
+| Goal | Command |
+|------|---------|
+| **Run backend locally** | `.\run-backend.ps1` |
+| **Run frontend locally** | `.\run-frontend.ps1` |
+| **Push to GitHub + deploy to Azure** | `.\deploy.ps1` |
+
+Each of these pulls the latest `main` first, so running them from VS Code
+always brings the project up to date. Details and troubleshooting: see
+[Run in VS Code, step by step](#run-in-vs-code-step-by-step) below and
+[VSCODE-GUIDE.md](VSCODE-GUIDE.md).
+
+**Other goals:**
+
 | Goal | Windows (PowerShell) | Linux / macOS |
 |------|----------------------|---------------|
 | **Setup** (venv + deps) | `python -m venv venv; .\venv\Scripts\Activate.ps1; pip install -r requirements-dev.txt` | `make install` |
 | **Re-score** existing data | `.\scripts\run.ps1` | `make run` |
 | **Smoke test** (10 records) | `.\scripts\run.ps1 -Profile smoke` | `make run-smoke` |
 | **Full wave** (~663 records) | `.\scripts\run.ps1 -Profile wave` | `make run-wave` |
-| **Start API** | `.\scripts\api_server.ps1` | `make api` |
-| **Start web UI** | `.\scripts\ui.ps1` | `make ui` |
 | **Try simulation** | Open http://127.0.0.1:5173/simulation | same |
-| **Deploy to Azure** | `.\scripts\deploy-azure-web.ps1` | see DEPLOYMENT-WEB.md |
 | **Pull latest main** (bootstrap) | `.\scripts\pull-main.ps1` | `git pull origin main` |
 | **Update all** (git + deps + sync) | `.\scripts\update-all.ps1` | `make update-all` |
 | **Update + deploy Azure** | `.\scripts\update-all.ps1 -Deploy` | `make update-all DEPLOY=1` |
@@ -125,6 +139,46 @@ Example: `POST https://gcc-coldchain-api.grayfield-8c57c3df.uaenorth.azurecontai
 | **Health check** | `python -m cold_chain.runner health` | `make health` |
 
 Open **http://127.0.0.1:5173** (UI) · **http://127.0.0.1:8080/docs** (API)
+
+---
+
+## Run in VS Code, step by step
+
+1. `File > Open Folder...` and open the repo folder (e.g.
+   `C:\Users\HI\Desktop\HAFIZAL-GHIDHA-main`).
+2. Make sure `.env` exists in the repo root with real values for
+   `MONGODB_URI`, `K2_API_KEY`, `K2_BASE_URL`, etc. (copy `.env.example` if
+   you don't have one).
+3. Open a terminal (`` Ctrl+` ``), split it into two (click the `+`), and run
+   one command in each:
+
+   **Terminal 1 — backend:**
+   ```powershell
+   .\run-backend.ps1
+   ```
+   Pulls latest `main`, installs Python deps, starts the API with reload on
+   `http://127.0.0.1:8080`.
+
+   **Terminal 2 — frontend:**
+   ```powershell
+   .\run-frontend.ps1
+   ```
+   Pulls latest `main`, runs `npm install`, starts Vite on
+   `http://127.0.0.1:5173`.
+4. Open **http://127.0.0.1:5173** in a browser — the dashboard talks to the
+   local backend automatically.
+5. When you're ready to publish a change, open a third terminal and run:
+   ```powershell
+   .\deploy.ps1
+   ```
+   This commits and pushes to GitHub (`main`), then rebuilds and redeploys
+   both the API (Azure Container Apps) and UI (Azure Static Web Apps) — see
+   [Live deployment](#live-deployment-azure) for the resulting URLs.
+
+Useful flags: `-NoPull` (skip the git pull), `-NoInstall` (skip
+pip/npm install), `-Port <n>` on the run scripts; `-SkipGitHub` /
+`-SkipAzure` / `-SkipApiImage` on `deploy.ps1`. Full guide with
+troubleshooting: [VSCODE-GUIDE.md](VSCODE-GUIDE.md).
 
 ---
 
@@ -158,13 +212,15 @@ make run-smoke
 
 **Terminal 1 — API:**
 ```powershell
-.\scripts\api_server.ps1          # Windows
+.\run-backend.ps1                  # Windows / VS Code (recommended -- see below)
+.\scripts\api_server.ps1          # Windows, older script
 make api                            # Linux/macOS
 ```
 
 **Terminal 2 — React dashboard:**
 ```powershell
-.\scripts\ui.ps1                    # Windows
+.\run-frontend.ps1                 # Windows / VS Code (recommended -- see below)
+.\scripts\ui.ps1                    # Windows, older script
 make ui                             # Linux/macOS
 ```
 
@@ -264,7 +320,14 @@ down the earlier K2 integration.
 | **UI** | Static Web Apps | `frontend/dist` |
 | **Pipeline batch** | Container Apps Job | `Dockerfile` |
 
-**One command (Windows, after `az login`):**
+**One command (Windows, after `az login`) — pushes to GitHub too:**
+
+```powershell
+.\deploy.ps1
+```
+
+Azure only (no GitHub push): `.\deploy.ps1 -SkipGitHub`, or call the
+underlying script directly:
 
 ```powershell
 .\scripts\deploy-azure-web.ps1
@@ -282,11 +345,14 @@ See [DEPLOYMENT-WEB.md](DEPLOYMENT-WEB.md) for details. Batch pipeline: [DEPLOYM
 
 | Issue | Fix |
 |-------|-----|
-| `uvicorn` not found on Windows | `.\scripts\api_server.ps1` (uses venv python) |
+| `uvicorn` not found on Windows | `.\run-backend.ps1` (uses its own venv) |
 | Gate A fails on rescore | Reset MongoDB: `python scripts/reset_pipeline_state.py --yes --wave 1` then `.\scripts\run.ps1 -Profile wave` |
 | PowerShell parse error | `git pull origin main` (ASCII-only `.ps1` scripts) |
 | UI cannot reach API | Start API first; check `frontend/.env` proxy target |
 | `update-all.ps1` not found | Repo is behind GitHub `main`. Run `.\scripts\sync-desktop-folder.ps1` (fetches latest), then `.\scripts\update-all.ps1`. Or: `git pull origin main` / `.\scripts\pull-main.ps1` |
+| `git push` says "no upstream branch" | Fixed as of `.\deploy.ps1` -- it always passes `-u/--set-upstream`. If you hit it outside `deploy.ps1`: `git push -u origin main` once. |
+| PowerShell throws `NativeCommandError`/`NativeCommandExitException` on a git call | Fixed in `run-backend.ps1` / `run-frontend.ps1` / `deploy.ps1` -- every git call now runs through an `Invoke-Git` helper that isolates `$ErrorActionPreference` per call instead of relying on `$PSNativeCommandUseErrorActionPreference` alone. `git pull origin main` to pick up the fix if you're on an older copy. |
+| "HTTP 500" (blank, no message) on the deployed `/ask` page | Was two Azure deploy gaps: `K2_API_KEY`/`K2_BASE_URL` were never wired into the Container App, and `minReplicas: 0` caused cold-start 500s. Both fixed in `infra/web-stack.json` / `scripts/deploy-azure-web.ps1` -- redeploy with `.\deploy.ps1`. |
 
 ---
 
