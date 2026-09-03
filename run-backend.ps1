@@ -40,6 +40,20 @@ function Test-Command([string]$Name) {
     return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
 }
 
+# Runs `git @GitArgs` without ever letting a stderr line or non-zero exit
+# code throw, regardless of PowerShell version/preference quirks -- see
+# deploy.ps1's Invoke-Git for why this exists as its own helper instead of
+# relying on $PSNativeCommandUseErrorActionPreference alone.
+function Invoke-Git {
+    param([Parameter(Mandatory)][string[]]$GitArgs)
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $output = & git @GitArgs 2>&1
+    $ErrorActionPreference = $prevEap
+    $script:LastGitOutput = ($output | Out-String).Trim()
+    return $LASTEXITCODE
+}
+
 Write-Host "=== [1/4] Update project from GitHub ===" -ForegroundColor Cyan
 if ($NoPull) {
     Write-Host "Skipped (-NoPull)."
@@ -48,13 +62,13 @@ if ($NoPull) {
 } elseif (-not (Test-Path (Join-Path $Root ".git"))) {
     Write-Host "Not a git repository yet -- run .\deploy.ps1 once first, or clone the repo normally." -ForegroundColor Yellow
 } else {
-    git fetch origin 2>$null
-    if ($LASTEXITCODE -ne 0) {
+    $exit = Invoke-Git @("fetch", "origin")
+    if ($exit -ne 0) {
         Write-Host "Could not reach GitHub (offline?) -- continuing with the code you already have." -ForegroundColor Yellow
     } else {
         $before = (git rev-parse HEAD 2>$null)
-        git merge --ff-only origin/main 2>$null
-        if ($LASTEXITCODE -ne 0) {
+        $exit = Invoke-Git @("merge", "--ff-only", "origin/main")
+        if ($exit -ne 0) {
             Write-Host "Could not fast-forward (you have local changes not on GitHub yet) -- continuing with your current code as-is." -ForegroundColor Yellow
             Write-Host "Run .\deploy.ps1 to push your local changes first, then re-run this." -ForegroundColor Yellow
         } else {

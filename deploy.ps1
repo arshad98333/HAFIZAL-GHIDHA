@@ -34,18 +34,37 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-# PowerShell 7.3+ treats ANY stderr line from a native command (even
-# git's routine progress text, e.g. "From https://..." on fetch or
-# "To https://..." on push) as a terminating error when combined with
-# $ErrorActionPreference = "Stop". Disable that so only real failures
-# (checked via $LASTEXITCODE below) stop the script. No effect on
-# Windows PowerShell 5.1, where this feature does not exist.
+# PowerShell 7.3+ can treat a native command's stderr output (even git's
+# routine progress text on a normal success, or its non-zero exit code) as
+# a terminating error when combined with $ErrorActionPreference = "Stop".
+# $PSNativeCommandUseErrorActionPreference is the documented switch for
+# this, but it has proven unreliable across different PowerShell builds --
+# so on top of setting it, every git call in this script goes through
+# Invoke-Git below, which runs with $ErrorActionPreference forced to
+# "Continue" for the duration of that one call. That makes this script's
+# native-command handling correct regardless of PSNativeCommandUseErrorActionPreference's
+# behavior on your specific PowerShell version. No effect on Windows
+# PowerShell 5.1, where none of this exists.
 $PSNativeCommandUseErrorActionPreference = $false
 $Root = $PSScriptRoot
 Set-Location $Root
 
 function Test-Command([string]$Name) {
     return [bool](Get-Command $Name -ErrorAction SilentlyContinue)
+}
+
+# Runs `git @GitArgs`, never lets a stderr line or non-zero exit code throw
+# regardless of PowerShell version/preference quirks, and captures the real
+# combined output in $script:LastGitOutput so callers can show it on
+# failure instead of guessing blind. Returns the process exit code.
+function Invoke-Git {
+    param([Parameter(Mandatory)][string[]]$GitArgs)
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    $output = & git @GitArgs 2>&1
+    $ErrorActionPreference = $prevEap
+    $script:LastGitOutput = ($output | Out-String).Trim()
+    return $LASTEXITCODE
 }
 
 # --- Step 1: GitHub ---------------------------------------------------------
@@ -67,38 +86,41 @@ if ($SkipGitHub) {
         Write-Host "Current branch is '$branch', not 'main'. Deploying from 'main' only -- switch first if this is unexpected." -ForegroundColor Yellow
     }
 
-    git fetch origin 2>$null
+    Invoke-Git @("fetch", "origin") | Out-Null
 
     $changes = git status --porcelain
     if ($changes) {
         Write-Host "Local changes found:"
         git status --short | ForEach-Object { Write-Host "  $_" }
 
-        git add -A
-        if ($LASTEXITCODE -ne 0) { throw "git add failed" }
+        $exit = Invoke-Git @("add", "-A")
+        if ($exit -ne 0) { Write-Error "git add failed:`n$script:LastGitOutput" }
 
         if (-not $Message) {
             $Message = "Update from local dev machine ($(Get-Date -Format 'yyyy-MM-dd HH:mm'))"
         }
-        git commit -m $Message
-        if ($LASTEXITCODE -ne 0) { throw "git commit failed" }
+        $exit = Invoke-Git @("commit", "-m", $Message)
+        if ($exit -ne 0) { Write-Error "git commit failed:`n$script:LastGitOutput" }
         Write-Host "Committed: $Message"
     } else {
         Write-Host "No local changes to commit."
     }
 
-    # Try a normal push first. If GitHub has commits we don't have locally,
-    # fast-forward-merge them in and retry once -- never force-push.
-    git push origin $branch 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Push rejected -- pulling latest from GitHub first..." -ForegroundColor Yellow
-        git merge --ff-only "origin/$branch" 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "GitHub has changes that don't fast-forward with your local history. Resolve manually (git pull / git merge) and re-run .\deploy.ps1."
+    # -u/--set-upstream is safe to pass every time: it's a no-op once the
+    # branch already tracks origin/$branch, and it's what fixes the "main
+    # has no upstream branch" error on a repo that was never pushed from
+    # this machine before.
+    $exit = Invoke-Git @("push", "-u", "origin", $branch)
+    if ($exit -ne 0) {
+        Write-Host "Push failed -- trying to sync with GitHub first:" -ForegroundColor Yellow
+        Write-Host $script:LastGitOutput
+        $exit = Invoke-Git @("merge", "--ff-only", "origin/$branch")
+        if ($exit -ne 0) {
+            Write-Error "GitHub has changes that don't fast-forward with your local history:`n$script:LastGitOutput`nResolve manually (git pull / git merge) and re-run .\deploy.ps1."
         }
-        git push origin $branch
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "git push failed even after syncing. Check your GitHub credentials (git push manually to see the real error)."
+        $exit = Invoke-Git @("push", "-u", "origin", $branch)
+        if ($exit -ne 0) {
+            Write-Error "git push failed even after syncing:`n$script:LastGitOutput"
         }
     }
 
